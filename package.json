@@ -10,7 +10,7 @@
 		"url": "https://github.com/dfgordon/vscode-language-applesoft"
 	},
 	"engines": {
-		"vscode": "~1.56.0"
+		"vscode": "^1.56.0"
 	},
 	"categories": [
 		"Other"
