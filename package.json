@@ -4,7 +4,7 @@
 	"description": "Language support for Applesoft BASIC",
 	"version": "0.0.1",
 	"license": "GPL-3.0-only",
-	"publisher": "gordon",
+	"publisher": "dfgordon",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/dfgordon/vscode-language-applesoft"
