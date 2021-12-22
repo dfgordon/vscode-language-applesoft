@@ -31,8 +31,7 @@
 		]
 	},
 	"dependencies": {
-		"tree-sitter": "^0.20",
-		"tree-sitter-applesoft": "^1.0.7"
+		"web-tree-sitter": "^0.19.4"
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

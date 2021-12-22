@@ -2,8 +2,6 @@
 
 Language support for Applesoft BASIC in Visual Studio Code.  Emulates behaviors of the Apple II ROM.
 
-**Important:** This extension is incompatible with VS Code versions > 1.56, due to an issue with compiling the underlying tree-sitter parser
-
 If you are viewing this on github, you can install the extension from VS Code by searching the Marketplace for `applesoft`.
 
 This extension uses semantic highlighting.  Here is an example:
