@@ -1,6 +1,6 @@
 10 DEF FN CUB(X1) = X1^3
 20 Y = ABS(X)
-30 Y = ASC(X)
+30 Y = ASC(A$)
 40 Y = ATN(X)
 50 Y = COS(X)
 60 Y = EXP(X)

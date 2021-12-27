@@ -5,3 +5,4 @@
 50 PRINT SPC(5);"HELLO WORLD": REM left parenthesis part of token
 60 A$ = STR$(X)
 70 PRINT TAB(1);"HELLO WORLD": REM left parenthesis part of token
+80 M = FRE(0)
