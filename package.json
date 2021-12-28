@@ -26,7 +26,8 @@
 				"id": "applesoft",
 				"extensions": [
 					".bas"
-				]
+				],
+				"configuration": "./language-configuration.json"
 			}
 		]
 	},

@@ -12,8 +12,10 @@ class VariableNameSentry
 		this.vars = new Set<string>();
 		this.shortnames = new Map<string,Set<string>>();
 	}
-	add(varname: string): string
+	add(curs: Parser.TreeCursor): string
 	{
+		const varname = curs.nodeText;
+		const colliding = [];
 		const parts = varname.replace(/ /g,'').split(/([$%()])/);
 		const basename = parts[0];
 		let trimmed = basename;
@@ -32,15 +34,20 @@ class VariableNameSentry
 				else
 					vals = new Set([trimmed]);
 				this.shortnames.set(key,vals);
-				let ans = "long variable name collision:\n";
 				for (const value of vals)
-					ans += value + ',';
-				return ans.substring(0,ans.length-1);
+					colliding.push(value);
 			}
 			else
 			{
 				this.shortnames.set(key,new Set([trimmed]));
 			}
+		}
+		if (colliding.length>1)
+		{
+			let s = "variable name collision:\n";
+			for (const c of colliding)
+				s += c + ",";
+			return s.substring(0,s.length-1);
 		}
 		return "";
 	}
@@ -101,7 +108,7 @@ export class TSDiagnosticProvider
 		}
 		if (["realvar","intvar","svar","real_scalar","int_scalar"].indexOf(curs.nodeType)>-1)
 		{
-			const s = vars.add(curs.nodeText);
+			const s = vars.add(curs);
 			if (s.length>0)
 				diag.push(new vscode.Diagnostic(rng,s,vscode.DiagnosticSeverity.Warning));
 		}

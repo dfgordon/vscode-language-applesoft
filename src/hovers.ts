@@ -108,7 +108,7 @@ export class TSHoverProvider implements vscode.HoverProvider
 			new vscode.MarkdownString('`FRE (expr)`')
 		]);
 		this.hmap.set("get_tok",[
-			new vscode.MarkdownString('Get a number of character from a keypress.  Displays a flashing prompt, but otherwise display is not affected.'),
+			new vscode.MarkdownString('Get a number or character from a keypress.  Displays blinking prompt, otherwise display is not affected.'),
 			new vscode.MarkdownString('`GET var`')
 		]);
 		this.hmap.set("gosub_tok",[
