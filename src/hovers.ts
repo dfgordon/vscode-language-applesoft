@@ -432,7 +432,7 @@ export class TSHoverProvider implements vscode.HoverProvider
 	provideHover(document:vscode.TextDocument,position: vscode.Position,token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover>
 	{
 		const hover = new Array<vscode.MarkdownString>();
-		const tree = this.parser.parse(document.getText());
+		const tree = this.parser.parse(document.getText()+"\n");
 		const cursor = tree.walk();
 		let recurse = true;
 		let finished = false;

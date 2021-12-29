@@ -107,7 +107,7 @@ export class TSSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
 
 		const tokensBuilder = new vscode.SemanticTokensBuilder(legend);
 
-		const tree = this.parser.parse(document.getText());
+		const tree = this.parser.parse(document.getText()+"\n");
 		const cursor = tree.walk();
 		let recurse = true;
 		let finished = false;

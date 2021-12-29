@@ -4,6 +4,7 @@ import * as path from 'path';
 import { TSHoverProvider } from './hovers';
 import { TSDiagnosticProvider } from './diagnostics';
 import { TSSemanticTokensProvider, legend } from './semanticTokens';
+import { TSCompletionProvider } from './completions';
 
 async function TreeSitterInit(): Promise<Parser>
 {
@@ -26,12 +27,14 @@ export function activate(context: vscode.ExtensionContext)
 		const diagnostics = new TSDiagnosticProvider(parser);
 		const tokens = new TSSemanticTokensProvider(parser);
 		const hovers = new TSHoverProvider(parser);
+		const completions = new TSCompletionProvider();
 		if (vscode.window.activeTextEditor)
 		{
 			diagnostics.update(vscode.window.activeTextEditor.document, collection);
 		}
 		vscode.languages.registerDocumentSemanticTokensProvider(selector,tokens,legend);
 		vscode.languages.registerHoverProvider(selector,hovers);
+		vscode.languages.registerCompletionItemProvider(selector,completions);
 
 		context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor =>
 		{

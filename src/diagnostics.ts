@@ -162,6 +162,22 @@ export class TSDiagnosticProvider
 			if (v)
 				this.value_range(diag,v,0,7);
 		}
+		if (curs.nodeType=="wait_tok")
+		{
+			const addr = curs.currentNode().nextNamedSibling;
+			if (addr)
+			{
+				this.value_range(diag,addr,-32767,65535);
+				const mask = addr.nextNamedSibling;
+				if (mask)
+				{
+					this.value_range(diag,mask,0,255);
+					const val = mask.nextNamedSibling;
+					if (val)
+						this.value_range(diag,val,0,255);
+				}
+			}
+		}
 		return true;
 	}
 	process_line_number(diag: Array<vscode.Diagnostic>,nums: Array<number>,curs: Parser.TreeCursor)
@@ -186,7 +202,7 @@ export class TSDiagnosticProvider
 			const vars = new VariableNameSentry();
 			const line_numbers = Array<number>();
 			const diag = Array<vscode.Diagnostic>();
-			const syntaxTree = this.parser.parse(document.getText());
+			const syntaxTree = this.parser.parse(document.getText()+"\n");
 			const cursor = syntaxTree.walk();
 			// First gather and check the line numbers
 			let recurse = true;
