@@ -1,6 +1,38 @@
 import * as vscode from 'vscode';
 //import * as Parser from 'web-tree-sitter';
 
+export class LineCompletionProvider implements vscode.CompletionItemProvider
+{
+	get_linenum(line: string) : number
+	{
+		const nums = line.match(/^[0-9]+/);
+		if (nums)
+			if (nums.length>0)
+			{
+				const num = parseInt(nums[0]);
+				if (!isNaN(num))
+					return num;
+			}
+		return -1;
+	}
+	provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext)
+	{
+		const linePrefix = document.lineAt(position).text.substring(0,position.character);
+		if (document.positionAt(0) && document.lineAt(position).text.length==0)
+		{
+			let step = 10;
+			const prevNum = this.get_linenum(document.lineAt(position.line-1).text);
+			if (prevNum==-1)
+				return undefined;
+			const prevPrevNum = this.get_linenum(document.lineAt(position.line-2).text);
+			if (prevPrevNum!=-1)
+				step = prevNum - prevPrevNum;
+			return [new vscode.CompletionItem((prevNum + step).toString()+' ')];
+		}
+		return undefined;
+	}
+}
+
 export class TSCompletionProvider implements vscode.CompletionItemProvider
 {
 	add_simple(ans: Array<vscode.CompletionItem>,a2tok: string[])
