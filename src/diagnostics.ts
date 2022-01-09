@@ -23,7 +23,7 @@ class VariableNameSentry
 		this.vars.add(trimmed);
 		if (basename.length>2)
 		{
-			let key = basename.substring(0,2);
+			let key = basename.substring(0,2).toUpperCase();
 			["$","%","(",")"].forEach(s => key += parts.indexOf(s)>-1 ? s : "" );
 
 			if (this.shortnames.has(key))

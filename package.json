@@ -14,13 +14,23 @@
 		"vscode": "^1.56.0"
 	},
 	"categories": [
-		"Other"
+		"Programming Languages"
 	],
 	"activationEvents": [
 		"onLanguage:applesoft"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"configuration": {
+			"title": "Applesoft BASIC",
+			"properties": {
+				"applesoft.caseSensitive": {
+					"type": "boolean",
+					"default": false,
+					"description": "Lower case in reserved words or variables is considered an error (requires reload)."
+				}
+			}
+		},
 		"languages": [
 			{
 				"id": "applesoft",
@@ -28,6 +38,13 @@
 					".bas"
 				],
 				"configuration": "./language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "applesoft",
+				"scopeName": "source.bas",
+				"path": "./syntaxes/applesoft.tmGrammar.json"
 			}
 		]
 	},

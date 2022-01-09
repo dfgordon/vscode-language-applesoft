@@ -1,0 +1,410 @@
+{
+    "scopeName": "source.bas",
+    "patterns": [
+        {
+            "name": "comment",
+            "match": "[Rr] *[Ee] *[Mm].*$"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ee] *[Nn] *[Dd]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ff] *[Oo] *[Rr]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Nn] *[Ee] *[Xx] *[Tt]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Dd] *[Aa] *[Tt] *[Aa]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ii] *[Nn] *[Pp] *[Uu] *[Tt]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Dd] *[Ee] *[Ll]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Dd] *[Ii] *[Mm]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Rr] *[Ee] *[Aa] *[Dd]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Gg] *[Rr]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Tt] *[Ee] *[Xx] *[Tt]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Pp] *[Rr] *[##]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ii] *[Nn] *[##]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Cc] *[Aa] *[Ll] *[Ll]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Pp] *[Ll] *[Oo] *[Tt]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Hh] *[Ll] *[Ii] *[Nn]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Vv] *[Ll] *[Ii] *[Nn]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Hh] *[Gg] *[Rr] *[22]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Hh] *[Gg] *[Rr]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Hh] *[Cc] *[Oo] *[Ll] *[Oo] *[Rr] *[==]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Hh] *[Pp] *[Ll] *[Oo] *[Tt]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Dd] *[Rr] *[Aa] *[Ww]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Xx] *[Dd] *[Rr] *[Aa] *[Ww]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Hh] *[Tt] *[Aa] *[Bb]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Hh] *[Oo] *[Mm] *[Ee]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Rr] *[Oo] *[Tt] *[==]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ss] *[Cc] *[Aa] *[Ll] *[Ee] *[==]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ss] *[Hh] *[Ll] *[Oo] *[Aa] *[Dd]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Tt] *[Rr] *[Aa] *[Cc] *[Ee]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Nn] *[Oo] *[Tt] *[Rr] *[Aa] *[Cc] *[Ee]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Nn] *[Oo] *[Rr] *[Mm] *[Aa] *[Ll]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ii] *[Nn] *[Vv] *[Ee] *[Rr] *[Ss] *[Ee]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ff] *[Ll] *[Aa] *[Ss] *[Hh]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Cc] *[Oo] *[Ll] *[Oo] *[Rr] *[==]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Pp] *[Oo] *[Pp]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Vv] *[Tt] *[Aa] *[Bb]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Hh] *[Ii] *[Mm] *[Ee] *[Mm] *[::]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ll] *[Oo] *[Mm] *[Ee] *[Mm] *[::]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Oo] *[Nn] *[Ee] *[Rr] *[Rr]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Rr] *[Ee] *[Ss] *[Uu] *[Mm] *[Ee]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Rr] *[Ee] *[Cc] *[Aa] *[Ll] *[Ll]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ss] *[Tt] *[Oo] *[Rr] *[Ee]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ss] *[Pp] *[Ee] *[Ee] *[Dd] *[==]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ll] *[Ee] *[Tt]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Gg] *[Oo] *[Tt] *[Oo]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Rr] *[Uu] *[Nn]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ii] *[Ff]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Rr] *[Ee] *[Ss] *[Tt] *[Oo] *[Rr] *[Ee]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Gg] *[Oo] *[Ss] *[Uu] *[Bb]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Rr] *[Ee] *[Tt] *[Uu] *[Rr] *[Nn]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Rr] *[Ee] *[Mm]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ss] *[Tt] *[Oo] *[Pp]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Oo] *[Nn]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ww] *[Aa] *[Ii] *[Tt]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ll] *[Oo] *[Aa] *[Dd]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ss] *[Aa] *[Vv] *[Ee]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Dd] *[Ee] *[Ff]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Pp] *[Oo] *[Kk] *[Ee]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Pp] *[Rr] *[Ii] *[Nn] *[Tt]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Cc] *[Oo] *[Nn] *[Tt]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ll] *[Ii] *[Ss] *[Tt]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Cc] *[Ll] *[Ee] *[Aa] *[Rr]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Gg] *[Ee] *[Tt]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Nn] *[Ee] *[Ww]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Tt] *[Aa] *[Bb] *[\\(\\(]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Tt] *[Oo]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ff] *[Nn]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ss] *[Pp] *[Cc] *[\\(\\(]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Tt] *[Hh] *[Ee] *[Nn]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Aa] *[Tt]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Nn] *[Oo] *[Tt]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ss] *[Tt] *[Ee] *[Pp]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Aa] *[Nn] *[Dd]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Oo] *[Rr]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ss] *[Gg] *[Nn]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ii] *[Nn] *[Tt]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Aa] *[Bb] *[Ss]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Uu] *[Ss] *[Rr]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ff] *[Rr] *[Ee]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ss] *[Cc] *[Rr] *[Nn] *[\\(\\(]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Pp] *[Dd] *[Ll]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Pp] *[Oo] *[Ss]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ss] *[Qq] *[Rr]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Rr] *[Nn] *[Dd]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ll] *[Oo] *[Gg]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ee] *[Xx] *[Pp]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Cc] *[Oo] *[Ss]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ss] *[Ii] *[Nn]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Tt] *[Aa] *[Nn]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Aa] *[Tt] *[Nn]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Pp] *[Ee] *[Ee] *[Kk]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ll] *[Ee] *[Nn]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ss] *[Tt] *[Rr] *[\\$\\$]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Vv] *[Aa] *[Ll]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Aa] *[Ss] *[Cc]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Cc] *[Hh] *[Rr] *[\\$\\$]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Ll] *[Ee] *[Ff] *[Tt] *[\\$\\$]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Rr] *[Ii] *[Gg] *[Hh] *[Tt] *[\\$\\$]"
+        },
+        {
+            "name": "keyword.control",
+            "match": "[Mm] *[Ii] *[Dd] *[\\$\\$]"
+        },
+        {
+            "name": "string",
+            "begin": "\"",
+            "end": "\""
+        },
+        {
+            "name": "variable",
+            "match": "[A-Za-z]+[$%]?"
+        }
+    ]
+}

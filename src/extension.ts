@@ -8,9 +8,11 @@ import { LineCompletionProvider, TSCompletionProvider } from './completions';
 
 async function TreeSitterInit(): Promise<Parser>
 {
+	const config = vscode.workspace.getConfiguration('applesoft');
+	let pathToLang = config.get('caseSensitive') ? '-case-sens.wasm' : '.wasm';
 	await Parser.init();
 	const parser = new Parser();
-	const pathToLang = path.join(__dirname,'../tree-sitter-applesoft.wasm');
+	pathToLang = path.join(__dirname,'../tree-sitter-applesoft' + pathToLang);
 	const Applesoft = await Parser.Language.load(pathToLang);
 	parser.setLanguage(Applesoft);
 	return parser;

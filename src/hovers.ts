@@ -1,4 +1,3 @@
-import { IncomingHttpStatusHeader } from 'http2';
 import * as vscode from 'vscode';
 import * as Parser from 'web-tree-sitter';
 
