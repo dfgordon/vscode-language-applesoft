@@ -35,17 +35,30 @@ export class LineCompletionProvider implements vscode.CompletionItemProvider
 
 export class TSCompletionProvider implements vscode.CompletionItemProvider
 {
+	config : vscode.WorkspaceConfiguration;
+	constructor()
+	{
+		this.config = vscode.workspace.getConfiguration('applesoft');
+	}
+	modify(s:string)
+	{
+		if (this.config.get('lowerCaseCompletions') && !this.config.get('caseSensitive'))
+			return s.toLowerCase();
+		else
+			return s;
+	}
 	add_simple(ans: Array<vscode.CompletionItem>,a2tok: string[])
 	{
 		a2tok.forEach(s =>
 		{
-			ans.push(new vscode.CompletionItem(s));
+			ans.push(new vscode.CompletionItem(this.modify(s)));
 		});
 	}
 	add_funcs(ans: Array<vscode.CompletionItem>,a2tok: string[],expr_typ: string)
 	{
 		a2tok.forEach(s =>
 		{
+			s = this.modify(s);
 			ans.push(new vscode.CompletionItem(s+' ('+expr_typ+')'));
 			ans[ans.length-1].insertText = new vscode.SnippetString(s+'(${0})');
 		});
@@ -54,12 +67,14 @@ export class TSCompletionProvider implements vscode.CompletionItemProvider
 	{
 		a2tok.forEach(s =>
 		{
+			s = this.modify(s);
 			ans.push(new vscode.CompletionItem(s+' '+expr_typ));
 			ans[ans.length-1].insertText = new vscode.SnippetString(s+' ${0}');
 		});
 	}
 	provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext)
 	{
+		this.config = vscode.workspace.getConfiguration('applesoft');
 		const ans = new Array<vscode.CompletionItem>();
 
 		this.add_simple(ans,['CLEAR','CONT','DATA','END','FLASH','GR','HGR','HGR2','HOME','INPUT','INVERSE','LOAD',
@@ -72,90 +87,90 @@ export class TSCompletionProvider implements vscode.CompletionItemProvider
 		this.add_procs(ans,['CALL','COLOR =','HCOLOR =','HIMEM:','HTAB','IN#','LOMEM:','PR#',
 			'ROT =','SCALE =','SPEED =','VTAB'],'aexpr');
 
-		ans.push(new vscode.CompletionItem('DEF FN name (name) = aexpr'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('DEF FN ${1:name} (${2:dummy variable}) = ${0:aexpr}');
+		ans.push(new vscode.CompletionItem(this.modify('DEF FN name (name) = aexpr')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('DEF FN ${1:name} (${2:dummy variable}) = ${0:aexpr}'));
 	
-		ans.push(new vscode.CompletionItem('DEL linenum,linenum'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('DEL ${1:first},${0:last}');
+		ans.push(new vscode.CompletionItem(this.modify('DEL linenum,linenum')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('DEL ${1:first},${0:last}'));
 
-		ans.push(new vscode.CompletionItem('DIM name (subscript)'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('DIM ${1:name} (${0:subscript})');
+		ans.push(new vscode.CompletionItem(this.modify('DIM name (subscript)')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('DIM ${1:name} (${0:subscript})'));
 
-		ans.push(new vscode.CompletionItem('DRAW aexpr'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('DRAW ${0:shape}');
-		ans.push(new vscode.CompletionItem('DRAW aexpr AT aexpr,aexpr'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('DRAW ${1:shape} AT ${2:x},${0:y}');
+		ans.push(new vscode.CompletionItem(this.modify('DRAW aexpr')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('DRAW ${0:shape}'));
+		ans.push(new vscode.CompletionItem(this.modify('DRAW aexpr AT aexpr,aexpr')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('DRAW ${1:shape} AT ${2:x},${0:y}'));
 
-		ans.push(new vscode.CompletionItem('FOR index = first TO last: statement: NEXT'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('FOR ${1:I} = ${2:1} TO ${3:last}: ${0}: NEXT');
-		ans.push(new vscode.CompletionItem('FOR index = first TO last STEP s: statement: NEXT'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('FOR ${1:I} = ${2:1} TO ${3:last} STEP ${4:step}: ${0}: NEXT');
+		ans.push(new vscode.CompletionItem(this.modify('FOR index = first TO last: statement: NEXT')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('FOR ${1:I} = ${2:1} TO ${3:last}: ${0}: NEXT'));
+		ans.push(new vscode.CompletionItem(this.modify('FOR index = first TO last STEP s: statement: NEXT')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('FOR ${1:I} = ${2:1} TO ${3:last} STEP ${4:step}: ${0}: NEXT'));
 
-		ans.push(new vscode.CompletionItem('FN name (aexpr)'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('FN ${1:name} (${0:aexpr})');
+		ans.push(new vscode.CompletionItem(this.modify('FN name (aexpr)')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('FN ${1:name} (${0:aexpr})'));
 
-		ans.push(new vscode.CompletionItem('GET var'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('GET ${0:var}');
+		ans.push(new vscode.CompletionItem(this.modify('GET var')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('GET ${0:var}'));
 
-		ans.push(new vscode.CompletionItem('GOSUB linenum'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('GOSUB ${0:linenum}');
+		ans.push(new vscode.CompletionItem(this.modify('GOSUB linenum')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('GOSUB ${0:linenum}'));
 
-		ans.push(new vscode.CompletionItem('GOTO linenum'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('GOTO ${0:linenum}');
+		ans.push(new vscode.CompletionItem(this.modify('GOTO linenum')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('GOTO ${0:linenum}'));
 
-		ans.push(new vscode.CompletionItem('HLIN aexpr,aexpr AT aexpr'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('HLIN ${1:x1},${2:x2} AT ${0:y}');
+		ans.push(new vscode.CompletionItem(this.modify('HLIN aexpr,aexpr AT aexpr')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('HLIN ${1:x1},${2:x2} AT ${0:y}'));
 
-		ans.push(new vscode.CompletionItem('HPLOT aexpr,aexpr'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('HPLOT ${1:x},${0:y}');
-		ans.push(new vscode.CompletionItem('HPLOT TO aexpr,aexpr'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('HPLOT TO ${1:x},${0:y}');
-		ans.push(new vscode.CompletionItem('HPLOT aexpr,aexpr TO aexpr,aexpr'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('HPLOT ${1:x},${2:y} TO ${3:x},${0:y}');
+		ans.push(new vscode.CompletionItem(this.modify('HPLOT aexpr,aexpr')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('HPLOT ${1:x},${0:y}'));
+		ans.push(new vscode.CompletionItem(this.modify('HPLOT TO aexpr,aexpr')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('HPLOT TO ${1:x},${0:y}'));
+		ans.push(new vscode.CompletionItem(this.modify('HPLOT aexpr,aexpr TO aexpr,aexpr')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('HPLOT ${1:x},${2:y} TO ${3:x},${0:y}'));
 
-		ans.push(new vscode.CompletionItem('IF expr THEN statement'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('IF ${1} THEN ${0}');
+		ans.push(new vscode.CompletionItem(this.modify('IF expr THEN statement')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('IF ${1} THEN ${0}'));
 
-		ans.push(new vscode.CompletionItem('LEFT$ (sexpr,aexpr)'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('LEFT$ (${1:sexpr},${0:length})');
+		ans.push(new vscode.CompletionItem(this.modify('LEFT$ (sexpr,aexpr)')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('LEFT$ (${1:sexpr},${0:length})'));
 
-		ans.push(new vscode.CompletionItem('LET var = expr'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('LET ${1:var} = ${0:expr}');
+		ans.push(new vscode.CompletionItem(this.modify('LET var = expr')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('LET ${1:var} = ${0:expr}'));
 		
-		ans.push(new vscode.CompletionItem('LIST linenum, linenum'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('LIST ${1:first}, ${0:last}');
+		ans.push(new vscode.CompletionItem(this.modify('LIST linenum, linenum')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('LIST ${1:first}, ${0:last}'));
 
-		ans.push(new vscode.CompletionItem('MID$ (sexpr,aexpr,aexpr)'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('MID$ (${1:sexpr},${2:start},${0:length})');
+		ans.push(new vscode.CompletionItem(this.modify('MID$ (sexpr,aexpr,aexpr)')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('MID$ (${1:sexpr},${2:start},${0:length})'));
 
-		ans.push(new vscode.CompletionItem('ON aexpr GOTO|GOSUB linenum'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('ON ${1:aexpr} ${2|GOTO,GOSUB|} ${0:linenum}');
+		ans.push(new vscode.CompletionItem(this.modify('ON aexpr GOTO|GOSUB linenum')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('ON ${1:aexpr} ${2|GOTO,GOSUB|} ${0:linenum}'));
 
-		ans.push(new vscode.CompletionItem('ONERR GOTO linenum'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('ONERR GOTO ${0:linenum}');
+		ans.push(new vscode.CompletionItem(this.modify('ONERR GOTO linenum')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('ONERR GOTO ${0:linenum}'));
 
-		ans.push(new vscode.CompletionItem('PLOT aexpr,aexpr'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('PLOT ${1:x},${0:y}');
+		ans.push(new vscode.CompletionItem(this.modify('PLOT aexpr,aexpr')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('PLOT ${1:x},${0:y}'));
 
-		ans.push(new vscode.CompletionItem('POKE aexpr,aexpr'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('POKE ${1:addr},${0:val}');
+		ans.push(new vscode.CompletionItem(this.modify('POKE aexpr,aexpr')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('POKE ${1:addr},${0:val}'));
 		
-		ans.push(new vscode.CompletionItem('RIGHT$ (sexpr,aexpr)'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('RIGHT$ (${1:sexpr},${0:length})');
+		ans.push(new vscode.CompletionItem(this.modify('RIGHT$ (sexpr,aexpr)')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('RIGHT$ (${1:sexpr},${0:length})'));
 
-		ans.push(new vscode.CompletionItem('SCRN (aexpr,aexpr)'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('SCRN (${1:x},${0:y})');
+		ans.push(new vscode.CompletionItem(this.modify('SCRN (aexpr,aexpr)')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('SCRN (${1:x},${0:y})'));
 
-		ans.push(new vscode.CompletionItem('VLIN aexpr,aexpr AT aexpr'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('VLIN ${1:y1},${2:y2} AT ${0:x}');
+		ans.push(new vscode.CompletionItem(this.modify('VLIN aexpr,aexpr AT aexpr')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('VLIN ${1:y1},${2:y2} AT ${0:x}'));
 
-		ans.push(new vscode.CompletionItem('WAIT aexpr,aexpr,aexpr'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('WAIT ${1:addr},${2:mask},${0:expected}');
+		ans.push(new vscode.CompletionItem(this.modify('WAIT aexpr,aexpr,aexpr')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('WAIT ${1:addr},${2:mask},${0:expected}'));
 
-		ans.push(new vscode.CompletionItem('XDRAW aexpr'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('XDRAW ${0:shape}');
-		ans.push(new vscode.CompletionItem('XDRAW aexpr AT aexpr,aexpr'));
-		ans[ans.length-1].insertText = new vscode.SnippetString('XDRAW ${1:shape} AT ${2:x},${0:y}');
+		ans.push(new vscode.CompletionItem(this.modify('XDRAW aexpr')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('XDRAW ${0:shape}'));
+		ans.push(new vscode.CompletionItem(this.modify('XDRAW aexpr AT aexpr,aexpr')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('XDRAW ${1:shape} AT ${2:x},${0:y}'));
 
 		return ans;
 	}

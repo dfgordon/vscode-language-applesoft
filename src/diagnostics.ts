@@ -57,10 +57,12 @@ class VariableNameSentry
 export class TSDiagnosticProvider
 {
 	parser : Parser;
+	config : vscode.WorkspaceConfiguration;
 
 	constructor(parser: Parser)
 	{
 		this.parser = parser;
+		this.config = vscode.workspace.getConfiguration('applesoft');
 	}
 	curs_to_range(curs: Parser.TreeCursor): vscode.Range
 	{
@@ -79,7 +81,7 @@ export class TSDiagnosticProvider
 		if (node.type!="integer" && node.type!="real")
 			return;
 		const rng = this.node_to_range(node);
-		const parsed = parseInt(node.text);
+		const parsed = parseFloat(node.text);
 		if (!isNaN(parsed))
 			if (parsed<low || parsed>high)
 				diag.push(new vscode.Diagnostic(rng,'Out of range ('+low+','+high+')'));
@@ -106,12 +108,13 @@ export class TSDiagnosticProvider
 			if (!this.is_error_inside(curs.currentNode()))
 				diag.push(new vscode.Diagnostic(rng,curs.currentNode().toString(),vscode.DiagnosticSeverity.Error));
 		}
-		if (["realvar","intvar","svar","real_scalar","int_scalar"].indexOf(curs.nodeType)>-1)
-		{
-			const s = vars.add(curs);
-			if (s.length>0)
-				diag.push(new vscode.Diagnostic(rng,s,vscode.DiagnosticSeverity.Warning));
-		}
+		if (this.config.get('collisions'))
+			if (["realvar","intvar","svar","real_scalar","int_scalar","real_array","int_array","string_array"].indexOf(curs.nodeType)>-1)
+			{
+				const s = vars.add(curs);
+				if (s.length>0)
+					diag.push(new vscode.Diagnostic(rng,s,vscode.DiagnosticSeverity.Warning));
+			}
 		if (curs.nodeType=="line")
 		{
 			if (curs.currentNode().text.trimEnd().length>239)
@@ -126,6 +129,18 @@ export class TSDiagnosticProvider
 				diag.push(new vscode.Diagnostic(rng,'Out of range (0,63999)'));
 			else if (nums.indexOf(parsed)==-1 && curs.currentNode().previousNamedSibling)
 				diag.push(new vscode.Diagnostic(rng,'Line does not exist'));
+		}
+		if (curs.nodeType=="assignment")
+		{
+			const lhs = curs.currentNode().firstNamedChild;
+			const rhs = curs.currentNode().lastNamedChild;
+			if (lhs && rhs)
+			{
+				if (lhs.type=="realvar" && rhs.type=="real")
+					this.value_range(diag,rhs,-1e38,1e38);
+				if (lhs.type=="intvar" && (rhs.type=="real" || rhs.type=="integer"))
+					this.value_range(diag,rhs,-32767,32767);
+			}
 		}
 		if (curs.nodeType=="poke_tok")
 		{
@@ -178,6 +193,11 @@ export class TSDiagnosticProvider
 				}
 			}
 		}
+		if (this.config.get('terminalString'))
+			if (curs.nodeType=="terminal_string")
+			{
+				diag.push(new vscode.Diagnostic(rng,"Unquote missing. This is valid if it is intended.",vscode.DiagnosticSeverity.Warning));
+			}
 		return true;
 	}
 	process_line_number(diag: Array<vscode.Diagnostic>,nums: Array<number>,curs: Parser.TreeCursor)
@@ -199,6 +219,7 @@ export class TSDiagnosticProvider
 	{
 		if (document && document.languageId=='applesoft')
 		{
+			this.config = vscode.workspace.getConfiguration('applesoft');
 			const vars = new VariableNameSentry();
 			const line_numbers = Array<number>();
 			const diag = Array<vscode.Diagnostic>();

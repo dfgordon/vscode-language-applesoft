@@ -28,6 +28,21 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Lower case in reserved words or variables is considered an error (requires reload)."
+				},
+				"applesoft.terminalString": {
+					"type": "boolean",
+					"default": true,
+					"description": "Warn against missing unquotes. In Applesoft, strings without an unquote run to end-of-line."
+				},
+				"applesoft.collisions": {
+					"type": "boolean",
+					"default": true,
+					"description": "Warn against long variable name collisions. In Applesoft, variables of the same type with the same first two characters share the same storage, i.e., are the same."
+				},
+				"applesoft.lowerCaseCompletions": {
+					"type": "boolean",
+					"default": false,
+					"markdownDescription": "Use lower case in completions and snippets (ingored if `#applesoft.caseSensitive#`)."
 				}
 			}
 		},

@@ -25,13 +25,23 @@ export class TSHoverProvider implements vscode.HoverProvider
 			new vscode.MarkdownString('ASCII code of first character'),
 			new vscode.MarkdownString('`ASC (sexpr)`')
 		]);
+		this.hmap.set("amp_tok",[
+			new vscode.MarkdownString('Execute JMP at $03F5.  Syntax depends on the particular object code that is called.'),
+			new vscode.MarkdownString('`& [{character}]`'),
+			exampleString([
+				'& "hello from ampersand"',
+				'& (X/5,A$,"hello from ampersand")'])
+		]);
 		this.hmap.set("atn_tok",[
 			new vscode.MarkdownString('arc tangent in radians'),
 			new vscode.MarkdownString('`ATN (aexpr)`')
 		]);
 		this.hmap.set("call_tok",[
-			new vscode.MarkdownString('call machine language subroutine at decimal address'),
-			new vscode.MarkdownString('`CALL aexpr`')
+			new vscode.MarkdownString('Call machine language subroutine at decimal address.  The optional string argument is only for specialized object code like `CHAIN`.'),
+			new vscode.MarkdownString('`CALL aexpr [string]`'),
+			exampleString([
+				'CALL 768',
+				'CALL 520"NEXT PROGRAM"'])
 		]);
 		this.hmap.set("chr_tok",[
 			new vscode.MarkdownString('character corresponding to ASCII code'),
@@ -103,7 +113,7 @@ export class TSHoverProvider implements vscode.HoverProvider
 			new vscode.MarkdownString('`FOR name = aexpr TO aexpr [STEP aexpr]`')
 		]);
 		this.hmap.set("fre_tok",[
-			new vscode.MarkdownString('returns remaining memory in bytes, argument is ignored but must be a valid expression.  This also forces garbage collection of strings.'),
+			new vscode.MarkdownString('Return remaining memory in bytes.  Argument is ignored but must be a valid expression.  This also forces garbage collection of strings.'),
 			new vscode.MarkdownString('`FRE (expr)`')
 		]);
 		this.hmap.set("get_tok",[

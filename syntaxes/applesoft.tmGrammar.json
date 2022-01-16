@@ -6,6 +6,10 @@
             "match": "[Rr] *[Ee] *[Mm].*$"
         },
         {
+            "name": "support.function",
+            "match": "[Aa] *[Tt][Nn]"
+        },
+        {
             "name": "keyword.control",
             "match": "[Ee] *[Nn] *[Dd]"
         },
@@ -298,7 +302,7 @@
             "match": "[Oo] *[Rr]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Ss] *[Gg] *[Nn]"
         },
         {
@@ -306,95 +310,95 @@
             "match": "[Ii] *[Nn] *[Tt]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Aa] *[Bb] *[Ss]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Uu] *[Ss] *[Rr]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Ff] *[Rr] *[Ee]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Ss] *[Cc] *[Rr] *[Nn] *[\\(\\(]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Pp] *[Dd] *[Ll]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Pp] *[Oo] *[Ss]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Ss] *[Qq] *[Rr]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Rr] *[Nn] *[Dd]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Ll] *[Oo] *[Gg]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Ee] *[Xx] *[Pp]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Cc] *[Oo] *[Ss]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Ss] *[Ii] *[Nn]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Tt] *[Aa] *[Nn]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Aa] *[Tt] *[Nn]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Pp] *[Ee] *[Ee] *[Kk]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Ll] *[Ee] *[Nn]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Ss] *[Tt] *[Rr] *[\\$\\$]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Vv] *[Aa] *[Ll]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Aa] *[Ss] *[Cc]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Cc] *[Hh] *[Rr] *[\\$\\$]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Ll] *[Ee] *[Ff] *[Tt] *[\\$\\$]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Rr] *[Ii] *[Gg] *[Hh] *[Tt] *[\\$\\$]"
         },
         {
-            "name": "keyword.control",
+            "name": "support.function",
             "match": "[Mm] *[Ii] *[Dd] *[\\$\\$]"
         },
         {

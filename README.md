@@ -1,6 +1,6 @@
 # Applesoft BASIC
 
-Language support for Applesoft BASIC in Visual Studio Code.
+Language support for Applesoft BASIC in Visual Studio Code.  Go to settings (`Ctrl+Comma`) and look under `Extensions/Applesoft BASIC` to select options.
 
 <img src="demo.gif" alt="session capture"/>
 

@@ -1,0 +1,1 @@
+The file `applesoft.tmGrammar.json` is a minimal TextMate grammar.  This is *not* the real grammar.  It is only used for the minor task of highlighting hovers.
