@@ -17,32 +17,48 @@
 		"Programming Languages"
 	],
 	"activationEvents": [
-		"onLanguage:applesoft"
+		"onLanguage:applesoft",
+		"onCommand:applesoft.commentLines",
+		"onCommand:applesoft.renumber",
+		"onCommand:applesoft.runFrontVii",
+		"onCommand:applesoft.enterFrontVii",
+		"onCommand:applesoft.runNewVii",
+		"onCommand:applesoft.enterNewVii"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"configuration": {
 			"title": "Applesoft BASIC",
 			"properties": {
-				"applesoft.caseSensitive": {
+				"applesoft.case.caseSensitive": {
 					"type": "boolean",
 					"default": false,
-					"description": "Lower case in reserved words or variables is considered an error (requires reload)."
+					"description": "Lower case in reserved words or variables is considered an error."
 				},
-				"applesoft.terminalString": {
+				"applesoft.warn.terminalString": {
 					"type": "boolean",
 					"default": true,
 					"description": "Warn against missing unquotes. In Applesoft, strings without an unquote run to end-of-line."
 				},
-				"applesoft.collisions": {
+				"applesoft.warn.collisions": {
 					"type": "boolean",
 					"default": true,
 					"description": "Warn against long variable name collisions. In Applesoft, variables of the same type with the same first two characters share the same storage, i.e., are the same."
 				},
-				"applesoft.lowerCaseCompletions": {
+				"applesoft.case.lowerCaseCompletions": {
 					"type": "boolean",
 					"default": false,
 					"markdownDescription": "Use lower case in completions and snippets (ingored if `#applesoft.caseSensitive#`)."
+				},
+				"applesoft.hovers.specialAddresses": {
+					"type": "boolean",
+					"default": true,
+					"markdownDescription": "Show hovers for special addresses such as ROM routines, soft switches, etc."
+				},
+				"applesoft.hovers.keywords": {
+					"type": "boolean",
+					"default": true,
+					"markdownDescription": "Show hovers for keywords such as `PRINT`, `FOR`, etc.."
 				}
 			}
 		},
@@ -50,7 +66,9 @@
 			{
 				"id": "applesoft",
 				"extensions": [
-					".bas"
+					".bas",
+					".abas",
+					".A"
 				],
 				"configuration": "./language-configuration.json"
 			}
@@ -61,9 +79,64 @@
 				"scopeName": "source.bas",
 				"path": "./syntaxes/applesoft.tmGrammar.json"
 			}
-		]
+		],
+		"commands": [
+			{
+				"command": "applesoft.commentLines",
+				"title": "applesoft: (Un)Comment Selection"
+			},
+			{
+				"command": "applesoft.renumber",
+				"title": "applesoft: Renumber Lines"
+			},
+			{
+				"command": "applesoft.runFrontVii",
+				"title": "applesoft: Run in Virtual ][ front machine"
+			},
+			{
+				"command": "applesoft.enterFrontVii",
+				"title": "applesoft: Enter in Virtual ][ front machine"
+			},
+			{
+				"command": "applesoft.runNewVii",
+				"title": "applesoft: Run in Virtual ][ new machine"
+			},
+			{
+				"command": "applesoft.enterNewVii",
+				"title": "applesoft: Enter in Virtual ][ new machine"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "applesoft.commentLines",
+					"when": "editorLangId == applesoft"
+				},
+				{
+					"command": "applesoft.renumber",
+					"when": "editorLangId == applesoft"
+				},
+				{
+					"command": "applesoft.runFrontVii",
+					"when": "editorLangId == applesoft"
+				},
+				{
+					"command": "applesoft.enterFrontVii",
+					"when": "editorLangId == applesoft"
+				},
+				{
+					"command": "applesoft.runNewVii",
+					"when": "editorLangId == applesoft"
+				},
+				{
+					"command": "applesoft.enterNewVii",
+					"when": "editorLangId == applesoft"
+				}
+			]
+		}
 	},
 	"dependencies": {
+		"tsc": "^2.0.4",
 		"web-tree-sitter": "^0.19.4"
 	},
 	"scripts": {

@@ -1,0 +1,830 @@
+{
+	"32": {
+		"type": "byte value",
+		"desc": "Sets left margin of text display. Range 0-39."
+	},
+	"33": {
+		"type": "byte value",
+		"desc": "Sets width of text display. Range 1-40."
+	},
+	"34": {
+		"type": "byte value",
+		"desc": "Sets top margin of text display. Range 0-23."
+	},
+	"35": {
+		"type": "byte value",
+		"desc": "Sets bottom margin of text display. Range 0-24."
+	},
+	"36": {
+		"type": "byte value",
+		"desc": "Horizontal position of the cursor. Range 0-39."
+	},
+	"37": {
+		"type": "byte value",
+		"desc": "Vertical position of the cursor. Range 0-23."
+	},
+	"43": {
+		"type": "byte value",
+		"desc": "Boot slot times 16."
+	},
+	"44": {
+		"type": "byte value",
+		"desc": "Low resolution line end point."
+	},
+	"48": {
+		"type": "byte value",
+		"desc": "Low resolution color times 17."
+	},
+	"50": {
+		"type": "byte value",
+		"desc": "Text output format."
+	},
+	"51": {
+		"type": "byte value",
+		"desc": "Prompt character."
+	},
+	"60": {
+		"type": "word",
+		"desc": "Source starting address for `AUXMOVE`."
+	},
+	"62": {
+		"type": "word",
+		"desc": "Source ending address for `AUXMOVE`."
+	},
+	"66": {
+		"type": "word",
+		"desc": "Destination starting address for `AUXMOVE`."
+	},
+	"78": {
+		"type": "word",
+		"desc": "Random number field."
+	},
+	"103": {
+		"type": "word",
+		"desc": "Start of Applesoft program."
+	},
+	"105": {
+		"type": "word",
+		"desc": "Start of variable space, `LOMEM`."
+	},
+	"107": {
+		"type": "word",
+		"desc": "Start of array space."
+	},
+	"109": {
+		"type": "word",
+		"desc": "End of array space."
+	},
+	"111": {
+		"type": "word",
+		"desc": "Start of string space."
+	},
+	"115": {
+		"type": "word",
+		"desc": "End of variable space, `HIMEM`."
+	},
+	"117": {
+		"type": "word",
+		"desc": "Line number being executed."
+	},
+	"119": {
+		"type": "word",
+		"desc": "Line number where program stopped."
+	},
+	"121": {
+		"type": "word",
+		"desc": "Address of line being executed."
+	},
+	"123": {
+		"type": "word",
+		"desc": "Line number of current `DATA` statement."
+	},
+	"125": {
+		"type": "word",
+		"desc": "Address of next `DATA` item."
+	},
+	"127": {
+		"type": "word",
+		"desc": "Address of `DATA` or `INPUT` item."
+	},
+	"129": {
+		"type": "word",
+		"desc": "Last used variable name."
+	},
+	"131": {
+		"type": "word",
+		"desc": "Last used variable address."
+	},
+	"175": {
+		"type": "word",
+		"desc": "End of Applesoft program."
+	},
+	"214": {
+		"type": "byte value",
+		"desc": "`RUN` flag."
+	},
+	"216": {
+		"type": "byte value",
+		"desc": "Error handler flag for `ONERR`."
+	},
+	"218": {
+		"type": "word",
+		"desc": "Line number of error."
+	},
+	"220": {
+		"type": "word",
+		"desc": "Address of error."
+	},
+	"222": {
+		"type": "byte value",
+		"desc": "Error code."
+	},
+	"224": {
+		"type": "word",
+		"desc": "Last `HPLOT` x coordinate."
+	},
+	"226": {
+		"type": "byte value",
+		"desc": "Last `HPLOT` y coordinate."
+	},
+	"228": {
+		"type": "byte value",
+		"desc": "Code related to `HCOLOR`."
+	},
+	"230": {
+		"type": "byte value",
+		"desc": "High resolution plotting page."
+	},
+	"231": {
+		"type": "byte value",
+		"desc": "`SCALE` value."
+	},
+	"232": {
+		"type": "word",
+		"desc": "Address of shape table."
+	},
+	"234": {
+		"type": "byte value",
+		"desc": "High resolution graphics collision flag."
+	},
+	"241": {
+		"type": "byte value",
+		"desc": "Code related to `SPEED`."
+	},
+	"243": {
+		"type": "byte value",
+		"desc": "Mask for `FLASH`."
+	},
+	"249": {
+		"type": "byte value",
+		"desc": "Code related to `ROT`."
+	},
+	"976": {
+		"type": "vector",
+		"desc": "DOS re-entry from the Monitor"
+	},
+	"1005": {
+		"type": "word",
+		"desc": "Program starting address for `XFER`."
+	},
+	"1008": {
+		"type": "word",
+		"desc": "Address of subroutine handling `BRK` requests."
+	},
+	"1010": {
+		"type": "word",
+		"desc": "Address of program taking control after `Reset`"
+	},
+	"1012": {
+		"type": "byte value",
+		"desc": "Power-up byte"
+	},
+	"1013": {
+		"type": "vector",
+		"desc": "Action to take upon issuing `&` command"
+	},
+	"1016": {
+		"type": "vector",
+		"desc": "Action to take upon issuing `Ctrl-Y`"
+	},
+	"1019": {
+		"type": "vector",
+		"desc": "Action to take upon non-maskable interrupt"
+	},
+	"1022": {
+		"type": "vector",
+		"desc": "Address of interrupt handler"
+	},
+	"-25153": {
+		"type": "DOS routine",
+		"desc": "Reconnect DOS.",
+		"ctx": "DOS 3.3"
+	},
+	"-16384": {
+		"label": "80STORE",
+		"type": "soft switch",
+		"desc": "Overloaded. [1] read the keyboard (read) [2] Set `PAGE2` function to normal (write)",
+		"ctx": "Enhanced Apple //e or higher needed for [2]"
+	},
+	"-16383": {
+		"label": "80STORE",
+		"type": "soft switch",
+		"desc": "Set `PAGE2` function to control the memory bank used for display storage, write only.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16382": {
+		"label": "RAMRD",
+		"type": "soft switch",
+		"desc": "Read from main memory, write only.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16381": {
+		"label": "RAMRD",
+		"type": "soft switch",
+		"desc": "Read from auxiliary memory, write only.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16380": {
+		"label": "RAMWRT",
+		"type": "soft switch",
+		"desc": "Write to main memory, write only.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16379": {
+		"label": "RAMWRT",
+		"type": "soft switch",
+		"desc": "Write to auxiliary memory, write only.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16378": {
+		"label": "SLOTCXROM",
+		"type": "soft switch",
+		"desc": "Map to internal ROM, write only.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16377": {
+		"label": "SLOTCXROM",
+		"type": "soft switch",
+		"desc": "Map to peripheral card ROM, write only.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16376": {
+		"label": "ALTZP",
+		"type": "soft switch",
+		"desc": "Main stack and zero page, write only.",
+		"ctx": "Enhanced Apple //e or higher",
+		"note": "Apple //e Reference Manual has inconsistent negative address"
+	},
+	"-16375": {
+		"label": "ALTZP",
+		"type": "soft switch",
+		"desc": "Auxiliary stack and zero page, write only.",
+		"ctx": "Enhanced Apple //e or higher",
+		"note": "Apple //e Reference Manual has inconsistent negative address"
+	},
+	"-16374": {
+		"label": "SLOTC3ROM",
+		"type": "soft switch",
+		"desc": "Map to internal ROM, write only.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16373": {
+		"label": "SLOTC3ROM",
+		"type": "soft switch",
+		"desc": "Map to peripheral card ROM, write only.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16372": {
+		"label": "80COL",
+		"type": "soft switch",
+		"desc": "80 column display off, write only.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16371": {
+		"label": "80COL",
+		"type": "soft switch",
+		"desc": "80 column display on, write only.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16370": {
+		"label": "ALTCHARSET",
+		"type": "soft switch",
+		"desc": "Disable alternate character set, write only.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16369": {
+		"label": "ALTCHARSET",
+		"type": "soft switch",
+		"desc": "Enable alternate character set, write only.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16368": {
+		"type": "soft switch",
+		"desc": "Reset the keyboard strobe."
+	},
+	"-16365": {
+		"label": "RAMRD",
+		"type": "soft switch",
+		"desc": "Read the memory bank read soft switch.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16364": {
+		"label": "RAMWRT",
+		"type": "soft switch",
+		"desc": "Read the memory bank write soft switch.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16363": {
+		"label": "SLOTCXROM",
+		"type": "soft switch",
+		"desc": "Read the all-slots ROM bank selector switch.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16362": {
+		"label": "ALTZP",
+		"type": "soft switch",
+		"desc": "Read the alternate stack and zero page soft switch.",
+		"ctx": "Enhanced Apple //e or higher",
+		"note": "Apple //e Reference Manual has inconsistent negative address"
+	},
+	"-16361": {
+		"label": "SLOTC3ROM",
+		"type": "soft switch",
+		"desc": "Read the slot 3 ROM bank selector switch.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16360": {
+		"label": "80STORE",
+		"type": "soft switch",
+		"desc": "Read the display memory bank storage soft switch.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16359": {
+		"label": "VBL",
+		"type": "soft switch",
+		"desc": "Read vertical blanking.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16358": {
+		"label": "TEXT",
+		"type": "soft switch",
+		"desc": "Read text display soft switch.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16357": {
+		"label": "MIXED",
+		"type": "soft switch",
+		"desc": "Read mixed display soft switch.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16356": {
+		"label": "PAGE2",
+		"type": "soft switch",
+		"desc": "Read page 2 display soft switch.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16355": {
+		"label": "HIRES",
+		"type": "soft switch",
+		"desc": "Read high resolution display soft switch.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16354": {
+		"label": "ALTCHARSET",
+		"type": "soft switch",
+		"desc": "Read alternate character set soft switch.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16353": {
+		"label": "80COL",
+		"type": "soft switch",
+		"desc": "Read 80 column display soft switch.",
+		"ctx": "Enhanced Apple //e or higher"
+	},
+	"-16352": {
+		"type": "soft switch",
+		"desc": "Ping the cassette recording."
+	},
+	"-16336": {
+		"type": "soft switch",
+		"desc": "Click the speaker."
+	},
+	"-16320": {
+		"type": "soft switch",
+		"desc": "Strobe Output."
+	},
+	"-16304": {
+		"label": "TEXT",
+		"type": "soft switch",
+		"desc": "Switch to graphics mode. Mode depends on other soft switch settings."
+	},
+	"-16303": {
+		"label": "TEXT",
+		"type": "soft switch",
+		"desc": "Switch to text mode. Mode depends on other soft switch settings."
+	},
+	"-16302": {
+		"label": "MIXED",
+		"type": "soft switch",
+		"desc": "Switch to full screen graphics. Mode depends on other soft switch settings."
+	},
+	"-16301": {
+		"label": "MIXED",
+		"type": "soft switch",
+		"desc": "Switch to mixed graphics and text. Mode depends on other soft switch settings."
+	},
+	"-16300": {
+		"label": "PAGE2",
+		"type": "soft switch",
+		"desc": "Overloaded. [1] Page 2 off, switch to page 1. Mode depends on other soft switch settings. [2] Switch to main display memory if `80STORE` is on.",
+		"ctx": "Enhanced Apple //e or higher needed for [2]"
+	},
+	"-16299": {
+		"label": "PAGE2",
+		"type": "soft switch",
+		"desc": "Overloaded. [1] Page 2 on, switch to page 2. Mode depends on other soft switch settings. [2] Switch to auxiliary display memory if `80STORE` is on.",
+		"ctx": "Enhanced Apple //e or higher needed for [2]"
+	},
+	"-16298": {
+		"label": "HIRES",
+		"type": "soft switch",
+		"desc": "Switch to low resolution mode. Mode depends on other soft switch settings."
+	},
+	"-16297": {
+		"label": "HIRES",
+		"type": "soft switch",
+		"desc": "Switch to high resolution mode. Mode depends on other soft switch settings."
+	},
+	"-16296": {
+		"type": "soft switch",
+		"desc": "Set game control annunciator output 0 to high (off)."
+	},
+	"-16295": {
+		"type": "soft switch",
+		"desc": "Set game control annunciator output 0 to low (on)."
+	},
+	"-16294": {
+		"type": "soft switch",
+		"desc": "Set game control annunciator output 1 to high (off)."
+	},
+	"-16293": {
+		"type": "soft switch",
+		"desc": "Set game control annunciator output 1 to low (on)."
+	},
+	"-16292": {
+		"type": "soft switch",
+		"desc": "Set game control annunciator output 2 to high (off)."
+	},
+	"-16291": {
+		"type": "soft switch",
+		"desc": "Set game control annunciator output 2 to low (on)."
+	},
+	"-16290": {
+		"label": "DHR",
+		"type": "soft switch",
+		"desc": "Overloaded. [1] set game control annunciator output 3 to high (off) [2] switch to double resolution graphics",
+		"ctx": "Enhanced Apple //e or later needed for [2]"
+	},
+	"-16289": {
+		"type": "soft switch",
+		"desc": "Set game control annunciator output 3 to low (on)."
+	},
+	"-16288": {
+		"type": "soft switch",
+		"desc": "Casette In."
+	},
+	"-16287": {
+		"type": "soft switch",
+		"desc": "Read pushbutton on game controller 0."
+	},
+	"-16286": {
+		"type": "soft switch",
+		"desc": "Read pushbutton on game controller 1."
+	},
+	"-16285": {
+		"type": "soft switch",
+		"desc": "Read pushbutton on game controller 2."
+	},
+	"-16284": {
+		"type": "soft switch",
+		"desc": "Analog input 0."
+	},
+	"-16283": {
+		"type": "soft switch",
+		"desc": "Analog input 1."
+	},
+	"-16282": {
+		"type": "soft switch",
+		"desc": "Analog input 2."
+	},
+	"-16281": {
+		"type": "soft switch",
+		"desc": "Analog input 3."
+	},
+	"-16272": {
+		"type": "soft switch",
+		"desc": "Analog input reset."
+	},
+	"-16256": {
+		"type": "soft switch",
+		"desc": "Upper address space, read RAM, 4K bank 2."
+	},
+	"-16255": {
+		"type": "soft switch",
+		"desc": "Upper address space, write RAM, read ROM, 4K bank 2."
+	},
+	"-16254": {
+		"type": "soft switch",
+		"desc": "Upper address space, read ROM, 4K bank 2."
+	},
+	"-16253": {
+		"type": "soft switch",
+		"desc": "Upper address space, write RAM, read RAM, 4K bank 2."
+	},
+	"-16252": {
+		"type": "soft switch",
+		"desc": "Upper address space, read RAM, 4K bank 2."
+	},
+	"-16251": {
+		"type": "soft switch",
+		"desc": "Upper address space, write RAM, read ROM, 4K bank 2."
+	},
+	"-16250": {
+		"type": "soft switch",
+		"desc": "Upper address space, read ROM, 4K bank 2."
+	},
+	"-16249": {
+		"type": "soft switch",
+		"desc": "Upper address space, write RAM, read RAM, 4K bank 2."
+	},
+	"-16248": {
+		"type": "soft switch",
+		"desc": "Upper address space, read RAM, 4K bank 1."
+	},
+	"-16247": {
+		"type": "soft switch",
+		"desc": "Upper address space, write RAM, read ROM, 4K bank 1."
+	},
+	"-16246": {
+		"type": "soft switch",
+		"desc": "Upper address space, read ROM, 4K bank 1."
+	},
+	"-16245": {
+		"type": "soft switch",
+		"desc": "Upper address space, write RAM, read RAM, 4K bank 1."
+	},
+	"-16244": {
+		"type": "soft switch",
+		"desc": "Upper address space, read RAM, 4K bank 1."
+	},
+	"-16243": {
+		"type": "soft switch",
+		"desc": "Upper address space, write RAM, read ROM, 4K bank 1."
+	},
+	"-16242": {
+		"type": "soft switch",
+		"desc": "Upper address space, read ROM, 4K bank 1."
+	},
+	"-16241": {
+		"type": "soft switch",
+		"desc": "Upper address space, write RAM, read RAM, 4K bank 1."
+	},
+	"-15599": {
+		"label": "AUXMOVE",
+		"type":"ROM routine",
+		"desc": "Move blocks of data between main and auxiliary memory."
+	},
+	"-15596": {
+		"label": "XFER",
+		"type":"ROM routine",
+		"desc": "Transfer program control between main and auxiliary memory."
+	},
+	"-10621": {
+		"type": "ROM routine",
+		"desc": "Clear all control information from the stack."
+	},
+	"-3288": {
+		"type": "ROM routine",
+		"desc": "Clear error handling information from the stack."
+	},
+	"-3100": {
+		"type": "ROM routine",
+		"desc": "Reveal high resolution page 1."
+	},
+	"-3086": {
+		"type": "ROM routine",
+		"desc": "Clear current high resolution screen to black."
+	},
+	"-3082": {
+		"type": "ROM routine",
+		"desc": "Clear current high resolution screen to most recent `HPLOT` color."
+	},
+	"-2613": {
+		"type": "ROM routine",
+		"desc": "Load current high resolution coordinate into word at 224 and byte at 226."
+	},
+	"-1998": {
+		"type": "ROM routine",
+		"desc": "Clear full screen of low resolution graphics."
+	},
+	"-1438": {
+		"type": "ROM routine",
+		"desc": "Pseudo reset."
+	},
+	"-1994": {
+		"type": "ROM routine",
+		"desc": "Clear upper 40 lines of low resolution graphics."
+	},
+	"-1370": {
+		"type": "ROM routine",
+		"desc": "Boot."
+	},
+	"-1321": {
+		"type": "ROM routine",
+		"desc": "Display all registers."
+	},
+	"-1184": {
+		"type": "ROM routine",
+		"desc": "Clear screen and display machine type."
+	},
+	"-1036": {
+		"type": "ROM routine",
+		"desc": "Move cursor right."
+	},
+	"-1008": {
+		"type": "ROM routine",
+		"desc": "Move cursor left."
+	},
+	"-998": {
+		"type": "ROM routine",
+		"desc": "Move cursor up."
+	},
+	"-958": {
+		"type": "ROM routine",
+		"desc": "Clear text between cursor and bottom margin."
+	},
+	"-936": {
+		"label": "HOME",
+		"type": "ROM routine",
+		"desc": "Clear the text screen and reset cursor."
+	},
+	"-922": {
+		"type": "ROM routine",
+		"desc": "Issues a line feed"
+	},
+	"-912": {
+		"type": "ROM routine",
+		"desc": "Scroll text up one line"
+	},
+	"-868": {
+		"type": "ROM routine",
+		"desc": "Clear text between cursor and right margin"
+	},
+	"-756": {
+		"type": "ROM routine",
+		"desc": "Wait for any keypress."
+	},
+	"-678": {
+		"type": "ROM routine",
+		"desc": "Wait for `Return` keypress."
+	},
+	"-657": {
+		"type": "ROM routine",
+		"desc": "Similar to `INPUT` but without parsing commas or colons, data left in page 2 buffer."
+	},
+	"-468": {
+		"type": "ROM routine",
+		"desc": "Memory move."
+	},
+	"-415": {
+		"type": "ROM routine",
+		"desc": "Disassembler."
+	},
+	"-211": {
+		"type": "ROM routine",
+		"desc": "Ring bell and print `ERR`."
+	},
+	"-198": {
+		"type": "ROM routine",
+		"desc": "Ring bell."
+	},
+	"-151": {
+		"type": "ROM routine",
+		"desc": "Enter the Monitor."
+	},
+	"-144": {
+		"type": "ROM routine",
+		"desc": "Scan input buffer."
+	},
+	"40193": {
+		"type": "byte value",
+		"desc": "Related to length of buffer in pages",
+		"ctx": "DOS 3.3"
+	},
+	"42964": {
+		"type": "DOS routine",
+		"desc": "Moves DOS buffers",
+		"ctx": "DOS 3.3"
+	},
+	"44452": {
+		"type": "byte value",
+		"desc": "Number of files plus one displayed before `CATALOG` pause",
+		"ctx": "DOS 3.3"
+	},
+	"44605": {
+		"type": "byte value",
+		"desc": "Number of files displayed before `CATALOG` pause",
+		"ctx": "DOS 3.3"
+	},
+	"44460": {
+		"type": "word",
+		"desc": "If word value is $FC58 (`HOME`) clear screen before `CATALOG`",
+		"ctx": "DOS 3.3"
+	},
+	"44505": {
+		"type": "word",
+		"desc": "If word value is $EAEA show deleted files in `CATALOG`",
+		"ctx": "DOS 3.3"
+	},
+	"44596": {
+		"type": "vector",
+		"desc": "Fill vector with `NOP` ($EA) to cancel `CATALOG` pause",
+		"ctx": "DOS 3.3"
+	},
+	"49107": {
+		"type": "vector",
+		"desc": "Fill vector with `NOP` ($EA) to prevent language card reload",
+		"ctx": "DOS 3.3"
+	},
+	"49384": {
+		"type": "soft switch",
+		"desc": "Stop drive motor",
+		"ctx": "DOS 3.3"
+	},
+	"49385": {
+		"type": "soft switch",
+		"desc": "Start drive motor",
+		"ctx": "DOS 3.3"
+	},
+	"42350": {
+		"label": "CATALOG",
+		"type": "ROM routine",
+		"desc": "Print listing of files on disk",
+		"ctx": "DOS 3.3"
+	},
+	"40514": {
+		"type": "byte value",
+		"desc": "Greeting program type",
+		"ctx": "DOS 3.3"
+	},
+	"43616": {
+		"type": "word",
+		"desc": "Last `BLOAD` length",
+		"ctx": "DOS 3.3"
+	},
+	"43634": {
+		"type": "word",
+		"desc": "Last `BLOAD` start",
+		"ctx": "DOS 3.3"
+	},
+	"43624": {
+		"type": "byte value",
+		"desc": "Current drive number",
+		"ctx": "DOS 3.3"
+	},
+	"43626": {
+		"type": "byte value",
+		"desc": "Current slot number",
+		"ctx": "DOS 3.3"
+	},
+	"43698": {
+		"type": "byte value",
+		"desc": "Trigger character for DOS commands (`Ctrl-D`)",
+		"ctx": "DOS 3.3"
+	},
+	"44033": {
+		"type": "byte value",
+		"desc": "`CATALOG` track number",
+		"ctx": "DOS 3.3"
+	},
+	"46017": {
+		"type": "byte value",
+		"desc": "Disk volume number",
+		"ctx": "DOS 3.3"
+	},
+	"48944": {
+		"type": "byte value",
+		"desc": "Slot/Drive value",
+		"ctx": "ProDOS"
+	},
+	"48840": {
+		"type": "word",
+		"desc": "Last `BLOAD` length",
+		"ctx": "ProDOS"
+	},
+	"48825": {
+		"type": "word",
+		"desc": "Last `BLOAD` start",
+		"ctx": "ProDOS"
+	}
+}

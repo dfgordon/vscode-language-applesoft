@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as Parser from 'web-tree-sitter';
+import { LangExtBase, LineNumberTool } from './langExtBase';
 
 // Warn against long name variables with same first two characters
 class VariableNameSentry
@@ -54,22 +55,8 @@ class VariableNameSentry
 }
 
 // Apparently no standard provider, so make one up
-export class TSDiagnosticProvider
+export class TSDiagnosticProvider extends LangExtBase
 {
-	parser : Parser;
-	config : vscode.WorkspaceConfiguration;
-
-	constructor(parser: Parser)
-	{
-		this.parser = parser;
-		this.config = vscode.workspace.getConfiguration('applesoft');
-	}
-	curs_to_range(curs: Parser.TreeCursor): vscode.Range
-	{
-		const start_pos = new vscode.Position(curs.startPosition.row,curs.startPosition.column);
-		const end_pos = new vscode.Position(curs.endPosition.row,curs.endPosition.column);
-		return new vscode.Range(start_pos,end_pos);
-	}
 	node_to_range(node: Parser.SyntaxNode): vscode.Range
 	{
 		const start_pos = new vscode.Position(node.startPosition.row,node.startPosition.column);
@@ -108,7 +95,7 @@ export class TSDiagnosticProvider
 			if (!this.is_error_inside(curs.currentNode()))
 				diag.push(new vscode.Diagnostic(rng,curs.currentNode().toString(),vscode.DiagnosticSeverity.Error));
 		}
-		if (this.config.get('collisions'))
+		if (this.config.get('warn.collisions'))
 			if (["realvar","intvar","svar","real_scalar","int_scalar","real_array","int_array","string_array"].indexOf(curs.nodeType)>-1)
 			{
 				const s = vars.add(curs);
@@ -122,7 +109,7 @@ export class TSDiagnosticProvider
 		}
 		if (curs.nodeType=="linenum")
 		{
-			const parsed = parseInt(curs.nodeText);
+			const parsed = parseInt(curs.nodeText.replace(/ /g,''));
 			if (isNaN(parsed))
 				diag.push(new vscode.Diagnostic(rng,'Line number is not a number')); // should not happen
 			else if (parsed<0 || parsed>63999)
@@ -193,56 +180,28 @@ export class TSDiagnosticProvider
 				}
 			}
 		}
-		if (this.config.get('terminalString'))
+		if (this.config.get('warn.terminalString'))
 			if (curs.nodeType=="terminal_string")
 			{
 				diag.push(new vscode.Diagnostic(rng,"Unquote missing. This is valid if it is intended.",vscode.DiagnosticSeverity.Warning));
 			}
 		return true;
 	}
-	process_line_number(diag: Array<vscode.Diagnostic>,nums: Array<number>,curs: Parser.TreeCursor)
-	{
-		if (curs.nodeType=="linenum")
-		{
-			const rng = this.curs_to_range(curs);
-			const parsed = parseInt(curs.nodeText);
-			if (!isNaN(parsed))
-			{
-				nums.push(parsed);
-				if (nums.length>1)
-					if (nums[nums.length-1]<=nums[nums.length-2])
-						diag.push(new vscode.Diagnostic(rng,'Line number out of order'));
-			}
-		}
-	}
 	update(document : vscode.TextDocument, collection: vscode.DiagnosticCollection): void
 	{
 		if (document && document.languageId=='applesoft')
 		{
-			this.config = vscode.workspace.getConfiguration('applesoft');
 			const vars = new VariableNameSentry();
-			const line_numbers = Array<number>();
 			const diag = Array<vscode.Diagnostic>();
-			const syntaxTree = this.parser.parse(document.getText()+"\n");
-			const cursor = syntaxTree.walk();
+			const syntaxTree = this.parse(document.getText()+"\n");
 			// First gather and check the line numbers
+			const lineTool = new LineNumberTool(syntaxTree);
+			const line_numbers = lineTool.get_nums();
+			lineTool.add_diagnostics(diag);
+			// Now run general diagnostics
+			const cursor = syntaxTree.walk();
 			let recurse = true;
 			let finished = false;
-			if (cursor.gotoFirstChild()) // line
-				do
-				{
-					if (cursor.gotoFirstChild()) // line number
-					{
-						this.process_line_number(diag,line_numbers,cursor);
-						cursor.gotoParent();
-					}
-					if (!cursor.gotoNextSibling())
-						finished = true;
-				} while (!finished);
-			// Now run general diagnostics
-			cursor.reset(syntaxTree.rootNode);
-			recurse = true;
-			finished = false;
 			do
 			{
 				if (recurse && cursor.gotoFirstChild())

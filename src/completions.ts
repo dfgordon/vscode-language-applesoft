@@ -1,15 +1,14 @@
 import * as vscode from 'vscode';
-//import * as Parser from 'web-tree-sitter';
 
 export class LineCompletionProvider implements vscode.CompletionItemProvider
 {
 	get_linenum(line: string) : number
 	{
-		const nums = line.match(/^[0-9]+/);
+		const nums = line.match(/^[0-9 ]+/);
 		if (nums)
 			if (nums.length>0)
 			{
-				const num = parseInt(nums[0]);
+				const num = parseInt(nums[0].replace(/ /g,''));
 				if (!isNaN(num))
 					return num;
 			}
@@ -17,8 +16,7 @@ export class LineCompletionProvider implements vscode.CompletionItemProvider
 	}
 	provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext)
 	{
-		const linePrefix = document.lineAt(position).text.substring(0,position.character);
-		if (document.positionAt(0) && document.lineAt(position).text.length==0)
+		if (document.lineAt(position).text.trim().length==0)
 		{
 			let step = 10;
 			const prevNum = this.get_linenum(document.lineAt(position.line-1).text);
@@ -42,7 +40,7 @@ export class TSCompletionProvider implements vscode.CompletionItemProvider
 	}
 	modify(s:string)
 	{
-		if (this.config.get('lowerCaseCompletions') && !this.config.get('caseSensitive'))
+		if (this.config.get('case.lowerCaseCompletions') && !this.config.get('case.caseSensitive'))
 			return s.toLowerCase();
 		else
 			return s;

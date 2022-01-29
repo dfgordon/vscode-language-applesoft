@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as Parser from 'web-tree-sitter';
+import { LangExtBase } from './langExtBase';
 
 const tokenTypes = [
 	'comment', 'string', 'keyword', 'number', 'regexp', 'operator', 'namespace',
@@ -40,20 +41,8 @@ const funcNames = [
 
 export const legend = new vscode.SemanticTokensLegend(tokenTypes,tokenModifiers);
 
-export class TSSemanticTokensProvider implements vscode.DocumentSemanticTokensProvider
+export class TSSemanticTokensProvider extends LangExtBase implements vscode.DocumentSemanticTokensProvider
 {
-	parser : Parser;
-
-	constructor(parser: Parser)
-	{
-		this.parser = parser;
-	}
-	curs_to_range(curs: Parser.TreeCursor): vscode.Range
-	{
-		const start_pos = new vscode.Position(curs.startPosition.row,curs.startPosition.column);
-		const end_pos = new vscode.Position(curs.endPosition.row,curs.endPosition.column);
-		return new vscode.Range(start_pos,end_pos);
-	}	
 	process_node(builder: vscode.SemanticTokensBuilder,curs: Parser.TreeCursor): boolean
 	{
 		const rng = this.curs_to_range(curs);
@@ -104,10 +93,9 @@ export class TSSemanticTokensProvider implements vscode.DocumentSemanticTokensPr
 	}
 	provideDocumentSemanticTokens(document:vscode.TextDocument): vscode.ProviderResult<vscode.SemanticTokens>
 	{
-
 		const tokensBuilder = new vscode.SemanticTokensBuilder(legend);
 
-		const tree = this.parser.parse(document.getText()+"\n");
+		const tree = this.parse(document.getText()+"\n");
 		const cursor = tree.walk();
 		let recurse = true;
 		let finished = false;

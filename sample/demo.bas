@@ -9,5 +9,5 @@
 200 TEST = TELLURIUM(1) + TENSILE(2): REM variable name collisions
 210 TELL = FN CUB(ATN(SIN(TEST) + COS(TEST))): RETURN
 
-301 POKE 6,256: HCOLOR = 8: REM range errors
+301 POKE -16370,256: HCOLOR = 8: REM range errors
 310000 RETURN: REM illegal line number
