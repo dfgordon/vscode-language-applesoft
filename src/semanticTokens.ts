@@ -64,7 +64,7 @@ export class TSSemanticTokensProvider extends LangExtBase implements vscode.Docu
 			builder.push(rng,"macro",[]);
 			return false;
 		}
-		if (curs.nodeType=="string")
+		if (["string","terminal_string"].indexOf(curs.nodeType)>-1)
 		{
 			builder.push(rng,"string",[]);
 			return false;

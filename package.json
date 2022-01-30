@@ -73,13 +73,6 @@
 				"configuration": "./language-configuration.json"
 			}
 		],
-		"grammars": [
-			{
-				"language": "applesoft",
-				"scopeName": "source.bas",
-				"path": "./syntaxes/applesoft.tmGrammar.json"
-			}
-		],
 		"commands": [
 			{
 				"command": "applesoft.commentLines",

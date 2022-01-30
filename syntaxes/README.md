@@ -1,1 +1,1 @@
-The file `applesoft.tmGrammar.json` is a minimal TextMate grammar.  This is *not* the real grammar.  It is only used for the minor task of highlighting hovers.
+The file `applesoft.tmGrammar.json` is a minimal TextMate grammar.  VS Code relies on this to highlight examples in hovers.  Unfortunately, the presence of this can override the much better semantic (non)highlights in some cases, so we are disabling it entirely at present.
