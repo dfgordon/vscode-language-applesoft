@@ -1,15 +1,43 @@
 import * as vscode from 'vscode';
 import * as Parser from 'web-tree-sitter';
+import * as path from 'path';
+
+function get_lang_path(caseSens: boolean|undefined) : string
+{
+	let lang = 'tree-sitter-applesoft';
+	if (caseSens)
+		lang += 'casesens';
+	return path.join(__dirname,'..',lang+'.wasm');
+}
+
+export async function TreeSitterInit(): Promise<[Parser,Parser.Language,Parser.Language,boolean]>
+{
+	const config = vscode.workspace.getConfiguration('applesoft');
+	const caseSens = (c => c==undefined?false:c)(config.get('case.caseSensitive')); 
+	await Parser.init();
+	const parser = new Parser();
+	const Applesoft = await Parser.Language.load(get_lang_path(false));
+	const ApplesoftCaseSens = await Parser.Language.load(get_lang_path(true));
+	if (caseSens)
+		parser.setLanguage(ApplesoftCaseSens);
+	else
+		parser.setLanguage(Applesoft);
+	return [parser,Applesoft,ApplesoftCaseSens,caseSens];
+}
 
 export class LangExtBase
 {
 	parser : Parser;
-	caseSensitiveParser: Parser;
+	Applesoft : Parser.Language;
+	ApplesoftCaseSens : Parser.Language;
 	config : vscode.WorkspaceConfiguration;
-	constructor(parser : Parser,caseSensitiveParser: Parser)
+	caseSens: boolean;
+	constructor(TSInitResult : [Parser,Parser.Language,Parser.Language,boolean])
 	{
-		this.parser = parser;
-		this.caseSensitiveParser = caseSensitiveParser;
+		this.parser = TSInitResult[0];
+		this.Applesoft = TSInitResult[1];
+		this.ApplesoftCaseSens = TSInitResult[2];
+		this.caseSens = TSInitResult[3];
 		this.config = vscode.workspace.getConfiguration('applesoft');
 	}
 	curs_to_range(curs: Parser.TreeCursor): vscode.Range
@@ -21,10 +49,16 @@ export class LangExtBase
 	parse(txt: string) : Parser.Tree
 	{
 		this.config = vscode.workspace.getConfiguration('applesoft');
-		if (this.config.get('case.caseSensitive'))
-			return this.caseSensitiveParser.parse(txt);
-		else
-			return this.parser.parse(txt);
+		const caseSens = (c => c==undefined?false:c)(this.config.get('case.caseSensitive')); 
+		if (caseSens!=this.caseSens)
+		{
+			this.caseSens = caseSens;
+			if (caseSens)
+				this.parser.setLanguage(this.ApplesoftCaseSens);
+			else
+				this.parser.setLanguage(this.Applesoft);
+		}
+		return this.parser.parse(txt);
 	}
 }
 

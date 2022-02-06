@@ -23,7 +23,9 @@
 		"onCommand:applesoft.runFrontVii",
 		"onCommand:applesoft.enterFrontVii",
 		"onCommand:applesoft.runNewVii",
-		"onCommand:applesoft.enterNewVii"
+		"onCommand:applesoft.enterNewVii",
+		"onCommand:applesoft.getFrontVii",
+		"onCommand:applesoft.getAppleWinSaveState"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -59,6 +61,38 @@
 					"type": "boolean",
 					"default": true,
 					"markdownDescription": "Show hovers for keywords such as `PRINT`, `FOR`, etc.."
+				},
+				"applesoft.completions.negativeAddresses": {
+					"type": "boolean",
+					"default": false,
+					"markdownDescription": "Use negative addresses in completions"
+				},
+				"applesoft.vii.newMachine": {
+					"enum": [
+						"appleiiplus",
+						"appleiie"
+					],
+					"default": "appleiie",
+					"markdownDescription": "Type of machine to use when spawning a new Virtual ][ machine"
+				},
+				"applesoft.vii.speed": {
+					"enum": [
+						"regular",
+						"high",
+						"maximum"
+					],
+					"default": "maximum",
+					"markdownDescription": "Emulator speed to set before running code in Virtual ]["
+				},
+				"applesoft.vii.color": {
+					"type": "boolean",
+					"default": false,
+					"markdownDescription": "Use color monitor when spawning a new Virtual ][ machine"
+				},
+				"applesoft.warn.run": {
+					"type": "boolean",
+					"default": true,
+					"markdownDescription": "Warn before interacting with the front Virtual ][ machine"
 				}
 			}
 		},
@@ -97,6 +131,14 @@
 			{
 				"command": "applesoft.enterNewVii",
 				"title": "applesoft: Enter in Virtual ][ new machine"
+			},
+			{
+				"command": "applesoft.getFrontVii",
+				"title": "applesoft: Insert program from Virtual ][ front machine"
+			},
+			{
+				"command": "applesoft.getAppleWinSaveState",
+				"title": "applesoft: Insert program from AppleWin save state"
 			}
 		],
 		"menus": {
@@ -124,13 +166,22 @@
 				{
 					"command": "applesoft.enterNewVii",
 					"when": "editorLangId == applesoft"
+				},
+				{
+					"command": "applesoft.getFrontVii",
+					"when": "editorLangId == applesoft"
+				},
+				{
+					"command": "applesoft.getAppleWinSaveState",
+					"when": "editorLangId == applesoft"
 				}
 			]
 		}
 	},
 	"dependencies": {
 		"tsc": "^2.0.4",
-		"web-tree-sitter": "^0.19.4"
+		"web-tree-sitter": "^0.20.3",
+		"yaml": "^1.10.2"
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

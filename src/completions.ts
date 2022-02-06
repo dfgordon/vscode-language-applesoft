@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as specialAddresses from './specialAddresses.json';
 
 export class LineCompletionProvider implements vscode.CompletionItemProvider
 {
@@ -25,9 +26,87 @@ export class LineCompletionProvider implements vscode.CompletionItemProvider
 			const prevPrevNum = this.get_linenum(document.lineAt(position.line-2).text);
 			if (prevPrevNum!=-1)
 				step = prevNum - prevPrevNum;
-			return [new vscode.CompletionItem((prevNum + step).toString()+' ')];
+			return [new vscode.CompletionItem((prevNum + step).toString()+' ',vscode.CompletionItemKind.Constant)];
 		}
 		return undefined;
+	}
+}
+
+export class AddressCompletionProvider implements vscode.CompletionItemProvider
+{
+	pokeCompletions : Array<vscode.CompletionItem>;
+	peekCompletions : Array<vscode.CompletionItem>;
+	callCompletions : Array<vscode.CompletionItem>;
+	negativeAddr: boolean | undefined;
+	constructor()
+	{
+		this.pokeCompletions = new Array<vscode.CompletionItem>();
+		this.peekCompletions = new Array<vscode.CompletionItem>();
+		this.callCompletions = new Array<vscode.CompletionItem>();
+		this.rebuild();
+	}
+	rebuild()
+	{
+		this.pokeCompletions = new Array<vscode.CompletionItem>();
+		this.peekCompletions = new Array<vscode.CompletionItem>();
+		this.callCompletions = new Array<vscode.CompletionItem>();
+		const config = vscode.workspace.getConfiguration('applesoft');
+		this.negativeAddr = config.get('completions.negativeAddresses');
+		for (const addr in specialAddresses)
+		{
+			const typ = Object(specialAddresses)[addr].type;
+			if (['byte value','word','vector'].indexOf(typ)>-1)
+			{
+				this.pokeCompletions.push(this.get_completion_item(addr,'',','));
+				this.peekCompletions.push(this.get_completion_item(addr,'(',')'));
+			}
+			if (typ=='soft switch')
+			{
+				this.pokeCompletions.push(this.get_completion_item(addr,'',',0'));
+				this.peekCompletions.push(this.get_completion_item(addr,'(',')'));
+			}
+			if (typ=='ROM routine' || typ=='DOS routine')
+				this.callCompletions.push(this.get_completion_item(addr,'',''));
+		}
+	}
+	get_completion_item(addr: string,prefix: string,postfix: string) : vscode.CompletionItem
+	{
+		const addr_entry = Object(specialAddresses)[addr];
+		let num_addr = parseInt(addr);
+		num_addr = num_addr<0 && !this.negativeAddr ? num_addr+2**16 : num_addr;
+		num_addr = num_addr>=2**15 && this.negativeAddr ? num_addr-2**16 : num_addr;
+		const it = { 
+			description: addr_entry.brief,
+			detail: addr_entry.label,
+			label: prefix + num_addr + postfix
+		};
+		if (!it.description)
+		{
+			const temp = addr_entry.desc as string;
+			const temp2 = temp.lastIndexOf('.')==temp.length-1 ? temp.substring(0,temp.length-1) : temp;
+			it.description = temp2;
+		}
+		return new vscode.CompletionItem(it,vscode.CompletionItemKind.Constant);
+	}
+	provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext)
+	{
+		let ans = new Array<vscode.CompletionItem>();
+
+		if (position.character>4)
+		{
+			const l = position.line;
+			const c = position.character;
+			let statement = document.getText(new vscode.Range(new vscode.Position(l,0),new vscode.Position(l,c)));
+			if (!vscode.workspace.getConfiguration('applesoft').get('case.caseSensitive'))
+				statement = statement.toUpperCase();
+			if (statement.search(/POKE\s*$/)>-1)
+				ans = ans.concat(this.pokeCompletions);
+			if (statement.search(/PEEK\s*$/)>-1)
+				ans = ans.concat(this.peekCompletions);
+			if (statement.search(/CALL\s*$/)>-1)
+				ans = ans.concat(this.callCompletions);
+		}
+		return ans;
 	}
 }
 
@@ -49,7 +128,7 @@ export class TSCompletionProvider implements vscode.CompletionItemProvider
 	{
 		a2tok.forEach(s =>
 		{
-			ans.push(new vscode.CompletionItem(this.modify(s)));
+			ans.push(new vscode.CompletionItem(this.modify(s),vscode.CompletionItemKind.Keyword));
 		});
 	}
 	add_funcs(ans: Array<vscode.CompletionItem>,a2tok: string[],expr_typ: string)
@@ -57,7 +136,7 @@ export class TSCompletionProvider implements vscode.CompletionItemProvider
 		a2tok.forEach(s =>
 		{
 			s = this.modify(s);
-			ans.push(new vscode.CompletionItem(s+' ('+expr_typ+')'));
+			ans.push(new vscode.CompletionItem(s+' ('+expr_typ+')',vscode.CompletionItemKind.Function));
 			ans[ans.length-1].insertText = new vscode.SnippetString(s+'(${0})');
 		});
 	}
@@ -66,7 +145,7 @@ export class TSCompletionProvider implements vscode.CompletionItemProvider
 		a2tok.forEach(s =>
 		{
 			s = this.modify(s);
-			ans.push(new vscode.CompletionItem(s+' '+expr_typ));
+			ans.push(new vscode.CompletionItem(s+' '+expr_typ,vscode.CompletionItemKind.Keyword));
 			ans[ans.length-1].insertText = new vscode.SnippetString(s+' ${0}');
 		});
 	}
@@ -85,6 +164,9 @@ export class TSCompletionProvider implements vscode.CompletionItemProvider
 		this.add_procs(ans,['CALL','COLOR =','HCOLOR =','HIMEM:','HTAB','IN#','LOMEM:','PR#',
 			'ROT =','SCALE =','SPEED =','VTAB'],'aexpr');
 
+		ans.push(new vscode.CompletionItem(this.modify('CALL special (enter, space)')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('CALL'));
+	
 		ans.push(new vscode.CompletionItem(this.modify('DEF FN name (name) = aexpr')));
 		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('DEF FN ${1:name} (${2:dummy variable}) = ${0:aexpr}'));
 	
@@ -147,11 +229,17 @@ export class TSCompletionProvider implements vscode.CompletionItemProvider
 		ans.push(new vscode.CompletionItem(this.modify('ONERR GOTO linenum')));
 		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('ONERR GOTO ${0:linenum}'));
 
+		ans.push(new vscode.CompletionItem(this.modify('PEEK (special) (enter, space)')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('PEEK'));
+
 		ans.push(new vscode.CompletionItem(this.modify('PLOT aexpr,aexpr')));
 		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('PLOT ${1:x},${0:y}'));
 
 		ans.push(new vscode.CompletionItem(this.modify('POKE aexpr,aexpr')));
 		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('POKE ${1:addr},${0:val}'));
+
+		ans.push(new vscode.CompletionItem(this.modify('POKE special (enter, space)')));
+		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('POKE'));
 		
 		ans.push(new vscode.CompletionItem(this.modify('RIGHT$ (sexpr,aexpr)')));
 		ans[ans.length-1].insertText = new vscode.SnippetString(this.modify('RIGHT$ (${1:sexpr},${0:length})'));

@@ -1,0 +1,537 @@
+[
+    {
+        "code": 128,
+        "lexeme": "end",
+        "rule id": "end_tok"
+    },
+    {
+        "code": 129,
+        "lexeme": "for",
+        "rule id": "for_tok"
+    },
+    {
+        "code": 130,
+        "lexeme": "next",
+        "rule id": "next_tok"
+    },
+    {
+        "code": 131,
+        "lexeme": "data",
+        "rule id": "data_tok"
+    },
+    {
+        "code": 132,
+        "lexeme": "input",
+        "rule id": "input_tok"
+    },
+    {
+        "code": 133,
+        "lexeme": "del",
+        "rule id": "del_tok"
+    },
+    {
+        "code": 134,
+        "lexeme": "dim",
+        "rule id": "dim_tok"
+    },
+    {
+        "code": 135,
+        "lexeme": "read",
+        "rule id": "read_tok"
+    },
+    {
+        "code": 136,
+        "lexeme": "gr",
+        "rule id": "gr_tok"
+    },
+    {
+        "code": 137,
+        "lexeme": "text",
+        "rule id": "text_tok"
+    },
+    {
+        "code": 138,
+        "lexeme": "pr#",
+        "rule id": "prn_tok"
+    },
+    {
+        "code": 139,
+        "lexeme": "in#",
+        "rule id": "inn_tok"
+    },
+    {
+        "code": 140,
+        "lexeme": "call",
+        "rule id": "call_tok"
+    },
+    {
+        "code": 141,
+        "lexeme": "plot",
+        "rule id": "plot_tok"
+    },
+    {
+        "code": 142,
+        "lexeme": "hlin",
+        "rule id": "hlin_tok"
+    },
+    {
+        "code": 143,
+        "lexeme": "vlin",
+        "rule id": "vlin_tok"
+    },
+    {
+        "code": 144,
+        "lexeme": "hgr2",
+        "rule id": "hgr2_tok"
+    },
+    {
+        "code": 145,
+        "lexeme": "hgr",
+        "rule id": "hgr_tok"
+    },
+    {
+        "code": 146,
+        "lexeme": "hcolor=",
+        "rule id": "hcoloreq_tok"
+    },
+    {
+        "code": 147,
+        "lexeme": "hplot",
+        "rule id": "hplot_tok"
+    },
+    {
+        "code": 148,
+        "lexeme": "draw",
+        "rule id": "draw_tok"
+    },
+    {
+        "code": 149,
+        "lexeme": "xdraw",
+        "rule id": "xdraw_tok"
+    },
+    {
+        "code": 150,
+        "lexeme": "htab",
+        "rule id": "htab_tok"
+    },
+    {
+        "code": 151,
+        "lexeme": "home",
+        "rule id": "home_tok"
+    },
+    {
+        "code": 152,
+        "lexeme": "rot=",
+        "rule id": "roteq_tok"
+    },
+    {
+        "code": 153,
+        "lexeme": "scale=",
+        "rule id": "scaleeq_tok"
+    },
+    {
+        "code": 154,
+        "lexeme": "shload",
+        "rule id": "shload_tok"
+    },
+    {
+        "code": 155,
+        "lexeme": "trace",
+        "rule id": "trace_tok"
+    },
+    {
+        "code": 156,
+        "lexeme": "notrace",
+        "rule id": "notrace_tok"
+    },
+    {
+        "code": 157,
+        "lexeme": "normal",
+        "rule id": "normal_tok"
+    },
+    {
+        "code": 158,
+        "lexeme": "inverse",
+        "rule id": "inverse_tok"
+    },
+    {
+        "code": 159,
+        "lexeme": "flash",
+        "rule id": "flash_tok"
+    },
+    {
+        "code": 160,
+        "lexeme": "color=",
+        "rule id": "coloreq_tok"
+    },
+    {
+        "code": 161,
+        "lexeme": "pop",
+        "rule id": "pop_tok"
+    },
+    {
+        "code": 162,
+        "lexeme": "vtab",
+        "rule id": "vtab_tok"
+    },
+    {
+        "code": 163,
+        "lexeme": "himem:",
+        "rule id": "himem_tok"
+    },
+    {
+        "code": 164,
+        "lexeme": "lomem:",
+        "rule id": "lomem_tok"
+    },
+    {
+        "code": 165,
+        "lexeme": "onerr",
+        "rule id": "onerr_tok"
+    },
+    {
+        "code": 166,
+        "lexeme": "resume",
+        "rule id": "resume_tok"
+    },
+    {
+        "code": 167,
+        "lexeme": "recall",
+        "rule id": "recall_tok"
+    },
+    {
+        "code": 168,
+        "lexeme": "store",
+        "rule id": "store_tok"
+    },
+    {
+        "code": 169,
+        "lexeme": "speed=",
+        "rule id": "speedeq_tok"
+    },
+    {
+        "code": 170,
+        "lexeme": "let",
+        "rule id": "let_tok"
+    },
+    {
+        "code": 171,
+        "lexeme": "goto",
+        "rule id": "goto_tok"
+    },
+    {
+        "code": 172,
+        "lexeme": "run",
+        "rule id": "run_tok"
+    },
+    {
+        "code": 173,
+        "lexeme": "if",
+        "rule id": "if_tok"
+    },
+    {
+        "code": 174,
+        "lexeme": "restore",
+        "rule id": "restore_tok"
+    },
+    {
+        "code": 175,
+        "lexeme": "&",
+        "rule id": "amp_tok"
+    },
+    {
+        "code": 176,
+        "lexeme": "gosub",
+        "rule id": "gosub_tok"
+    },
+    {
+        "code": 177,
+        "lexeme": "return",
+        "rule id": "return_tok"
+    },
+    {
+        "code": 178,
+        "lexeme": "rem",
+        "rule id": "rem_tok"
+    },
+    {
+        "code": 179,
+        "lexeme": "stop",
+        "rule id": "stop_tok"
+    },
+    {
+        "code": 180,
+        "lexeme": "on",
+        "rule id": "on_tok"
+    },
+    {
+        "code": 181,
+        "lexeme": "wait",
+        "rule id": "wait_tok"
+    },
+    {
+        "code": 182,
+        "lexeme": "load",
+        "rule id": "load_tok"
+    },
+    {
+        "code": 183,
+        "lexeme": "save",
+        "rule id": "save_tok"
+    },
+    {
+        "code": 184,
+        "lexeme": "def",
+        "rule id": "def_tok"
+    },
+    {
+        "code": 185,
+        "lexeme": "poke",
+        "rule id": "poke_tok"
+    },
+    {
+        "code": 186,
+        "lexeme": "print",
+        "rule id": "print_tok"
+    },
+    {
+        "code": 187,
+        "lexeme": "cont",
+        "rule id": "cont_tok"
+    },
+    {
+        "code": 188,
+        "lexeme": "list",
+        "rule id": "list_tok"
+    },
+    {
+        "code": 189,
+        "lexeme": "clear",
+        "rule id": "clear_tok"
+    },
+    {
+        "code": 190,
+        "lexeme": "get",
+        "rule id": "get_tok"
+    },
+    {
+        "code": 191,
+        "lexeme": "new",
+        "rule id": "new_tok"
+    },
+    {
+        "code": 192,
+        "lexeme": "tab(",
+        "rule id": "tabp_tok"
+    },
+    {
+        "code": 193,
+        "lexeme": "to",
+        "rule id": "to_tok"
+    },
+    {
+        "code": 194,
+        "lexeme": "fn",
+        "rule id": "fn_tok"
+    },
+    {
+        "code": 195,
+        "lexeme": "spc(",
+        "rule id": "spcp_tok"
+    },
+    {
+        "code": 196,
+        "lexeme": "then",
+        "rule id": "then_tok"
+    },
+    {
+        "code": 197,
+        "lexeme": "at",
+        "rule id": "at_tok"
+    },
+    {
+        "code": 198,
+        "lexeme": "not",
+        "rule id": "not_tok"
+    },
+    {
+        "code": 199,
+        "lexeme": "step",
+        "rule id": "step_tok"
+    },
+    {
+        "code": 200,
+        "lexeme": "+",
+        "rule id": "plus_tok"
+    },
+    {
+        "code": 201,
+        "lexeme": "-",
+        "rule id": "minus_tok"
+    },
+    {
+        "code": 202,
+        "lexeme": "*",
+        "rule id": "times_tok"
+    },
+    {
+        "code": 203,
+        "lexeme": "/",
+        "rule id": "div_tok"
+    },
+    {
+        "code": 204,
+        "lexeme": "^",
+        "rule id": "pow_tok"
+    },
+    {
+        "code": 205,
+        "lexeme": "and",
+        "rule id": "and_tok"
+    },
+    {
+        "code": 206,
+        "lexeme": "or",
+        "rule id": "or_tok"
+    },
+    {
+        "code": 207,
+        "lexeme": ">",
+        "rule id": "gtr_tok"
+    },
+    {
+        "code": 208,
+        "lexeme": "=",
+        "rule id": "eq_tok"
+    },
+    {
+        "code": 209,
+        "lexeme": "<",
+        "rule id": "less_tok"
+    },
+    {
+        "code": 210,
+        "lexeme": "sgn",
+        "rule id": "sgn_tok"
+    },
+    {
+        "code": 211,
+        "lexeme": "int",
+        "rule id": "int_tok"
+    },
+    {
+        "code": 212,
+        "lexeme": "abs",
+        "rule id": "abs_tok"
+    },
+    {
+        "code": 213,
+        "lexeme": "usr",
+        "rule id": "usr_tok"
+    },
+    {
+        "code": 214,
+        "lexeme": "fre",
+        "rule id": "fre_tok"
+    },
+    {
+        "code": 215,
+        "lexeme": "scrn(",
+        "rule id": "scrnp_tok"
+    },
+    {
+        "code": 216,
+        "lexeme": "pdl",
+        "rule id": "pdl_tok"
+    },
+    {
+        "code": 217,
+        "lexeme": "pos",
+        "rule id": "pos_tok"
+    },
+    {
+        "code": 218,
+        "lexeme": "sqr",
+        "rule id": "sqr_tok"
+    },
+    {
+        "code": 219,
+        "lexeme": "rnd",
+        "rule id": "rnd_tok"
+    },
+    {
+        "code": 220,
+        "lexeme": "log",
+        "rule id": "log_tok"
+    },
+    {
+        "code": 221,
+        "lexeme": "exp",
+        "rule id": "exp_tok"
+    },
+    {
+        "code": 222,
+        "lexeme": "cos",
+        "rule id": "cos_tok"
+    },
+    {
+        "code": 223,
+        "lexeme": "sin",
+        "rule id": "sin_tok"
+    },
+    {
+        "code": 224,
+        "lexeme": "tan",
+        "rule id": "tan_tok"
+    },
+    {
+        "code": 225,
+        "lexeme": "atn",
+        "rule id": "atn_tok"
+    },
+    {
+        "code": 226,
+        "lexeme": "peek",
+        "rule id": "peek_tok"
+    },
+    {
+        "code": 227,
+        "lexeme": "len",
+        "rule id": "len_tok"
+    },
+    {
+        "code": 228,
+        "lexeme": "str$",
+        "rule id": "str_tok"
+    },
+    {
+        "code": 229,
+        "lexeme": "val",
+        "rule id": "val_tok"
+    },
+    {
+        "code": 230,
+        "lexeme": "asc",
+        "rule id": "asc_tok"
+    },
+    {
+        "code": 231,
+        "lexeme": "chr$",
+        "rule id": "chr_tok"
+    },
+    {
+        "code": 232,
+        "lexeme": "left$",
+        "rule id": "left_tok"
+    },
+    {
+        "code": 233,
+        "lexeme": "right$",
+        "rule id": "right_tok"
+    },
+    {
+        "code": 234,
+        "lexeme": "mid$",
+        "rule id": "mid_tok"
+    }
+]

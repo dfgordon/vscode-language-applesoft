@@ -1,3 +1,5 @@
 10 A$ = "Hello"
 20 PRINT A$ " " "world": REM dispensing with separator
 30 INPUT "What is your name (first,last)? ";FIRST$,LAST$
+40 READ A$,X,C$
+50 DATA this is "good",1.5,,,"hello,hello",PRINT:PRINT ;;A$,,B$;;:::
