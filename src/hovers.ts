@@ -2,12 +2,15 @@ import * as vscode from 'vscode';
 import * as Parser from 'web-tree-sitter';
 import { AddressHovers } from './hoversAddresses';
 import { StatementHovers } from './hoversStatements';
-import { LangExtBase } from './langExtBase';
+import * as lxbase from './langExtBase';
 
-export class TSHoverProvider extends LangExtBase implements vscode.HoverProvider
+export class TSHoverProvider extends lxbase.LangExtBase implements vscode.HoverProvider
 {
 	addresses = new AddressHovers();
 	statements = new StatementHovers();
+	hover = new Array<vscode.MarkdownString>();
+	position = new vscode.Position(0,0);
+	range = new vscode.Range(new vscode.Position(0,0),new vscode.Position(0,0));
 
 	addr_hover(hover:Array<vscode.MarkdownString>,curs:Parser.TreeCursor) : boolean
 	{
@@ -50,52 +53,35 @@ export class TSHoverProvider extends LangExtBase implements vscode.HoverProvider
 		}
 		return false;
 	}
-	get_hover(hover:Array<vscode.MarkdownString>,curs:Parser.TreeCursor,position:vscode.Position) : boolean
+	get_hover(curs:Parser.TreeCursor) : lxbase.WalkerChoice
 	{
-		const rng = this.curs_to_range(curs);
-		if (rng.contains(position))
+		this.range = this.curs_to_range(curs);
+		if (this.range.contains(this.position))
 		{
 			if (this.config.get('hovers.specialAddresses'))
-				if (this.addr_hover(hover,curs))
-					return false;
+				if (this.addr_hover(this.hover,curs))
+					return lxbase.WalkerOptions.exit;
 			if (this.config.get('hovers.keywords'))
 			{
 				const temp = this.statements.get(curs.nodeType);
 				if (temp)
 				{
-					temp.forEach(s => hover.push(s));
-					return false;
+					temp.forEach(s => this.hover.push(s));
+					return lxbase.WalkerOptions.exit;
 				}
 			}
-			return true;
+			return lxbase.WalkerOptions.gotoChild;
 		}
-		return false;
+		return lxbase.WalkerOptions.gotoChild;
 	}
 	provideHover(document:vscode.TextDocument,position: vscode.Position,token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover>
 	{
-		const hover = new Array<vscode.MarkdownString>();
+		this.hover = new Array<vscode.MarkdownString>();
+		this.position = position;
 		const tree = this.parse(document.getText()+"\n");
-		const cursor = tree.walk();
-		let recurse = true;
-		let finished = false;
-		do
-		{
-			if (recurse && cursor.gotoFirstChild())
-				recurse = this.get_hover(hover,cursor,position);
-			else
-			{
-				if (cursor.gotoNextSibling())
-					recurse = this.get_hover(hover,cursor,position);
-				else if (cursor.gotoParent())
-					recurse = false;
-				else
-					finished = true;
-			}
-			if (hover.length>0)
-				finished = true;
-		} while (!finished);
-		if (hover.length>0)
-			return new vscode.Hover(hover,this.curs_to_range(cursor));
+		this.walk(tree,this.get_hover.bind(this));
+		if (this.hover.length>0)
+			return new vscode.Hover(this.hover,this.range);
 		else
 			return undefined;
 	}

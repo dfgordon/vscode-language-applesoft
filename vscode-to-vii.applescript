@@ -15,8 +15,9 @@ end waitForTyping
 on enterProgram(theMachine, t)
 	tell application "Virtual ]["
 		tell theMachine
-			type line "NEW"
+			type line "TEXT"
 			type line "HOME"
+			type line "NEW"
 			type line "POKE 35,15"
 			type text t
 			type line ""

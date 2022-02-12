@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as Parser from 'web-tree-sitter';
-import { LangExtBase } from './langExtBase';
+import * as lxbase from './langExtBase';
 
 const tokenTypes = [
 	'comment', 'string', 'keyword', 'number', 'regexp', 'operator', 'namespace',
@@ -41,79 +41,63 @@ const funcNames = [
 
 export const legend = new vscode.SemanticTokensLegend(tokenTypes,tokenModifiers);
 
-export class TSSemanticTokensProvider extends LangExtBase implements vscode.DocumentSemanticTokensProvider
+export class TSSemanticTokensProvider extends lxbase.LangExtBase implements vscode.DocumentSemanticTokensProvider
 {
-	process_node(builder: vscode.SemanticTokensBuilder,curs: Parser.TreeCursor): boolean
+	tokensBuilder : vscode.SemanticTokensBuilder = new vscode.SemanticTokensBuilder(legend);
+	process_node(curs: Parser.TreeCursor): lxbase.WalkerChoice
 	{
 		const rng = this.curs_to_range(curs);
 		if (["comment_text","rem_tok"].indexOf(curs.nodeType)>-1) // must precede _tok handler
 		{
-			builder.push(rng,"comment",[]);
-			return false;
+			this.tokensBuilder.push(rng,"comment",[]);
+			return lxbase.WalkerOptions.gotoSibling;
 		}
 		if (curs.nodeType.slice(-3)=="tok")
 		{
 			if (funcNames.indexOf(curs.nodeType.slice(0,-4))>-1)
-				builder.push(rng,"function",[]);
+				this.tokensBuilder.push(rng,"function",[]);
 			else
-				builder.push(rng,"keyword",[]);
-			return false;
+				this.tokensBuilder.push(rng,"keyword",[]);
+			return lxbase.WalkerOptions.gotoSibling;
 		}
 		if (curs.nodeType=="linenum")
 		{
-			builder.push(rng,"macro",[]);
-			return false;
+			this.tokensBuilder.push(rng,"macro",[]);
+			return lxbase.WalkerOptions.gotoSibling;
 		}
 		if (["string","terminal_string"].indexOf(curs.nodeType)>-1)
 		{
-			builder.push(rng,"string",[]);
-			return false;
+			this.tokensBuilder.push(rng,"string",[]);
+			return lxbase.WalkerOptions.gotoSibling;
 		}
 		if (curs.nodeType=="fn_name")
 		{
-			builder.push(rng,"function",[]);
-			return false;
+			this.tokensBuilder.push(rng,"function",[]);
+			return lxbase.WalkerOptions.gotoSibling;
 		}
 		if (["integer","real"].indexOf(curs.nodeType)>-1)
 		{
-			builder.push(rng,"number",[]);
-			return false;
+			this.tokensBuilder.push(rng,"number",[]);
+			return lxbase.WalkerOptions.gotoSibling;
 		}
-		if (["intvar","realvar","svar","real_scalar","int_scalar","real_array","int_array","string_array"].indexOf(curs.nodeType)>-1)
+		if (lxbase.VariableTypes.indexOf(curs.nodeType)>-1)
 		{
-			builder.push(rng,"variable",[]);
-			return true;
+			this.tokensBuilder.push(this.var_name_range(curs),"variable",[]);
+			return lxbase.WalkerOptions.gotoChild;
 		}
 		if (curs.nodeType=="literal")
 		{
-			builder.push(rng,"string",[]);
-			return false;
+			this.tokensBuilder.push(rng,"string",[]);
+			return lxbase.WalkerOptions.gotoSibling;
 		}
-		return true;
+		return lxbase.WalkerOptions.gotoChild;
 	}
 	provideDocumentSemanticTokens(document:vscode.TextDocument): vscode.ProviderResult<vscode.SemanticTokens>
 	{
-		const tokensBuilder = new vscode.SemanticTokensBuilder(legend);
+		this.tokensBuilder = new vscode.SemanticTokensBuilder(legend);
 
 		const tree = this.parse(document.getText()+"\n");
-		const cursor = tree.walk();
-		let recurse = true;
-		let finished = false;
-		do
-		{
-			if (recurse && cursor.gotoFirstChild())
-				recurse = this.process_node(tokensBuilder,cursor);
-			else
-			{
-				if (cursor.gotoNextSibling())
-					recurse = this.process_node(tokensBuilder,cursor);
-				else if (cursor.gotoParent())
-					recurse = false;
-				else
-					finished = true;
-			}
-		} while (!finished);
-
-		return tokensBuilder.build();
+		this.walk(tree,this.process_node.bind(this));
+		return this.tokensBuilder.build();
 	}
 }

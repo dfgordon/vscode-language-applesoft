@@ -22,13 +22,19 @@ The extension knows over 180 special address locations relevant to Applesoft, DO
 
 ## Using with AppleWin
 
-The extension can transfer programs from the [AppleWin](https://github.com/AppleWin/AppleWin) emulator.  To do this, first load the code in [AppleWin](https://github.com/AppleWin/AppleWin) and create a state file by pressing `F11`.  Once you have the state file, return to the editor, position the cursor at the insertion point, and use `Ctrl-P` to select `applesoft: Insert program from AppleWin save state`.  Select the state file and the program should be inserted.
+The extension can transfer programs to and from the [AppleWin](https://github.com/AppleWin/AppleWin) emulator.
 
-Reading the state file works the same on any platform, but [AppleWin](https://github.com/AppleWin/AppleWin) itself is native to Windows.  Note that [AppleWin](https://github.com/AppleWin/AppleWin) is not part of the extension, and must be installed separately.
+* To transfer a program from [AppleWin](https://github.com/AppleWin/AppleWin), make sure the program is in the emulated machine's memory, and create a state file by pressing `F11`.  Once you have the state file, return to the editor, position the cursor at the insertion point, and use `Ctrl-P` to select `applesoft: Insert program from AppleWin save state`.  Select the state file and the program should be inserted.
+* To transfer a program to [AppleWin](https://github.com/AppleWin/AppleWin), use `Ctrl-P` to select `applesoft: Store program in AppleWin save state`.  Select a previously created state file to store the program there.  Finally, go to [AppleWin](https://github.com/AppleWin/AppleWin) and press `F12` to load the state file.
+	- Any program or variables already in the state file are lost.
+	- The state file used for this should be a "safe state," e.g., machine awaiting line entry.
+	- Start of program space (103,104) and `HIMEM` are retained, `LOMEM` is reset.  If the program would break `HIMEM` the operation is aborted.
+
+Operations with the state file are the same on any platform, but [AppleWin](https://github.com/AppleWin/AppleWin) itself is native to Windows.  Note that [AppleWin](https://github.com/AppleWin/AppleWin) is not part of the extension, and must be installed separately.
 
 ## Using with Virtual ][
 
-The extension can transfer programs to and from the [Virtual \]\[](https://virtualii.com) emulator.  To do this, use one of the `Ctrl+P` commands:
+The extension can transfer programs to and from the [Virtual \]\[](https://virtualii.com) emulator.  To do this, use one of the `Cmd+P` commands:
 
 * `applesoft: Enter in Virtual ][ new machine`: creates a new virtual machine, resets it, and enters the code.  Since this resets the machine while it is waiting for a disk to be inserted, there are no operating system commands available.  This is suitable for self-contained programs.
 * `applesoft: Run in Virtual ][ new machine`: same as above, except the code is also run in the same step.

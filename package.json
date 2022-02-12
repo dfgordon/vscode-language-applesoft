@@ -25,7 +25,9 @@
 		"onCommand:applesoft.runNewVii",
 		"onCommand:applesoft.enterNewVii",
 		"onCommand:applesoft.getFrontVii",
-		"onCommand:applesoft.getAppleWinSaveState"
+		"onCommand:applesoft.getAppleWinSaveState",
+		"onCommand:applesoft.setAppleWinSaveState",
+		"onCommand:applesoft.showTokenizedProgram"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -92,7 +94,7 @@
 				"applesoft.warn.run": {
 					"type": "boolean",
 					"default": true,
-					"markdownDescription": "Warn before interacting with the front Virtual ][ machine"
+					"markdownDescription": "Warn before writing to an emulator or emulator state file"
 				}
 			}
 		},
@@ -139,6 +141,14 @@
 			{
 				"command": "applesoft.getAppleWinSaveState",
 				"title": "applesoft: Insert program from AppleWin save state"
+			},
+			{
+				"command": "applesoft.setAppleWinSaveState",
+				"title": "applesoft: Store program in AppleWin save state"
+			},
+			{
+				"command": "applesoft.showTokenizedProgram",
+				"title": "applesoft: Show tokenized program"
 			}
 		],
 		"menus": {
@@ -174,6 +184,14 @@
 				{
 					"command": "applesoft.getAppleWinSaveState",
 					"when": "editorLangId == applesoft"
+				},
+				{
+					"command": "applesoft.setAppleWinSaveState",
+					"when": "editorLangId == applesoft"
+				},
+				{
+					"command": "applesoft.showTokenizedProgram",
+					"when": "editorLangId == applesoft"
 				}
 			]
 		}
@@ -181,7 +199,7 @@
 	"dependencies": {
 		"tsc": "^2.0.4",
 		"web-tree-sitter": "^0.20.3",
-		"yaml": "^1.10.2"
+		"yaml": "^2.0.0-10"
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
@@ -195,6 +213,6 @@
 		"@typescript-eslint/eslint-plugin": "^4.16.0",
 		"@typescript-eslint/parser": "^4.16.0",
 		"eslint": "^7.21.0",
-		"typescript": "^4.4.3"
+		"typescript": "^4.5.5"
 	}
 }

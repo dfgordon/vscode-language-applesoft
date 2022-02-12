@@ -2,6 +2,26 @@ import * as vscode from 'vscode';
 import * as Parser from 'web-tree-sitter';
 import * as path from 'path';
 
+export const VariableTypes = [
+	'realvar',
+	'intvar',
+	'svar',
+	'real_scalar',
+	'int_scalar',
+	'real_array',
+	'int_array',
+	'string_array'
+];
+
+export const WalkerOptions = {
+	gotoChild: 0,
+	gotoSibling: 1,
+	gotoParentSibling: 2,
+	exit: 3
+} as const;
+
+export type WalkerChoice = typeof WalkerOptions[keyof typeof WalkerOptions];
+
 function get_lang_path(caseSens: boolean|undefined) : string
 {
 	let lang = 'tree-sitter-applesoft';
@@ -46,6 +66,28 @@ export class LangExtBase
 		const end_pos = new vscode.Position(curs.endPosition.row,curs.endPosition.column);
 		return new vscode.Range(start_pos,end_pos);
 	}
+	var_name_range(curs: Parser.TreeCursor) : vscode.Range
+	{
+		// get the `name` portion of a variable node
+		// this includes trailing anonymous nodes like '$','%' in the range
+		let endPosition = curs.endPosition;
+		const node = curs.currentNode();
+		if (node.firstNamedChild)
+			endPosition = node.firstNamedChild.startPosition;
+		const start_pos = new vscode.Position(curs.startPosition.row,curs.startPosition.column);
+		const end_pos = new vscode.Position(endPosition.row,endPosition.column);
+		return new vscode.Range(start_pos,end_pos);
+	}
+	verify_document() : {ed:vscode.TextEditor,doc:vscode.TextDocument} | undefined
+	{
+		const textEditor = vscode.window.activeTextEditor;
+		if (!textEditor)
+			return undefined;
+		const document = textEditor.document;
+		if (!document || document.languageId!='applesoft')
+			return undefined;
+		return {ed:textEditor,doc:document};
+	}
 	parse(txt: string) : Parser.Tree
 	{
 		this.config = vscode.workspace.getConfiguration('applesoft');
@@ -60,104 +102,120 @@ export class LangExtBase
 		}
 		return this.parser.parse(txt);
 	}
+	walk(syntaxTree: Parser.Tree,visit: (node: Parser.TreeCursor) => WalkerChoice)
+	{
+		const curs = syntaxTree.walk();
+		let choice : WalkerChoice = WalkerOptions.gotoChild;
+		do
+		{
+			if (choice==WalkerOptions.gotoChild && curs.gotoFirstChild())
+				choice = visit(curs);
+			else if (choice==WalkerOptions.gotoParentSibling && curs.gotoParent() && curs.gotoNextSibling())
+				choice = visit(curs);
+			else if (choice==WalkerOptions.gotoSibling && curs.gotoNextSibling())
+				choice = visit(curs);
+			else if (curs.gotoNextSibling())
+				choice = visit(curs);
+			else if (curs.gotoParent())
+				choice = WalkerOptions.gotoSibling;
+			else
+				choice = WalkerOptions.exit;
+		} while (choice!=WalkerOptions.exit);
+	}
 }
 
-export class LineNumberTool
+export class LineNumberTool extends LangExtBase
 {
-	syntaxTree : Parser.Tree;
 	nums : Array<number>;
 	rngs : Array<vscode.Range>;
 	leading_space : Array<number>;
 	trailing_space : Array<number>;
-	constructor(tree: Parser.Tree)
+	constructor(TSInitResult : [Parser,Parser.Language,Parser.Language,boolean])
 	{
-		// leaves nums and rngs with only *primary* line numbers
-		this.syntaxTree = tree;
+		super(TSInitResult);
 		this.nums = new Array<number>();
 		this.rngs = new Array<vscode.Range>();
 		this.leading_space = new Array<number>();
 		this.trailing_space = new Array<number>();
-		const curs = this.syntaxTree.walk();
-		let finished = false;
-		if (curs.gotoFirstChild()) // line
-			do
-			{
-				if (curs.gotoFirstChild()) // line number
-				{
-					this.record(curs);
-					curs.gotoParent();
-				}
-				if (!curs.gotoNextSibling())
-					finished = true;
-			} while (!finished);
 	}
-	curs_to_range(curs: Parser.TreeCursor): vscode.Range
+	clear()
 	{
-		const start_pos = new vscode.Position(curs.startPosition.row,curs.startPosition.column);
-		const end_pos = new vscode.Position(curs.endPosition.row,curs.endPosition.column);
-		return new vscode.Range(start_pos,end_pos);
+		this.nums = new Array<number>();
+		this.rngs = new Array<vscode.Range>();
+		this.leading_space = new Array<number>();
+		this.trailing_space = new Array<number>();
 	}
-	record(curs: Parser.TreeCursor)
+	push_linenum(curs: Parser.TreeCursor)
 	{
-		if (curs.nodeType=="linenum")
+		const rng = this.curs_to_range(curs);
+		const leading = curs.nodeText.length - curs.nodeText.trimLeft().length;
+		const trailing = curs.nodeText.length - curs.nodeText.trimRight().length;
+		const parsed = parseInt(curs.nodeText.replace(/ /g,''));
+		if (!isNaN(parsed))
 		{
-			const rng = this.curs_to_range(curs);
-			const leading = curs.nodeText.length - curs.nodeText.trimLeft().length;
-			const trailing = curs.nodeText.length - curs.nodeText.trimRight().length;
-			const parsed = parseInt(curs.nodeText.replace(/ /g,''));
-			if (!isNaN(parsed))
-			{
-				this.nums.push(parsed);
-				this.rngs.push(rng);
-				this.leading_space.push(leading);
-				this.trailing_space.push(trailing);
-			}
+			this.nums.push(parsed);
+			this.rngs.push(rng);
+			this.leading_space.push(leading);
+			this.trailing_space.push(trailing);
 		}
 	}
-	get_nums() : Array<number>
+	visitPrimaryLineNumber(curs:Parser.TreeCursor) : WalkerChoice
 	{
+		const parent = curs.currentNode().parent;
+		if (curs.nodeType=="linenum" && parent)
+			if (parent.type=="line")
+			{
+				this.push_linenum(curs);
+				return WalkerOptions.gotoParentSibling;
+			}
+		return WalkerOptions.gotoChild;
+	}
+	visitSecondaryLineNumber(curs:Parser.TreeCursor) : WalkerChoice
+	{
+		const parent = curs.currentNode().parent;
+		if (curs.nodeType=="linenum" && parent)
+			if (parent.type!="line")
+			{
+				this.push_linenum(curs);
+				return WalkerOptions.gotoSibling;
+			}
+		return WalkerOptions.gotoChild;
+	}
+	get_primary_nums(tree: Parser.Tree) : Array<number>
+	{
+		this.clear();
+		this.walk(tree,this.visitPrimaryLineNumber.bind(this));
 		return this.nums;
 	}
-	renumber(mapping: Map<number,number>,editBuilder: vscode.TextEditorEdit)
+	apply_mapping(i: number,mapping: Map<number,number>,editBuilder: vscode.TextEditorEdit)
 	{
-		// clear the primary line number data
-		this.nums = new Array<number>();
-		this.rngs = new Array<vscode.Range>();
-		this.leading_space = new Array<number>();
-		this.trailing_space = new Array<number>();
-		// walk the entire tree to load the full line number data (including statement refs)
-		const curs = this.syntaxTree.walk();
-		let recurse = true;
-		let finished = false;
-		do
+		const new_num =  mapping.get(this.nums[i]);
+		if (new_num!=undefined)
 		{
-			if (recurse && curs.gotoFirstChild())
-				this.record(curs);
-			else
-			{
-				recurse = true;
-				if (curs.gotoNextSibling())
-					this.record(curs);
-				else if (curs.gotoParent())
-					recurse = false;
-				else
-					finished = true;
-			}
-		} while (!finished);
-		// apply the mapping
-		for (let i=0;i<this.nums.length;i++)
-		{
-			const new_num =  mapping.get(this.nums[i]);
-			if (new_num!=undefined)
-			{
-				let fmt_num = ' '.repeat(this.leading_space[i]);
-				fmt_num += new_num.toString();
-				fmt_num += ' '.repeat(this.trailing_space[i]);
-				editBuilder.replace(this.rngs[i],fmt_num);
-			}
+			let fmt_num = ' '.repeat(this.leading_space[i]);
+			fmt_num += new_num.toString();
+			fmt_num += ' '.repeat(this.trailing_space[i]);
+			editBuilder.replace(this.rngs[i],fmt_num);
 		}
 	}
-	add_diagnostics(diag: Array<vscode.Diagnostic>)
+	renumber(sel: vscode.Range | undefined,updateRefs: boolean,tree: Parser.Tree,mapping: Map<number,number>,editBuilder: vscode.TextEditorEdit)
+	{
+		// Modify primary line numbers only in selected range
+		this.clear();
+		this.walk(tree,this.visitPrimaryLineNumber.bind(this));
+		for (let i=0;i<this.nums.length;i++)
+			if (sel==undefined || sel.contains(this.rngs[i]))
+				this.apply_mapping(i,mapping,editBuilder);
+		// Modify line number references globally
+		if (updateRefs)
+		{
+			this.clear();
+			this.walk(tree,this.visitSecondaryLineNumber.bind(this));
+			for (let i=0;i<this.nums.length;i++)
+				this.apply_mapping(i,mapping,editBuilder);
+		}
+	}
+	add_linenum_diagnostics(diag: Array<vscode.Diagnostic>)
 	{
 		const n = this.nums.length;
 		for (let i=1;i<n;i++)

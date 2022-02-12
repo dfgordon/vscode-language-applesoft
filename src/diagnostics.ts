@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as Parser from 'web-tree-sitter';
-import { LangExtBase, LineNumberTool } from './langExtBase';
+import * as lxbase from './langExtBase';
 
 // Warn against long name variables with same first two characters
 class VariableNameSentry
@@ -55,7 +55,7 @@ class VariableNameSentry
 }
 
 // Apparently no standard provider, so make one up
-export class TSDiagnosticProvider extends LangExtBase
+export class TSDiagnosticProvider extends lxbase.LineNumberTool
 {
 	node_to_range(node: Parser.SyntaxNode): vscode.Range
 	{
@@ -96,7 +96,7 @@ export class TSDiagnosticProvider extends LangExtBase
 				diag.push(new vscode.Diagnostic(rng,curs.currentNode().toString(),vscode.DiagnosticSeverity.Error));
 		}
 		if (this.config.get('warn.collisions'))
-			if (["realvar","intvar","svar","real_scalar","int_scalar","real_array","int_array","string_array"].indexOf(curs.nodeType)>-1)
+			if (lxbase.VariableTypes.indexOf(curs.nodeType)>-1)
 			{
 				const s = vars.add(curs);
 				if (s.length>0)
@@ -194,10 +194,9 @@ export class TSDiagnosticProvider extends LangExtBase
 			const vars = new VariableNameSentry();
 			const diag = Array<vscode.Diagnostic>();
 			const syntaxTree = this.parse(document.getText()+"\n");
-			// First gather and check the line numbers
-			const lineTool = new LineNumberTool(syntaxTree);
-			const line_numbers = lineTool.get_nums();
-			lineTool.add_diagnostics(diag);
+			// First gather and check the primary line numbers
+			const line_numbers = this.get_primary_nums(syntaxTree);
+			this.add_linenum_diagnostics(diag);
 			// Now run general diagnostics
 			const cursor = syntaxTree.walk();
 			let recurse = true;

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { TreeSitterInit } from './langExtBase';
+import * as lxbase from './langExtBase';
 import { TSHoverProvider } from './hovers';
 import { TSDiagnosticProvider } from './diagnostics';
 import { TSSemanticTokensProvider, legend } from './semanticTokens';
@@ -10,7 +10,7 @@ import * as com from './commands';
 /// It creates the parser object and sets up the providers.
 export function activate(context: vscode.ExtensionContext)
 {
-	TreeSitterInit().then( TSInitResult =>
+	lxbase.TreeSitterInit().then( TSInitResult =>
 	{
 		const selector = { language: 'applesoft' };
 		const collection = vscode.languages.createDiagnosticCollection('applesoft-file');
@@ -21,6 +21,8 @@ export function activate(context: vscode.ExtensionContext)
 		const lineCompletions = new completions.LineCompletionProvider();
 		const addressCompletions = new completions.AddressCompletionProvider();
 		const renumberer = new com.RenumberTool(TSInitResult);
+		const viiEntry = new com.ViiEntryTool(TSInitResult);
+		const tokenizer = new com.TokenizationTool(TSInitResult);
 		if (vscode.window.activeTextEditor)
 		{
 			diagnostics.update(vscode.window.activeTextEditor.document, collection);
@@ -31,12 +33,14 @@ export function activate(context: vscode.ExtensionContext)
 		vscode.languages.registerCompletionItemProvider(selector,lineCompletions,'\n');
 		vscode.languages.registerCompletionItemProvider(selector,addressCompletions,' ');
 
-		context.subscriptions.push(vscode.commands.registerCommand("applesoft.runNewVii",com.runNewVirtualII));
-		context.subscriptions.push(vscode.commands.registerCommand("applesoft.runFrontVii",com.runFrontVirtualII));
-		context.subscriptions.push(vscode.commands.registerCommand("applesoft.enterNewVii",com.enterNewVirtualII));
-		context.subscriptions.push(vscode.commands.registerCommand("applesoft.enterFrontVii",com.enterFrontVirtualII));
-		context.subscriptions.push(vscode.commands.registerCommand("applesoft.getFrontVii",com.getFrontVirtualII));
-		context.subscriptions.push(vscode.commands.registerCommand("applesoft.getAppleWinSaveState",com.getAppleWinSaveState));
+		context.subscriptions.push(vscode.commands.registerCommand("applesoft.runNewVii",viiEntry.runNewVirtualII,viiEntry));
+		context.subscriptions.push(vscode.commands.registerCommand("applesoft.runFrontVii",viiEntry.runFrontVirtualII,viiEntry));
+		context.subscriptions.push(vscode.commands.registerCommand("applesoft.enterNewVii",viiEntry.enterNewVirtualII,viiEntry));
+		context.subscriptions.push(vscode.commands.registerCommand("applesoft.enterFrontVii",viiEntry.enterFrontVirtualII,viiEntry));
+		context.subscriptions.push(vscode.commands.registerCommand("applesoft.getFrontVii",tokenizer.getFrontVirtualII,tokenizer));
+		context.subscriptions.push(vscode.commands.registerCommand("applesoft.getAppleWinSaveState",tokenizer.getAppleWinSaveState,tokenizer));
+		context.subscriptions.push(vscode.commands.registerCommand("applesoft.setAppleWinSaveState",tokenizer.setAppleWinSaveState,tokenizer));
+		context.subscriptions.push(vscode.commands.registerCommand("applesoft.showTokenizedProgram",tokenizer.showTokenizedProgram,tokenizer));
 		context.subscriptions.push(vscode.commands.registerCommand("applesoft.renumber",renumberer.command,renumberer));
 		context.subscriptions.push(vscode.commands.registerTextEditorCommand("applesoft.commentLines",com.commentLinesCommand));
 
