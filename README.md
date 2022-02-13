@@ -1,5 +1,7 @@
 # Applesoft BASIC
 
+![unit tests](https://github.com/dfgordon/vscode-language-applesoft/actions/workflows/node.js.yml/badge.svg)
+
 Language support for Applesoft BASIC in Visual Studio Code.
 
 If you are viewing this on github, you can install the extension from VS Code by searching the Marketplace for `applesoft`.
