@@ -197,7 +197,6 @@
 		}
 	},
 	"dependencies": {
-		"tsc": "^2.0.4",
 		"web-tree-sitter": "^0.20.3",
 		"yaml": "^2.0.0-10"
 	},
