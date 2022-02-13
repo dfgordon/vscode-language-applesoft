@@ -10,6 +10,7 @@ If you are viewing this on github, you can install the extension from VS Code by
 * Diagnostics to identify errors and gotchas
 * Renumber lines in a selection or full document
 * Transfer programs to and from Apple ][ emulators (see below)
+* View tokenized program as hex dump and unicode text
 * Options : see `Ctrl+Comma` -> `Extensions` -> `Applesoft BASIC`
 * Commands: see `Ctrl+P` -> `applesoft`
 * Activates for file extensions `.bas`, `.abas`, `.A`
@@ -24,11 +25,11 @@ The extension knows over 180 special address locations relevant to Applesoft, DO
 
 The extension can transfer programs to and from the [AppleWin](https://github.com/AppleWin/AppleWin) emulator.
 
-* To transfer a program from [AppleWin](https://github.com/AppleWin/AppleWin), make sure the program is in the emulated machine's memory, and create a state file by pressing `F11`.  Once you have the state file, return to the editor, position the cursor at the insertion point, and use `Ctrl-P` to select `applesoft: Insert program from AppleWin save state`.  Select the state file and the program should be inserted.
-* To transfer a program to [AppleWin](https://github.com/AppleWin/AppleWin), use `Ctrl-P` to select `applesoft: Store program in AppleWin save state`.  Select a previously created state file to store the program there.  Finally, go to [AppleWin](https://github.com/AppleWin/AppleWin) and press `F12` to load the state file.
+* To transfer a program to [AppleWin](https://github.com/AppleWin/AppleWin), first use [AppleWin](https://github.com/AppleWin/AppleWin) to create a state file (press `F11`).  Then in the editor use `Ctrl-P` to select `applesoft: Store program in AppleWin save state`, and select the state file.  Then go to [AppleWin](https://github.com/AppleWin/AppleWin) and press `F12` to load the modified state file.  Type `LIST` to verify succes.
 	- Any program or variables already in the state file are lost.
 	- The state file used for this should be a "safe state," e.g., machine awaiting line entry.
 	- Start of program space (103,104) and `HIMEM` are retained, `LOMEM` is reset.  If the program would break `HIMEM` the operation is aborted.
+* To transfer a program from [AppleWin](https://github.com/AppleWin/AppleWin), make sure the program is in the emulated machine's memory, and create a state file by pressing `F11`.  Once you have the state file, return to the editor, position the cursor at the insertion point, and use `Ctrl-P` to select `applesoft: Insert program from AppleWin save state`.  Select the state file and the program should be inserted.
 
 Operations with the state file are the same on any platform, but [AppleWin](https://github.com/AppleWin/AppleWin) itself is native to Windows.  Note that [AppleWin](https://github.com/AppleWin/AppleWin) is not part of the extension, and must be installed separately.
 
