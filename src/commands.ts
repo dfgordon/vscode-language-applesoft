@@ -237,11 +237,22 @@ export class TokenizationTool extends lxbase.LangExtBase
 			rawBinary[i] = raw_str.charCodeAt(i);
 		return Buffer.from(rawBinary);
 	}
-	replace_node(newNodeText: string, curs: Parser.TreeCursor) : string
+	hex_from_raw_str(raw_str: string) : string
+	{
+		const rawBinary = new Uint8Array(this.buffer_from_raw_str(raw_str));
+		return [...rawBinary].map(b => b.toString(16).toUpperCase().padStart(2,"0")).join("");
+	}
+	replace_curs(newNodeText: string, curs: Parser.TreeCursor) : string
 	{
 		const preNode = this.tokenizedLine.substring(0,curs.startPosition.column);
 		const postNode = this.tokenizedLine.substring(curs.endPosition.column);
 		return preNode + newNodeText + ' '.repeat(curs.nodeText.length-newNodeText.length) + postNode;
+	}
+	replace_node(newNodeText: string, node: Parser.SyntaxNode) : string
+	{
+		const preNode = this.tokenizedLine.substring(0,node.startPosition.column);
+		const postNode = this.tokenizedLine.substring(node.endPosition.column);
+		return preNode + newNodeText + ' '.repeat(node.text.length-newNodeText.length) + postNode;
 	}
 	replace_var_name(curs: Parser.TreeCursor) : string
 	{
@@ -258,21 +269,36 @@ export class TokenizationTool extends lxbase.LangExtBase
 
 		// Negative ASCII tokens
 		if (curs.nodeType in tokenize_map)
-			this.tokenizedLine = this.replace_node(String.fromCharCode(Object(tokenize_map)[curs.nodeType] as number),curs);
+			this.tokenizedLine = this.replace_curs(String.fromCharCode(Object(tokenize_map)[curs.nodeType] as number),curs);
 		
 		// Required upper case
 		if (lxbase.VariableTypes.indexOf(curs.nodeType)>-1)
 			this.tokenizedLine = this.replace_var_name(curs);
-		if (curs.nodeType=='fn_name')
-			this.tokenizedLine = this.replace_node(curs.nodeText.toUpperCase(),curs);
+		if (['fn_name','real'].indexOf(curs.nodeType)>-1)
+			this.tokenizedLine = this.replace_curs(curs.nodeText.toUpperCase(),curs);
 		
 		// Persistent spaces
+		if (curs.nodeType=='statement')
+		{
+			const tok = curs.currentNode().firstNamedChild;
+			if (tok)
+			{
+				// Space in the DATA statement is kept unconditionally, so handle all at once and go out
+				if (tok.type=='data_tok')
+				{
+					const preItems = this.tokenizedLine.substring(0,tok.endPosition.column);
+					const items = this.tokenizedLine.substring(tok.endPosition.column,curs.endPosition.column);
+					const postData = this.tokenizedLine.substring(curs.endPosition.column);
+					this.tokenizedLine = preItems + items.replace(/ /g,this.persistentSpace) + postData;
+					this.tokenizedLine = this.replace_node(String.fromCharCode(Object(tokenize_map)['data_tok'] as number),tok);
+					return lxbase.WalkerOptions.gotoSibling;
+				}
+			}
+		}
 		if (curs.nodeType=='string' || curs.nodeType=='terminal_string')
-			this.tokenizedLine = this.replace_node(curs.nodeText.trim().replace(/ /g,this.persistentSpace),curs);
-		if (curs.nodeType=='literal')
-			this.tokenizedLine = this.replace_node(curs.nodeText.trimStart().replace(/ /g,this.persistentSpace),curs);
+			this.tokenizedLine = this.replace_curs(curs.nodeText.trim().replace(/ /g,this.persistentSpace),curs);
 		if (curs.nodeType=='comment_text')
-			this.tokenizedLine = this.replace_node(curs.nodeText.replace(/ /g,this.persistentSpace),curs);
+			this.tokenizedLine = this.replace_curs(curs.nodeText.replace(/ /g,this.persistentSpace),curs);
 		
 		return lxbase.WalkerOptions.gotoChild;
 	}

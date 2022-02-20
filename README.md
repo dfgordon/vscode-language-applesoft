@@ -27,7 +27,7 @@ The extension knows over 180 special address locations relevant to Applesoft, DO
 
 The extension can transfer programs to and from the [AppleWin](https://github.com/AppleWin/AppleWin) emulator.
 
-* To transfer a program to [AppleWin](https://github.com/AppleWin/AppleWin), first use [AppleWin](https://github.com/AppleWin/AppleWin) to create a state file (press `F11`).  Then in the editor use `Ctrl-P` to select `applesoft: Store program in AppleWin save state`, and select the state file.  Then go to [AppleWin](https://github.com/AppleWin/AppleWin) and press `F12` to load the modified state file.  Type `LIST` to verify succes.
+* To transfer a program to [AppleWin](https://github.com/AppleWin/AppleWin), first use [AppleWin](https://github.com/AppleWin/AppleWin) to create a state file (press `F11`).  Then in the editor use `Ctrl-P` to select `applesoft: Store program in AppleWin save state`, and select the state file.  Then go to [AppleWin](https://github.com/AppleWin/AppleWin) and press `F12` to load the modified state file.  Type `LIST` to verify success.
 	- Any program or variables already in the state file are lost.
 	- The state file used for this should be a "safe state," e.g., machine awaiting line entry.
 	- Start of program space (103,104) and `HIMEM` are retained, `LOMEM` is reset.  If the program would break `HIMEM` the operation is aborted.
@@ -39,10 +39,10 @@ Operations with the state file are the same on any platform, but [AppleWin](http
 
 The extension can transfer programs to and from the [Virtual \]\[](https://virtualii.com) emulator.  To do this, use one of the `Cmd+P` commands:
 
-* `applesoft: Enter in Virtual ][ new machine`: creates a new virtual machine, resets it, and enters the code.  Since this resets the machine while it is waiting for a disk to be inserted, there are no operating system commands available.  This is suitable for self-contained programs.
-* `applesoft: Run in Virtual ][ new machine`: same as above, except the code is also run in the same step.
-* `applesoft: Enter in Virtual ][ front machine`: attempts to enter code into the machine in the front window.  This allows you to configure the machine any way you like, but is more dangerous, since we cannot know what the machine is doing at the moment you give the command.  Existing program and variables are erased.
-* `applesoft: Run in Virtual ][ front machine`: same as above, except the code is also run in the same step.
+* `applesoft: Enter in Virtual ][ new machine`: creates a new virtual machine, resets it, and enters the program.  Since this resets the machine while it is waiting for a disk to be inserted, there are no operating system commands available.  This is suitable for self-contained programs.
+* `applesoft: Run in Virtual ][ new machine`: same as above, except the program is also run in the same step.
+* `applesoft: Enter in Virtual ][ front machine`: attempts to enter program into the machine in the front window.  This allows you to configure the machine any way you like, but is more dangerous, since we cannot know what the machine is doing at the moment you give the command.  Existing program and variables are erased.
+* `applesoft: Run in Virtual ][ front machine`: same as above, except the program is also run in the same step.
 * `applesoft: Insert program from Virtual ][ front machine`: extracts the Applesoft program currently in the memory of the virtual machine, and inserts it at the position of the cursor or selection.
 
 This capability only applies to MacOS. Note that [Virtual \]\[](https://virtualii.com) is not part of the extension, and must be installed separately.
