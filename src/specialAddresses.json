@@ -1,4 +1,747 @@
 {
+    "10": {
+        "brief": "USR vector",
+        "ctx": "Applesoft",
+        "desc": "Action to take upon calling `USR` function",
+        "label": "USR",
+        "type": "vector"
+    },
+    "22": {
+        "brief": "FP compare parameter",
+        "ctx": "Applesoft",
+        "desc": "Code related to floating point comparison routine",
+        "type": "byte value"
+    },
+    "32": {
+        "brief": "Sets left margin of text display",
+        "desc": "Sets left margin of text display. Range 0-39.",
+        "label": "WNDLFT",
+        "type": "byte value"
+    },
+    "33": {
+        "brief": "Sets width of text display",
+        "desc": "Sets width of text display. Range 1-40.",
+        "label": "WNDWDTH",
+        "type": "byte value"
+    },
+    "34": {
+        "brief": "Sets top margin of text display",
+        "desc": "Sets top margin of text display. Range 0-23.",
+        "label": "WNDTOP",
+        "type": "byte value"
+    },
+    "35": {
+        "brief": "Sets bottom margin of text display",
+        "desc": "Sets bottom margin of text display. Range 0-24.",
+        "label": "WNDBTM",
+        "type": "byte value"
+    },
+    "36": {
+        "brief": "Horizontal position of the cursor",
+        "desc": "Horizontal position of the cursor. Range 0-39.",
+        "label": "CH",
+        "type": "byte value"
+    },
+    "37": {
+        "brief": "Vertical position of the cursor",
+        "desc": "Vertical position of the cursor. Range 0-23.",
+        "label": "CV",
+        "type": "byte value"
+    },
+    "40": {
+        "brief": "cursor address",
+        "desc": "Base address of the cursor's row",
+        "label": "BAS",
+        "type": "word"
+    },
+    "43": {
+        "desc": "Boot slot times 16.",
+        "type": "byte value"
+    },
+    "44": {
+        "desc": "Low resolution horizontal end point.",
+        "label": "H2",
+        "type": "byte value"
+    },
+    "45": {
+        "desc": "Low resolution vertical end point.",
+        "label": "V2",
+        "type": "byte value"
+    },
+    "46": {
+        "desc": "Tape checksum.",
+        "label": "CHKSUM",
+        "type": "byte value"
+    },
+    "48": {
+        "desc": "Low resolution color times 17.",
+        "label": "COLOR",
+        "type": "byte value"
+    },
+    "50": {
+        "desc": "Text output format.",
+        "label": "INVFLG",
+        "type": "byte value"
+    },
+    "51": {
+        "desc": "Prompt character.",
+        "label": "PROMPT",
+        "type": "byte value"
+    },
+    "52": {
+        "ctx": "Monitor",
+        "desc": "Used by Monitor.",
+        "label": "YSAV",
+        "type": "byte value"
+    },
+    "53": {
+        "ctx": "Monitor",
+        "desc": "Used by Monitor.",
+        "label": "YSAV1",
+        "type": "byte value"
+    },
+    "54": {
+        "desc": "Address of output device.",
+        "label": "CSW",
+        "type": "word"
+    },
+    "56": {
+        "desc": "Address of input device.",
+        "label": "KSW",
+        "type": "word"
+    },
+    "58": {
+        "ctx": "Monitor",
+        "desc": "Program counter",
+        "label": "PC",
+        "type": "word"
+    },
+    "60": {
+        "brief": "source start for AUXMOVE",
+        "desc": "Source starting address for AUXMOVE.",
+        "label": "A1",
+        "type": "word"
+    },
+    "62": {
+        "brief": "source end for AUXMOVE",
+        "desc": "Source ending address for AUXMOVE.",
+        "label": "A2",
+        "type": "word"
+    },
+    "64": {
+        "ctx": "Monitor",
+        "desc": "Used by Monitor.",
+        "label": "A3",
+        "type": "word"
+    },
+    "66": {
+        "brief": "dest start for AUXMOVE",
+        "desc": "Destination starting address for AUXMOVE.",
+        "label": "A4",
+        "type": "word"
+    },
+    "68": {
+        "ctx": "Monitor",
+        "desc": "Used by Monitor.",
+        "label": "A5",
+        "type": "word"
+    },
+    "74": {
+        "ctx": "Integer BASIC",
+        "desc": "Start of variables",
+        "label": "LOMEM",
+        "type": "word"
+    },
+    "76": {
+        "ctx": "Integer BASIC",
+        "desc": "End of program",
+        "label": "HIMEM",
+        "type": "word"
+    },
+    "78": {
+        "desc": "Random number field.",
+        "label": "RND",
+        "type": "word"
+    },
+    "80": {
+        "ctx": "Applesoft",
+        "desc": "Result of GETADR routine.",
+        "label": "LINNUM",
+        "type": "word"
+    },
+    "103": {
+        "ctx": "Applesoft",
+        "desc": "Start of Applesoft program.",
+        "label": "TXTTAB",
+        "type": "word"
+    },
+    "105": {
+        "ctx": "Applesoft",
+        "desc": "Start of variable space, `LOMEM`.",
+        "label": "VARTAB",
+        "type": "word"
+    },
+    "107": {
+        "ctx": "Applesoft",
+        "desc": "Start of array space.",
+        "label": "ARYTAB",
+        "type": "word"
+    },
+    "109": {
+        "ctx": "Applesoft",
+        "desc": "End of array space.",
+        "label": "STREND",
+        "type": "word"
+    },
+    "111": {
+        "ctx": "Applesoft",
+        "desc": "Start of string space.",
+        "label": "FRETOP",
+        "type": "word"
+    },
+    "113": {
+        "ctx": "Applesoft",
+        "desc": "String storage pointer.",
+        "label": "FRESPC",
+        "type": "word"
+    },
+    "115": {
+        "ctx": "Applesoft",
+        "desc": "End of variable space, `HIMEM`.",
+        "label": "MEMSIZ",
+        "type": "word"
+    },
+    "117": {
+        "ctx": "Applesoft",
+        "desc": "Line number being executed.",
+        "label": "CURLIN",
+        "type": "word"
+    },
+    "119": {
+        "ctx": "Applesoft",
+        "desc": "Line number where program stopped.",
+        "label": "OLDLIN",
+        "type": "word"
+    },
+    "121": {
+        "ctx": "Applesoft",
+        "desc": "Address of line being executed.",
+        "label": "NXTPTR",
+        "type": "word"
+    },
+    "123": {
+        "brief": "`DATA` statement line",
+        "ctx": "Applesoft",
+        "desc": "Line number of current `DATA` statement.",
+        "label": "DATLIN",
+        "type": "word"
+    },
+    "125": {
+        "ctx": "Applesoft",
+        "desc": "Address of next `DATA` item.",
+        "label": "DATPTR",
+        "type": "word"
+    },
+    "127": {
+        "ctx": "Applesoft",
+        "desc": "Address of `DATA` or `INPUT` item.",
+        "type": "word"
+    },
+    "129": {
+        "ctx": "Applesoft",
+        "desc": "Last used variable name.",
+        "type": "word"
+    },
+    "131": {
+        "ctx": "Applesoft",
+        "desc": "Last used variable address.",
+        "label": "VARPNT",
+        "type": "word"
+    },
+    "138": {
+        "ctx": "Applesoft",
+        "desc": "Temporary FP register",
+        "label": "TEMP3",
+        "type": "float"
+    },
+    "147": {
+        "ctx": "Applesoft",
+        "desc": "Temporary FP register",
+        "label": "TEMP1",
+        "type": "float"
+    },
+    "152": {
+        "ctx": "Applesoft",
+        "desc": "Temporary FP register",
+        "label": "TEMP2",
+        "type": "float"
+    },
+    "155": {
+        "ctx": "Applesoft",
+        "desc": "Address of array from GETARYPT",
+        "label": "LOWTR",
+        "type": "float"
+    },
+    "157": {
+        "ctx": "Applesoft",
+        "desc": "FP Accumulator",
+        "label": "FAC",
+        "type": "unpacked float"
+    },
+    "165": {
+        "ctx": "Applesoft",
+        "desc": "FP Argument",
+        "label": "ARG",
+        "type": "unpacked float"
+    },
+    "175": {
+        "ctx": "Applesoft",
+        "desc": "End of Applesoft program.",
+        "type": "word"
+    },
+    "177": {
+        "ctx": "Applesoft",
+        "desc": "get program character",
+        "label": "CHRGET",
+        "type": "ZP routine"
+    },
+    "183": {
+        "ctx": "Applesoft",
+        "desc": "re-get program character",
+        "label": "CHRGOT",
+        "type": "ZP routine"
+    },
+    "184": {
+        "ctx": "Applesoft",
+        "desc": "Pointer to current program character",
+        "label": "TXTPTR",
+        "type": "word"
+    },
+    "198": {
+        "ctx": "Integer BASIC",
+        "desc": "Address of line for GOTO",
+        "label": "GOTOA",
+        "type": "word"
+    },
+    "202": {
+        "ctx": "Integer BASIC",
+        "desc": "Pointer to start of program",
+        "label": "PP",
+        "type": "word"
+    },
+    "204": {
+        "ctx": "Integer BASIC",
+        "desc": "End of variables",
+        "label": "PV",
+        "type": "word"
+    },
+    "206": {
+        "ctx": "Integer BASIC",
+        "desc": "Next line number",
+        "label": "VAL",
+        "type": "word"
+    },
+    "214": {
+        "ctx": "Applesoft",
+        "desc": "`RUN` flag.",
+        "type": "byte value"
+    },
+    "216": {
+        "ctx": "Applesoft",
+        "desc": "Error handler flag for `ONERR`.",
+        "label": "ERRFLG",
+        "type": "byte value"
+    },
+    "217": {
+        "ctx": "Integer BASIC",
+        "desc": "Run flag, positive is immediate mode",
+        "type": "byte value"
+    },
+    "218": {
+        "ctx": "Applesoft",
+        "desc": "Line number of error.",
+        "label": "ERRLIN",
+        "type": "word"
+    },
+    "220": {
+        "ctx": "Applesoft | Integer BASIC",
+        "desc": "address of error | current line number",
+        "type": "word"
+    },
+    "222": {
+        "ctx": "Applesoft",
+        "desc": "Error code.",
+        "type": "byte value"
+    },
+    "224": {
+        "ctx": "Applesoft",
+        "desc": "Last `HPLOT` x coordinate.",
+        "type": "word"
+    },
+    "226": {
+        "ctx": "Applesoft",
+        "desc": "Last `HPLOT` y coordinate.",
+        "type": "byte value"
+    },
+    "228": {
+        "ctx": "Applesoft | Integer BASIC",
+        "desc": "Code related to HCOLOR | line number address",
+        "type": "byte value"
+    },
+    "230": {
+        "desc": "High resolution plotting page.",
+        "type": "byte value"
+    },
+    "231": {
+        "desc": "`SCALE` value.",
+        "type": "byte value"
+    },
+    "232": {
+        "desc": "Address of shape table.",
+        "label": "SHADDR",
+        "type": "word"
+    },
+    "234": {
+        "brief": "hi-res collision flag",
+        "desc": "High resolution graphics collision flag.",
+        "type": "byte value"
+    },
+    "241": {
+        "desc": "Code related to `SPEED`.",
+        "type": "byte value"
+    },
+    "243": {
+        "desc": "Mask for `FLASH`.",
+        "type": "byte value"
+    },
+    "249": {
+        "desc": "Code related to `ROT`.",
+        "type": "byte value"
+    },
+    "976": {
+        "desc": "DOS re-entry from the Monitor",
+        "type": "vector"
+    },
+    "979": {
+        "desc": "DOS cold start",
+        "type": "vector"
+    },
+    "982": {
+        "desc": "File manager",
+        "type": "vector"
+    },
+    "985": {
+        "desc": "DOS RWTS",
+        "type": "vector"
+    },
+    "1005": {
+        "desc": "Program starting address for XFER.",
+        "type": "word"
+    },
+    "1008": {
+        "brief": "address of `BRK` handler",
+        "desc": "Address of subroutine handling `BRK` requests.",
+        "type": "word"
+    },
+    "1010": {
+        "brief": "address of `Reset` handler",
+        "desc": "Address of program taking control after `Reset`",
+        "type": "word"
+    },
+    "1012": {
+        "desc": "Power-up byte",
+        "type": "byte value"
+    },
+    "1013": {
+        "brief": "`&` vector",
+        "desc": "Action to take upon issuing `&` command",
+        "type": "vector"
+    },
+    "1016": {
+        "brief": "`Ctrl-Y` vector",
+        "desc": "Action to take upon issuing `Ctrl-Y`",
+        "type": "vector"
+    },
+    "1019": {
+        "brief": "interrupt vector",
+        "desc": "Action to take upon non-maskable interrupt",
+        "type": "vector"
+    },
+    "1022": {
+        "desc": "Address of interrupt handler",
+        "type": "vector"
+    },
+    "40193": {
+        "ctx": "DOS 3.3",
+        "desc": "Related to length of buffer in pages",
+        "type": "byte value"
+    },
+    "40324": {
+        "ctx": "DOS 3.3",
+        "desc": "Cold start routine",
+        "type": "DOS routine"
+    },
+    "40383": {
+        "ctx": "DOS 3.3",
+        "desc": "Reconnect DOS.",
+        "type": "DOS routine"
+    },
+    "40514": {
+        "ctx": "DOS 3.3",
+        "desc": "Greeting program type",
+        "type": "byte value"
+    },
+    "42350": {
+        "ctx": "DOS 3.3",
+        "desc": "Print listing of files on disk",
+        "label": "CATALOG",
+        "type": "DOS routine"
+    },
+    "42964": {
+        "ctx": "DOS 3.3",
+        "desc": "Moves DOS buffers",
+        "type": "DOS routine"
+    },
+    "43616": {
+        "ctx": "DOS 3.3",
+        "desc": "Last `BLOAD` length",
+        "type": "word"
+    },
+    "43624": {
+        "ctx": "DOS 3.3",
+        "desc": "Current drive number",
+        "type": "byte value"
+    },
+    "43626": {
+        "ctx": "DOS 3.3",
+        "desc": "Current slot number",
+        "type": "byte value"
+    },
+    "43634": {
+        "ctx": "DOS 3.3",
+        "desc": "Last `BLOAD` start",
+        "type": "word"
+    },
+    "43698": {
+        "brief": "DOS command trigger",
+        "ctx": "DOS 3.3",
+        "desc": "Trigger character for DOS commands (`Ctrl-D`)",
+        "type": "byte value"
+    },
+    "44033": {
+        "ctx": "DOS 3.3",
+        "desc": "`CATALOG` track number",
+        "type": "byte value"
+    },
+    "44452": {
+        "brief": "files+1 before `CATALOG` pause",
+        "ctx": "DOS 3.3",
+        "desc": "Number of files plus one displayed before `CATALOG` pause",
+        "type": "byte value"
+    },
+    "44460": {
+        "brief": "vector within `CATALOG`",
+        "ctx": "DOS 3.3",
+        "desc": "If word value is $FC58 (`HOME`) clear screen before `CATALOG`",
+        "type": "word"
+    },
+    "44505": {
+        "brief": "If $EAEA show deleted files",
+        "ctx": "DOS 3.3",
+        "desc": "If word value is $EAEA show deleted files in `CATALOG`",
+        "type": "word"
+    },
+    "44596": {
+        "brief": "If $EA cancel `CATALOG` pause",
+        "ctx": "DOS 3.3",
+        "desc": "Fill vector with `NOP` ($EA) to cancel `CATALOG` pause",
+        "type": "vector"
+    },
+    "44605": {
+        "brief": "files before `CATALOG` pause",
+        "ctx": "DOS 3.3",
+        "desc": "Number of files displayed before `CATALOG` pause",
+        "type": "byte value"
+    },
+    "46017": {
+        "ctx": "DOS 3.3",
+        "desc": "Disk volume number",
+        "type": "byte value"
+    },
+    "48825": {
+        "ctx": "ProDOS",
+        "desc": "Last `BLOAD` start",
+        "type": "word"
+    },
+    "48840": {
+        "ctx": "ProDOS",
+        "desc": "Last `BLOAD` length",
+        "type": "word"
+    },
+    "48944": {
+        "ctx": "ProDOS",
+        "desc": "Slot/Drive value",
+        "type": "byte value"
+    },
+    "49107": {
+        "brief": "If $EAEAEA prevent language reload",
+        "ctx": "DOS 3.3",
+        "desc": "Fill vector with `NOP` ($EA) to prevent language card reload",
+        "type": "vector"
+    },
+    "49384": {
+        "ctx": "DOS 3.3",
+        "desc": "Stop drive motor",
+        "type": "soft switch"
+    },
+    "49385": {
+        "ctx": "DOS 3.3",
+        "desc": "Start drive motor",
+        "type": "soft switch"
+    },
+    "-144": {
+        "desc": "Scan input buffer.",
+        "type": "ROM routine"
+    },
+    "-151": {
+        "desc": "Warm start monitor.",
+        "label": "MONZ",
+        "type": "ROM routine"
+    },
+    "-155": {
+        "desc": "Cold start Monitor.",
+        "label": "MON",
+        "type": "ROM routine"
+    },
+    "-198": {
+        "desc": "Ring bell indirect.",
+        "label": "BELL",
+        "type": "ROM routine"
+    },
+    "-211": {
+        "desc": "Ring bell and print `ERR`.",
+        "type": "ROM routine"
+    },
+    "-259": {
+        "brief": "Read from tape.",
+        "desc": "Read block (60)-(62) from tape.",
+        "label": "READ",
+        "type": "ROM routine"
+    },
+    "-307": {
+        "brief": "Write to tape.",
+        "desc": "Write block (60)-(62) to tape, including header.",
+        "label": "WRITE",
+        "type": "ROM routine"
+    },
+    "-365": {
+        "brief": "equivalent to PR#0.",
+        "desc": "Reset the output hook to address of COUT1.",
+        "label": "COUT1",
+        "type": "ROM routine"
+    },
+    "-375": {
+        "brief": "equivalent to IN#0",
+        "desc": "Reset the input hook to address of KEYIN.",
+        "label": "SETKB",
+        "type": "ROM routine"
+    },
+    "-415": {
+        "desc": "Disassembler.",
+        "type": "ROM routine"
+    },
+    "-468": {
+        "brief": "memory move",
+        "desc": "Memory move source (60)-(62) to destination (66).",
+        "label": "MOVE",
+        "type": "ROM routine"
+    },
+    "-528": {
+        "brief": "Print character in A.",
+        "desc": "Print character in A to video with window parameters and control character routines.",
+        "label": "COUT1",
+        "type": "ROM routine"
+    },
+    "-531": {
+        "brief": "Print character in A",
+        "desc": "Invoke output routine whose address is in (56).  Usually prints character in A.",
+        "label": "COUT",
+        "type": "ROM routine"
+    },
+    "-550": {
+        "desc": "Print A as hex.",
+        "label": "PRBYTE",
+        "type": "ROM routine"
+    },
+    "-657": {
+        "brief": "Input without parsing `,` or `:`",
+        "desc": "Similar to `INPUT` but without parsing commas or colons, data left in page 2 buffer.",
+        "type": "ROM routine"
+    },
+    "-662": {
+        "desc": "Input a record.",
+        "label": "GETLN",
+        "type": "ROM routine"
+    },
+    "-678": {
+        "desc": "Wait for `Return` keypress.",
+        "type": "ROM routine"
+    },
+    "-741": {
+        "brief": "get character",
+        "desc": "Get one character in A, set random number, replace cursor with character.",
+        "label": "KEYIN",
+        "type": "ROM routine"
+    },
+    "-756": {
+        "desc": "Wait for any keypress.",
+        "label": "RDKEY",
+        "type": "ROM routine"
+    },
+    "-823": {
+        "desc": "write tape header",
+        "label": "HEADR",
+        "type": "ROM routine"
+    },
+    "-856": {
+        "brief": "pause loop",
+        "desc": "Wait (26+27*A+5*A*A)/2 cycles, 1 cycle = .977778 microseconds",
+        "label": "WAIT",
+        "type": "ROM routine"
+    },
+    "-868": {
+        "brief": "clear right of cursor",
+        "desc": "Clear text between cursor and right margin",
+        "type": "ROM routine"
+    },
+    "-912": {
+        "desc": "Scroll text up one line.",
+        "type": "ROM routine"
+    },
+    "-922": {
+        "desc": "Issue a line feed.",
+        "type": "ROM routine"
+    },
+    "-936": {
+        "brief": "clear text & reset cursor",
+        "desc": "Clear the text screen and reset cursor.",
+        "label": "HOME",
+        "type": "ROM routine"
+    },
+    "-958": {
+        "brief": "clear below cursor",
+        "desc": "Clear text between cursor and bottom margin.",
+        "type": "ROM routine"
+    },
+    "-990": {
+        "desc": "Vertical tab.",
+        "label": "VTAB",
+        "type": "ROM routine"
+    },
+    "-998": {
+        "desc": "Move cursor up.",
+        "type": "ROM routine"
+    },
     "-1008": {
         "desc": "Move cursor left.",
         "type": "ROM routine"
@@ -7,13 +750,34 @@
         "desc": "Move cursor right.",
         "type": "ROM routine"
     },
-    "-10621": {
-        "brief": "clear control info from stack",
-        "desc": "Clear all control information from the stack.",
+    "-1059": {
+        "desc": "Ring bell direct.",
+        "label": "BELLA",
         "type": "ROM routine"
+    },
+    "-1101": {
+        "brief": "Monitor signature",
+        "desc": "Monitor signature byte, 56 = standard, 234 = autostart, 6 = //e.",
+        "label": "VERSION",
+        "type": "byte value"
     },
     "-1184": {
         "desc": "Clear screen and display machine type.",
+        "type": "ROM routine"
+    },
+    "-1216": {
+        "desc": "Equivalent to GR.",
+        "label": "SETGR",
+        "type": "ROM routine"
+    },
+    "-1233": {
+        "desc": "Equivalent to TEXT.",
+        "label": "INIT",
+        "type": "ROM routine"
+    },
+    "-1250": {
+        "desc": "Read analog port X, store in Y.",
+        "label": "PREAD",
         "type": "ROM routine"
     },
     "-1321": {
@@ -28,12 +792,430 @@
         "desc": "Pseudo reset.",
         "type": "ROM routine"
     },
-    "-144": {
-        "desc": "Scan input buffer.",
+    "-1718": {
+        "desc": "Print A spaces.",
+        "label": "PRBL2",
         "type": "ROM routine"
     },
-    "-151": {
-        "desc": "Enter the Monitor.",
+    "-1720": {
+        "desc": "Print 3 spaces.",
+        "label": "PRBLNK",
+        "type": "ROM routine"
+    },
+    "-1727": {
+        "brief": "print 4 digit hex",
+        "desc": "Print 4 digit hex with value (X,A).",
+        "label": "PRNTAX",
+        "type": "ROM routine"
+    },
+    "-1935": {
+        "brief": "get lores pixel color",
+        "desc": "Get the color of the lores pixel at x=Y and y=A, put in A.",
+        "label": "SCRN",
+        "type": "ROM routine"
+    },
+    "-1948": {
+        "brief": "set lores color",
+        "desc": "Set color in A on low resolution graphics screen.",
+        "label": "SETCOL",
+        "type": "ROM routine"
+    },
+    "-1994": {
+        "brief": "clear upper 40 lines of low-res",
+        "desc": "Clear upper 40 lines of low resolution graphics.",
+        "label": "CLRTOP",
+        "type": "ROM routine"
+    },
+    "-1998": {
+        "brief": "clear full screen of low-res",
+        "desc": "Clear full screen of low resolution graphics.",
+        "label": "CLRSCR",
+        "type": "ROM routine"
+    },
+    "-2008": {
+        "brief": "lores vertical line",
+        "desc": "Plot a vertical line on low resolution graphics screen.",
+        "label": "VLINE",
+        "type": "ROM routine"
+    },
+    "-2023": {
+        "brief": "lores horizontal line",
+        "desc": "Plot a horizontal line on low resolution graphics screen.",
+        "label": "HLINE",
+        "type": "ROM routine"
+    },
+    "-2048": {
+        "brief": "plot lores pixel",
+        "desc": "Plot a pixel on low resolution graphics screen.",
+        "label": "PLOT",
+        "type": "ROM routine"
+    },
+    "-2087": {
+        "brief": "find array variable",
+        "ctx": "Applesoft",
+        "desc": "find array variable named by TXTPTR, result in LOWTR",
+        "subctx": "parsing & variables",
+        "label": "GETARYPT",
+        "type": "ROM routine"
+    },
+    "-2613": {
+        "brief": "load high-res coords at 224",
+        "ctx": "Applesoft",
+        "desc": "Load current high resolution coordinate into word at 224 and byte at 226.",
+        "type": "ROM routine"
+    },
+    "-3082": {
+        "brief": "clear high-res to last color",
+        "ctx": "Applesoft",
+        "desc": "Clear current high resolution screen to most recent `HPLOT` color.",
+        "type": "ROM routine"
+    },
+    "-3086": {
+        "brief": "clear high-res to black",
+        "ctx": "Applesoft",
+        "desc": "Clear current high resolution screen to black.",
+        "type": "ROM routine"
+    },
+    "-3100": {
+        "ctx": "Applesoft",
+        "desc": "reveal high-res page 1.",
+        "type": "ROM routine"
+    },
+    "-3288": {
+        "brief": "clear error handling stack",
+        "ctx": "Applesoft",
+        "desc": "Clear error handling information from the stack.",
+        "type": "ROM routine"
+    },
+    "-3938": {
+        "ctx": "Applesoft",
+        "desc": "FAC = arctan(FAC)",
+        "label": "ATN",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-4038": {
+        "ctx": "Applesoft",
+        "desc": "FAC = tan(FAC)",
+        "label": "TAN",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-4111": {
+        "ctx": "Applesoft",
+        "desc": "FAC = sin(FAC)",
+        "label": "SIN",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-4118": {
+        "ctx": "Applesoft",
+        "desc": "FAC = cos(FAC)",
+        "label": "COS",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-4178": {
+        "brief": "pseudorandom number",
+        "ctx": "Applesoft",
+        "desc": "put pseudorandom number in FAC",
+        "label": "RND",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-4343": {
+        "ctx": "Applesoft",
+        "desc": "FAC = exp(FAC)",
+        "label": "EXP",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-4457": {
+        "ctx": "Applesoft",
+        "desc": "FAC = ARG^FAC",
+        "label": "FPWRT",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-4467": {
+        "ctx": "Applesoft",
+        "desc": "FAC = sqrt(FAC)",
+        "label": "SQR",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-4812": {
+        "brief": "float to string",
+        "ctx": "Applesoft",
+        "desc": "convert FAC to string and store in FBUFFR (page 1)",
+        "label": "FOUT",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-5085": {
+        "brief": "truncate float",
+        "ctx": "Applesoft",
+        "desc": "truncate FAC and put result in FAC",
+        "label": "INT",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-5198": {
+        "brief": "float comparison",
+        "ctx": "Applesoft",
+        "desc": "compare float at (Y,A) with FAC, A=-1, 0, 1 if <FAC, =FAC, >FAC",
+        "label": "FCOMP",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-5201": {
+        "brief": "FAC = abs(FAC)",
+        "ctx": "Applesoft",
+        "desc": "set FAC to absolute value of FAC",
+        "label": "ABS",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-5232": {
+        "brief": "FAC = sign of FAC",
+        "ctx": "Applesoft",
+        "desc": "set FAC to -1.0, 0.0, 1.0 based on sign of FAC",
+        "label": "SGN",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-5246": {
+        "brief": "A = sign of FAC",
+        "ctx": "Applesoft",
+        "desc": "set A = -1, 0, or 1 based on sign of FAC",
+        "label": "SIGN",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-5277": {
+        "brief": "ARG = FAC",
+        "ctx": "Applesoft",
+        "desc": "move ARG to FAC",
+        "label": "MOVAF",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-5293": {
+        "brief": "FAC = ARG",
+        "ctx": "Applesoft",
+        "desc": "move FAC to ARG",
+        "label": "MOVFA",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-5333": {
+        "brief": "pack float",
+        "ctx": "Applesoft",
+        "desc": "pack FAC and store at (Y,A)",
+        "label": "MOVMF",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-5383": {
+        "brief": "unpack float",
+        "ctx": "Applesoft",
+        "desc": "unpack float at (Y,A) and put in FAC",
+        "label": "MOVFM",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-5527": {
+        "brief": "FAC = ARG / FAC",
+        "ctx": "Applesoft",
+        "desc": "FAC = ARG / FAC, must follow JSR MOVFM, must test for div by 0",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-5661": {
+        "brief": "unpack float",
+        "ctx": "Applesoft",
+        "desc": "unpack float at (Y,A) and put in ARG",
+        "label": "CONUPK",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-5758": {
+        "brief": "FAC = ARG * FAC",
+        "ctx": "Applesoft",
+        "desc": "FAC = ARG * FAC, must follow JSR MOVFM",
+        "label": "FMULTT",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-5823": {
+        "brief": "FAC = ln(FAC)",
+        "ctx": "Applesoft",
+        "desc": "FAC = ln(FAC), natural logarithm",
+        "label": "LOG",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-6041": {
+        "ctx": "Integer BASIC",
+        "desc": "GOTO line of GOTOA",
+        "type": "ROM routine"
+    },
+    "-6207": {
+        "brief": "FAC = ARG + FAC",
+        "ctx": "Applesoft",
+        "desc": "FAC = ARG + FAC, must follow JSR MOVFM",
+        "label": "FADDT",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-6230": {
+        "brief": "FAC = ARG - FAC",
+        "ctx": "Applesoft",
+        "desc": "FAC = ARG - FAC, must follow JSR MOVFM",
+        "label": "FSUBT",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-6318": {
+        "brief": "FAC to LINNUM",
+        "ctx": "Applesoft",
+        "desc": "Convert FAC to integer and store in (Y,A) and LINNUM",
+        "label": "GETADR",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-6408": {
+        "brief": "expression to X",
+        "ctx": "Applesoft",
+        "desc": "Evaluate expression at TXTPTR and store in X. Produce error if out of range.",
+        "label": "GETBYT",
+        "subctx": "FP & parsing",
+        "type": "ROM routine"
+    },
+    "-6686": {
+        "brief": "move string",
+        "ctx": "Applesoft",
+        "desc": "Move string at (X,Y) with length A to FRESPC",
+        "label": "MOVSTR",
+        "type": "ROM routine"
+    },
+    "-6803": {
+        "ctx": "Integer BASIC",
+        "desc": "Find line number",
+        "type": "ROM routine"
+    },
+    "-6885": {
+        "ctx": "Integer BASIC",
+        "desc": "Display A and X in decimal",
+        "type": "ROM routine"
+    },
+    "-6997": {
+        "ctx": "Integer BASIC",
+        "desc": "Display current line number",
+        "type": "ROM routine"
+    },
+    "-7438": {
+        "brief": "integer to float",
+        "ctx": "Applesoft",
+        "desc": "convert integer (Y,A) into float in FAC",
+        "label": "GIVAYF",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-7938": {
+        "brief": "constant = -32768",
+        "ctx": "Applesoft",
+        "desc": "constant value of -32768",
+        "type": "float"
+    },
+    "-8067": {
+        "brief": "C = (A == [A-Z] ? 1 : 0)",
+        "ctx": "Applesoft",
+        "desc": "Set carry bit if accumulator contains ASCII A through Z",
+        "label": "ISLETC",
+        "type": "ROM routine"
+    },
+    "-8189": {
+        "ctx": "Applesoft | Integer BASIC",
+        "desc": "Warm entry point",
+        "type": "ROM routine"
+    },
+    "-8192": {
+        "ctx": "Applesoft | Integer BASIC",
+        "desc": "Cold entry point",
+        "type": "ROM routine"
+    },
+    "-8221": {
+        "brief": "Get variable at TXTPTR",
+        "ctx": "Applesoft",
+        "desc": "Load $83 with variable pointer at TXTPTR, create if necessary, advance TXTPTR",
+        "label": "PTRGET",
+        "subctx": "parsing & variables",
+        "type": "ROM routine"
+    },
+    "-8342": {
+        "brief": "FAC = ARG lop($16) FAC",
+        "ctx": "Applesoft",
+        "desc": "Compare ARC and FAC using operator encoded at $16, result in FAC",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-8503": {
+        "brief": "syntax error routine",
+        "ctx": "Applesoft",
+        "desc": "Prints SYNTAX ERROR and warm starts Applesoft",
+        "label": "SNERR",
+        "type": "ROM routine"
+    },
+    "-8514": {
+        "brief": "check comma",
+        "ctx": "Applesoft",
+        "desc": "Test for comma at TXTPTR, return via CHRGET or SNERR",
+        "label": "CHKCOM",
+        "subctx": "parsing",
+        "type": "ROM routine"
+    },
+    "-8517": {
+        "brief": "check opening bracket",
+        "ctx": "Applesoft",
+        "desc": "Test for opening bracket at TXTPTR, return via CHRGET or SNERR",
+        "label": "CHKOPN",
+        "subctx": "parsing",
+        "type": "ROM routine"
+    },
+    "-8520": {
+        "brief": "check closing bracket",
+        "ctx": "Applesoft",
+        "desc": "Test for closing bracket at TXTPTR, return via CHRGET or SNERR",
+        "label": "CHKCLS",
+        "subctx": "parsing",
+        "type": "ROM routine"
+    },
+    "-8857": {
+        "brief": "aexpr at TXTPTR to FAC",
+        "ctx": "Applesoft",
+        "desc": "Evaluate numerical expression at TXTPTR and put into FAC",
+        "label": "FRMNUM",
+        "subctx": "parsing & FP",
+        "type": "ROM routine"
+    },
+    "-9414": {
+        "ctx": "Applesoft",
+        "desc": "Print string at (Y,A)",
+        "label": "STROUT",
+        "type": "ROM routine"
+    },
+    "-9835": {
+        "ctx": "Applesoft",
+        "desc": "Advance to end of statement",
+        "label": "DATA",
+        "subctx": "parsing",
+        "type": "ROM routine"
+    },
+    "-10621": {
+        "brief": "clear control info from stack",
+        "ctx": "Applesoft",
+        "desc": "Clear all control information from the stack.",
         "type": "ROM routine"
     },
     "-15596": {
@@ -493,451 +1675,5 @@
         "desc": "Overloaded. [1] read the keyboard (read) [2] Set PAGE2 function to normal (write)",
         "label": "80STORE",
         "type": "soft switch"
-    },
-    "-198": {
-        "desc": "Ring bell.",
-        "type": "ROM routine"
-    },
-    "-1994": {
-        "brief": "clear upper 40 lines of low-res",
-        "desc": "Clear upper 40 lines of low resolution graphics.",
-        "type": "ROM routine"
-    },
-    "-1998": {
-        "brief": "clear full screen of low-res",
-        "desc": "Clear full screen of low resolution graphics.",
-        "type": "ROM routine"
-    },
-    "-211": {
-        "desc": "Ring bell and print `ERR`.",
-        "type": "ROM routine"
-    },
-    "-25153": {
-        "ctx": "DOS 3.3",
-        "desc": "Reconnect DOS.",
-        "type": "DOS routine"
-    },
-    "-2613": {
-        "brief": "load high-res coords at 224",
-        "desc": "Load current high resolution coordinate into word at 224 and byte at 226.",
-        "type": "ROM routine"
-    },
-    "-3082": {
-        "brief": "clear high-res to last color",
-        "desc": "Clear current high resolution screen to most recent `HPLOT` color.",
-        "type": "ROM routine"
-    },
-    "-3086": {
-        "brief": "clear high-res to black",
-        "desc": "Clear current high resolution screen to black.",
-        "type": "ROM routine"
-    },
-    "-3100": {
-        "desc": "reveal high-res page 1.",
-        "type": "ROM routine"
-    },
-    "-3288": {
-        "brief": "clear error handling stack",
-        "desc": "Clear error handling information from the stack.",
-        "type": "ROM routine"
-    },
-    "-415": {
-        "desc": "Disassembler.",
-        "type": "ROM routine"
-    },
-    "-468": {
-        "desc": "Memory move.",
-        "type": "ROM routine"
-    },
-    "-657": {
-        "brief": "`INPUT` without parsing `,` or `:`",
-        "desc": "Similar to `INPUT` but without parsing commas or colons, data left in page 2 buffer.",
-        "type": "ROM routine"
-    },
-    "-678": {
-        "desc": "Wait for `Return` keypress.",
-        "type": "ROM routine"
-    },
-    "-756": {
-        "desc": "Wait for any keypress.",
-        "type": "ROM routine"
-    },
-    "-868": {
-        "brief": "clear right of cursor",
-        "desc": "Clear text between cursor and right margin",
-        "type": "ROM routine"
-    },
-    "-912": {
-        "desc": "Scroll text up one line.",
-        "type": "ROM routine"
-    },
-    "-922": {
-        "desc": "Issue a line feed.",
-        "type": "ROM routine"
-    },
-    "-936": {
-        "brief": "clear text & reset cursor",
-        "desc": "Clear the text screen and reset cursor.",
-        "label": "HOME",
-        "type": "ROM routine"
-    },
-    "-958": {
-        "brief": "clear below cursor",
-        "desc": "Clear text between cursor and bottom margin.",
-        "type": "ROM routine"
-    },
-    "-998": {
-        "desc": "Move cursor up.",
-        "type": "ROM routine"
-    },
-    "1005": {
-        "desc": "Program starting address for XFER.",
-        "type": "word"
-    },
-    "1008": {
-        "brief": "address of `BRK` handler",
-        "desc": "Address of subroutine handling `BRK` requests.",
-        "type": "word"
-    },
-    "1010": {
-        "brief": "address of `Reset` handler",
-        "desc": "Address of program taking control after `Reset`",
-        "type": "word"
-    },
-    "1012": {
-        "desc": "Power-up byte",
-        "type": "byte value"
-    },
-    "1013": {
-        "brief": "`&` vector",
-        "desc": "Action to take upon issuing `&` command",
-        "type": "vector"
-    },
-    "1016": {
-        "brief": "`Ctrl-Y` vector",
-        "desc": "Action to take upon issuing `Ctrl-Y`",
-        "type": "vector"
-    },
-    "1019": {
-        "brief": "interrupt vector",
-        "desc": "Action to take upon non-maskable interrupt",
-        "type": "vector"
-    },
-    "1022": {
-        "desc": "Address of interrupt handler",
-        "type": "vector"
-    },
-    "103": {
-        "desc": "Start of Applesoft program.",
-        "type": "word"
-    },
-    "105": {
-        "desc": "Start of variable space, `LOMEM`.",
-        "type": "word"
-    },
-    "107": {
-        "desc": "Start of array space.",
-        "type": "word"
-    },
-    "109": {
-        "desc": "End of array space.",
-        "type": "word"
-    },
-    "111": {
-        "desc": "Start of string space.",
-        "type": "word"
-    },
-    "115": {
-        "desc": "End of variable space, `HIMEM`.",
-        "type": "word"
-    },
-    "117": {
-        "desc": "Line number being executed.",
-        "type": "word"
-    },
-    "119": {
-        "desc": "Line number where program stopped.",
-        "type": "word"
-    },
-    "121": {
-        "desc": "Address of line being executed.",
-        "type": "word"
-    },
-    "123": {
-        "brief": "`DATA` statement line",
-        "desc": "Line number of current `DATA` statement.",
-        "type": "word"
-    },
-    "125": {
-        "desc": "Address of next `DATA` item.",
-        "type": "word"
-    },
-    "127": {
-        "desc": "Address of `DATA` or `INPUT` item.",
-        "type": "word"
-    },
-    "129": {
-        "desc": "Last used variable name.",
-        "type": "word"
-    },
-    "131": {
-        "desc": "Last used variable address.",
-        "type": "word"
-    },
-    "175": {
-        "desc": "End of Applesoft program.",
-        "type": "word"
-    },
-    "214": {
-        "desc": "`RUN` flag.",
-        "type": "byte value"
-    },
-    "216": {
-        "desc": "Error handler flag for `ONERR`.",
-        "type": "byte value"
-    },
-    "218": {
-        "desc": "Line number of error.",
-        "type": "word"
-    },
-    "220": {
-        "desc": "Address of error.",
-        "type": "word"
-    },
-    "222": {
-        "desc": "Error code.",
-        "type": "byte value"
-    },
-    "224": {
-        "desc": "Last `HPLOT` x coordinate.",
-        "type": "word"
-    },
-    "226": {
-        "desc": "Last `HPLOT` y coordinate.",
-        "type": "byte value"
-    },
-    "228": {
-        "desc": "Code related to `HCOLOR`.",
-        "type": "byte value"
-    },
-    "230": {
-        "desc": "High resolution plotting page.",
-        "type": "byte value"
-    },
-    "231": {
-        "desc": "`SCALE` value.",
-        "type": "byte value"
-    },
-    "232": {
-        "desc": "Address of shape table.",
-        "type": "word"
-    },
-    "234": {
-        "brief": "hi-res collision flag",
-        "desc": "High resolution graphics collision flag.",
-        "type": "byte value"
-    },
-    "241": {
-        "desc": "Code related to `SPEED`.",
-        "type": "byte value"
-    },
-    "243": {
-        "desc": "Mask for `FLASH`.",
-        "type": "byte value"
-    },
-    "249": {
-        "desc": "Code related to `ROT`.",
-        "type": "byte value"
-    },
-    "32": {
-        "brief": "Sets left margin of text display",
-        "desc": "Sets left margin of text display. Range 0-39.",
-        "type": "byte value"
-    },
-    "33": {
-        "brief": "Sets width of text display",
-        "desc": "Sets width of text display. Range 1-40.",
-        "type": "byte value"
-    },
-    "34": {
-        "brief": "Sets top margin of text display",
-        "desc": "Sets top margin of text display. Range 0-23.",
-        "type": "byte value"
-    },
-    "35": {
-        "brief": "Sets bottom margin of text display",
-        "desc": "Sets bottom margin of text display. Range 0-24.",
-        "type": "byte value"
-    },
-    "36": {
-        "brief": "Horizontal position of the cursor",
-        "desc": "Horizontal position of the cursor. Range 0-39.",
-        "type": "byte value"
-    },
-    "37": {
-        "brief": "Vertical position of the cursor",
-        "desc": "Vertical position of the cursor. Range 0-23.",
-        "type": "byte value"
-    },
-    "40193": {
-        "ctx": "DOS 3.3",
-        "desc": "Related to length of buffer in pages",
-        "type": "byte value"
-    },
-    "40514": {
-        "ctx": "DOS 3.3",
-        "desc": "Greeting program type",
-        "type": "byte value"
-    },
-    "42350": {
-        "ctx": "DOS 3.3",
-        "desc": "Print listing of files on disk",
-        "label": "CATALOG",
-        "type": "ROM routine"
-    },
-    "42964": {
-        "ctx": "DOS 3.3",
-        "desc": "Moves DOS buffers",
-        "type": "DOS routine"
-    },
-    "43": {
-        "desc": "Boot slot times 16.",
-        "type": "byte value"
-    },
-    "43616": {
-        "ctx": "DOS 3.3",
-        "desc": "Last `BLOAD` length",
-        "type": "word"
-    },
-    "43624": {
-        "ctx": "DOS 3.3",
-        "desc": "Current drive number",
-        "type": "byte value"
-    },
-    "43626": {
-        "ctx": "DOS 3.3",
-        "desc": "Current slot number",
-        "type": "byte value"
-    },
-    "43634": {
-        "ctx": "DOS 3.3",
-        "desc": "Last `BLOAD` start",
-        "type": "word"
-    },
-    "43698": {
-        "brief": "DOS command trigger",
-        "ctx": "DOS 3.3",
-        "desc": "Trigger character for DOS commands (`Ctrl-D`)",
-        "type": "byte value"
-    },
-    "44": {
-        "desc": "Low resolution line end point.",
-        "type": "byte value"
-    },
-    "44033": {
-        "ctx": "DOS 3.3",
-        "desc": "`CATALOG` track number",
-        "type": "byte value"
-    },
-    "44452": {
-        "brief": "files+1 before `CATALOG` pause",
-        "ctx": "DOS 3.3",
-        "desc": "Number of files plus one displayed before `CATALOG` pause",
-        "type": "byte value"
-    },
-    "44460": {
-        "brief": "vector within `CATALOG`",
-        "ctx": "DOS 3.3",
-        "desc": "If word value is $FC58 (`HOME`) clear screen before `CATALOG`",
-        "type": "word"
-    },
-    "44505": {
-        "brief": "If $EAEA show deleted files",
-        "ctx": "DOS 3.3",
-        "desc": "If word value is $EAEA show deleted files in `CATALOG`",
-        "type": "word"
-    },
-    "44596": {
-        "brief": "If $EA cancel `CATALOG` pause",
-        "ctx": "DOS 3.3",
-        "desc": "Fill vector with `NOP` ($EA) to cancel `CATALOG` pause",
-        "type": "vector"
-    },
-    "44605": {
-        "brief": "files before `CATALOG` pause",
-        "ctx": "DOS 3.3",
-        "desc": "Number of files displayed before `CATALOG` pause",
-        "type": "byte value"
-    },
-    "46017": {
-        "ctx": "DOS 3.3",
-        "desc": "Disk volume number",
-        "type": "byte value"
-    },
-    "48": {
-        "desc": "Low resolution color times 17.",
-        "type": "byte value"
-    },
-    "48825": {
-        "ctx": "ProDOS",
-        "desc": "Last `BLOAD` start",
-        "type": "word"
-    },
-    "48840": {
-        "ctx": "ProDOS",
-        "desc": "Last `BLOAD` length",
-        "type": "word"
-    },
-    "48944": {
-        "ctx": "ProDOS",
-        "desc": "Slot/Drive value",
-        "type": "byte value"
-    },
-    "49107": {
-        "brief": "If $EAEAEA prevent language reload",
-        "ctx": "DOS 3.3",
-        "desc": "Fill vector with `NOP` ($EA) to prevent language card reload",
-        "type": "vector"
-    },
-    "49384": {
-        "ctx": "DOS 3.3",
-        "desc": "Stop drive motor",
-        "type": "soft switch"
-    },
-    "49385": {
-        "ctx": "DOS 3.3",
-        "desc": "Start drive motor",
-        "type": "soft switch"
-    },
-    "50": {
-        "desc": "Text output format.",
-        "type": "byte value"
-    },
-    "51": {
-        "desc": "Prompt character.",
-        "type": "byte value"
-    },
-    "60": {
-        "brief": "source start for AUXMOVE",
-        "desc": "Source starting address for AUXMOVE.",
-        "type": "word"
-    },
-    "62": {
-        "brief": "source end for AUXMOVE",
-        "desc": "Source ending address for AUXMOVE.",
-        "type": "word"
-    },
-    "66": {
-        "brief": "dest start for AUXMOVE",
-        "desc": "Destination starting address for AUXMOVE.",
-        "type": "word"
-    },
-    "78": {
-        "desc": "Random number field.",
-        "type": "word"
-    },
-    "976": {
-        "desc": "DOS re-entry from the Monitor",
-        "type": "vector"
     }
 }

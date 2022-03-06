@@ -283,7 +283,9 @@ export class TokenizationTool extends lxbase.LangExtBase
 			const tok = curs.currentNode().firstNamedChild;
 			if (tok)
 			{
-				// Space in the DATA statement is kept unconditionally, so handle all at once and go out
+				// Text in the DATA statement is preserved unconditionally, so handle all at once and go out.
+				// There is a problem with calculation of end of data in connection with quote parity that
+				// cannot be solved in any satisfactory way (ROM handles it inconsistently).
 				if (tok.type=='data_tok')
 				{
 					const preItems = this.tokenizedLine.substring(0,tok.endPosition.column);

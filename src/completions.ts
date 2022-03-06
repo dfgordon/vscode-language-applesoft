@@ -65,7 +65,7 @@ export class AddressCompletionProvider implements vscode.CompletionItemProvider
 				this.pokeCompletions.push(this.get_completion_item(addr,'',',0'));
 				this.peekCompletions.push(this.get_completion_item(addr,'(',')'));
 			}
-			if (typ=='ROM routine' || typ=='DOS routine')
+			if (typ=='ROM routine' || typ=='DOS routine' || typ=='ZP routine')
 				this.callCompletions.push(this.get_completion_item(addr,'',''));
 		}
 	}

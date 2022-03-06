@@ -25,7 +25,7 @@ The extension knows over 180 special address locations relevant to Applesoft, DO
 
 ## Using with AppleWin
 
-The extension can transfer programs to and from the [AppleWin](https://github.com/AppleWin/AppleWin) emulator.
+You can transfer programs to and from [AppleWin](https://github.com/AppleWin/AppleWin).  One way is to use the emulator's own clipboard functions.  The extension also provides the following save state interactions:
 
 * To transfer a program to [AppleWin](https://github.com/AppleWin/AppleWin), first use [AppleWin](https://github.com/AppleWin/AppleWin) to create a state file (press `F11`).  Then in the editor use `Ctrl-P` to select `applesoft: Store program in AppleWin save state`, and select the state file.  Then go to [AppleWin](https://github.com/AppleWin/AppleWin) and press `F12` to load the modified state file.  Type `LIST` to verify success.
 	- Any program or variables already in the state file are lost.
@@ -37,7 +37,7 @@ Operations with the state file are the same on any platform, but [AppleWin](http
 
 ## Using with Virtual ][
 
-The extension can transfer programs to and from the [Virtual \]\[](https://virtualii.com) emulator.  To do this, use one of the `Cmd+P` commands:
+You can transfer programs to and from the [Virtual \]\[](https://virtualii.com) emulator.  One way is to use the emulator's own clipboard functions.  The extension also provides the following commands (`Cmd+P`):
 
 * `applesoft: Enter in Virtual ][ new machine`: creates a new virtual machine, resets it, and enters the program.  Since this resets the machine while it is waiting for a disk to be inserted, there are no operating system commands available.  This is suitable for self-contained programs.
 * `applesoft: Run in Virtual ][ new machine`: same as above, except the program is also run in the same step.
