@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import * as Parser from 'web-tree-sitter';
+import Parser from 'web-tree-sitter';
 import * as lxbase from './langExtBase';
 
 // Warn against long name variables with same first two characters
@@ -191,16 +191,6 @@ export class TSDiagnosticProvider extends lxbase.LineNumberTool
 					if (sib.text.trim()==":" && (curs.nodeText.split('"').length-1)%2 == 1)
 						diag.push(new vscode.Diagnostic(rng,"Odd quote parity in literal on multi-statement line invites trouble.",vscode.DiagnosticSeverity.Warning));
 				}
-			}
-		}
-		if (curs.nodeType=="real" || curs.nodeType=="real_data_item") // perhaps parser should handle this
-		{
-			const data_st = curs.currentNode().parent;
-			if (data_st)
-			{
-				const data_tok = data_st.firstNamedChild;
-				if (data_tok && data_tok.type=="data_tok" && curs.nodeText.includes("e"))
-					diag.push(new vscode.Diagnostic(rng,"Lowercase `e` is kept by the tokenizer (you probably should capitalize it).",vscode.DiagnosticSeverity.Warning));
 			}
 		}
 		if (this.config.get('warn.terminalString'))

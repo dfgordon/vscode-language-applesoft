@@ -40,7 +40,7 @@ import * as assert from 'assert';
 //          CMP   ZPTR+1
 //          BNE   :LOOP
 //          RTS
-		 
+
 describe('Output Statements', async function() {
 	//vscode.window.showInformationMessage('Start output statements');
 	this.beforeEach(async function() {
@@ -104,7 +104,7 @@ describe('Data Statements', async function() {
 		assert.deepStrictEqual(actual,expected);
 	});
 	it('float items', function() {
-		const testCode = '10 data 1.5 e 4 , 100000: print a$\n'; // lower case e is a syntax error, but A2ROM does the same
+		const testCode = '10 data 1.5 e 4 , 100000: print a$\n'; // lower case e is kept, but A2ROM does the same
 		const tree = this.tokTool.parse(testCode);
 		const tokStr = this.tokTool.tokenize(tree,2049);
 		const actual = this.tokTool.hex_from_raw_str(tokStr);

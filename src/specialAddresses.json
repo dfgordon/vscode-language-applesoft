@@ -414,9 +414,32 @@
         "desc": "Mask for `FLASH`.",
         "type": "byte value"
     },
+    "244": {
+        "ctx": "Integer BASIC",
+        "desc": "Floating point register 2",
+        "label": "FP2",
+        "type": "float32"
+    },
+    "248": {
+        "ctx": "Integer BASIC",
+        "desc": "Floating point register 1",
+        "label": "FP1",
+        "type": "float32"
+    },
     "249": {
+        "ctx": "Applesoft",
         "desc": "Code related to `ROT`.",
         "type": "byte value"
+    },
+    "806": {
+        "ctx": "Integer BASIC",
+        "desc": "Integer BASIC flag for plotting in high-resolution page 1 (32) or 2 (64).",
+        "type": "byte value"
+    },
+    "808": {
+        "ctx": "Integer BASIC",
+        "desc": "Integer BASIC pointer to a high resolution shape table.",
+        "type": "word"
     },
     "976": {
         "desc": "DOS re-entry from the Monitor",
@@ -600,7 +623,8 @@
         "type": "soft switch"
     },
     "-144": {
-        "desc": "Scan input buffer.",
+        "brief": "Scan input buffer.",
+        "desc": "Monitor routine to process contents of input buffer, cf. Lam's method.",
         "type": "ROM routine"
     },
     "-151": {
@@ -637,7 +661,7 @@
     "-365": {
         "brief": "equivalent to PR#0.",
         "desc": "Reset the output hook to address of COUT1.",
-        "label": "COUT1",
+        "label": "SETVID",
         "type": "ROM routine"
     },
     "-375": {
@@ -854,14 +878,70 @@
         "brief": "find array variable",
         "ctx": "Applesoft",
         "desc": "find array variable named by TXTPTR, result in LOWTR",
-        "subctx": "parsing & variables",
         "label": "GETARYPT",
+        "subctx": "parsing & variables",
+        "type": "ROM routine"
+    },
+    "-2419": {
+        "brief": "convert -float to integer",
+        "ctx": "Integer BASIC",
+        "desc": "Integer BASIC convert negative 32 bit float to 16 bit integer.",
+        "label": "FIX1",
         "type": "ROM routine"
     },
     "-2613": {
         "brief": "load high-res coords at 224",
         "ctx": "Applesoft",
         "desc": "Load current high resolution coordinate into word at 224 and byte at 226.",
+        "type": "ROM routine"
+    },
+    "-2894": {
+        "brief": "FP1 = FP2 / FP1",
+        "ctx": "Integer BASIC",
+        "desc": "Integer BASIC floating point quotient FP1 = FP2 / FP1.",
+        "label": "FDIV",
+        "type": "ROM routine"
+    },
+    "-2908": {
+        "brief": "FP1 = -FP1",
+        "ctx": "Integer BASIC",
+        "desc": "Integer BASIC floating point complement FP1 = -FP1.",
+        "label": "FCOMPL",
+        "type": "ROM routine"
+    },
+    "-2932": {
+        "brief": "FP1 = FP1 * FP2",
+        "ctx": "Integer BASIC",
+        "desc": "Integer BASIC floating point product FP1 = FP1 * FP2.",
+        "label": "FMUL",
+        "type": "ROM routine"
+    },
+    "-2968": {
+        "brief": "FP1 = FP2 - FP1",
+        "ctx": "Integer BASIC",
+        "desc": "Integer BASIC floating point difference FP1 = FP1 + FP2.",
+        "label": "FSUB",
+        "type": "ROM routine"
+    },
+    "-2976": {
+        "brief": "convert +float to integer",
+        "ctx": "Integer BASIC",
+        "desc": "Integer BASIC convert positive 32 bit float to 16 bit integer.",
+        "label": "FIX",
+        "type": "ROM routine"
+    },
+    "-2991": {
+        "brief": "convert integer to float",
+        "ctx": "Integer BASIC",
+        "desc": "Integer BASIC convert 16 bit integer to 32 bit float.",
+        "label": "FLOAT",
+        "type": "ROM routine"
+    },
+    "-3035": {
+        "brief": "FP1 = FP1 + FP2",
+        "ctx": "Integer BASIC",
+        "desc": "Integer BASIC floating point sum FP1 = FP1 + FP2.",
+        "label": "FADD",
         "type": "ROM routine"
     },
     "-3082": {
@@ -1216,6 +1296,69 @@
         "brief": "clear control info from stack",
         "ctx": "Applesoft",
         "desc": "Clear all control information from the stack.",
+        "type": "ROM routine"
+    },
+    "-11355": {
+        "brief": "load shape table",
+        "ctx": "Integer BASIC",
+        "desc": "Integer routine to load high-res shape table",
+        "label": "SHLOAD",
+        "type": "ROM routine"
+    },
+    "-11462": {
+        "brief": "draw hi-res shape at cursor",
+        "ctx": "Integer BASIC",
+        "desc": "Integer routine to draw a high-res shape at cursor position",
+        "label": "DRAW1",
+        "type": "ROM routine"
+    },
+    "-11465": {
+        "brief": "draw hi-res shape",
+        "ctx": "Integer BASIC",
+        "desc": "Integer routine to draw a high-res shape",
+        "label": "DRAW",
+        "type": "ROM routine"
+    },
+    "-11471": {
+        "brief": "clear hi-res to color",
+        "ctx": "Integer BASIC",
+        "desc": "Integer routine to clear high-res screen to color in color variable",
+        "label": "BKGND",
+        "type": "ROM routine"
+    },
+    "-11500": {
+        "brief": "plot hi-res line",
+        "ctx": "Integer BASIC",
+        "desc": "Integer routine to plot high-res line from last point to new point",
+        "label": "LINE",
+        "type": "ROM routine"
+    },
+    "-11506": {
+        "brief": "plot a hi-res point",
+        "ctx": "Integer BASIC",
+        "desc": "Integer routine to plot a high-res pixel",
+        "label": "PLOT",
+        "type": "ROM routine"
+    },
+    "-11527": {
+        "brief": "move hi-res cursor",
+        "ctx": "Integer BASIC",
+        "desc": "Integer routine to set the plotting position without drawing",
+        "label": "POSN",
+        "type": "ROM routine"
+    },
+    "-12274": {
+        "brief": "clear hi-res to black",
+        "ctx": "Integer BASIC",
+        "desc": "Integer routine to clear high-res screen to black",
+        "label": "CLEAR",
+        "type": "ROM routine"
+    },
+    "-12288": {
+        "brief": "init hi-res",
+        "ctx": "Integer BASIC",
+        "desc": "Initialize high-res graphics for Integer BASIC",
+        "label": "INIT",
         "type": "ROM routine"
     },
     "-15596": {

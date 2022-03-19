@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import * as Parser from 'web-tree-sitter';
+import Parser from 'web-tree-sitter';
 import * as lxbase from './langExtBase';
 
 const tokenTypes = [
@@ -75,7 +75,7 @@ export class TSSemanticTokensProvider extends lxbase.LangExtBase implements vsco
 			this.tokensBuilder.push(rng,"function",[]);
 			return lxbase.WalkerOptions.gotoSibling;
 		}
-		if (["integer","real"].indexOf(curs.nodeType)>-1)
+		if (["integer","real","data_integer","data_real"].indexOf(curs.nodeType)>-1)
 		{
 			this.tokensBuilder.push(rng,"number",[]);
 			return lxbase.WalkerOptions.gotoSibling;

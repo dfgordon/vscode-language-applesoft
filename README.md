@@ -17,11 +17,11 @@ If you are viewing this on github, you can install the extension from VS Code by
 * Commands: see `Ctrl+P` -> `applesoft`
 * Activates for file extensions `.bas`, `.abas`, `.A`
 
-<img src="demo.gif" alt="session capture"/>
+<img src="sample/demo.gif" alt="session capture"/>
 
 ## Apple ][ Special Addresses
 
-The extension knows over 180 special address locations relevant to Applesoft, DOS 3.3, ProDOS, and the Apple ][ ROM.  Hovering over a literal address argument of `CALL`, `PEEK`, or `POKE` will display information about any address in the database.  Completions for special addresses are triggered when the `space` key is pressed following `CALL`, `PEEK`, or `POKE`.  A convenient way to do this is to select the snippet with the `special` annotation, and then immediately press `space`.
+The extension knows hundreds of special address locations relevant to Applesoft, DOS 3.3, ProDOS, and the Apple ][ ROM.  Hovering over a literal address argument of `CALL`, `PEEK`, or `POKE` will display information about any address in the database.  Completions for special addresses are triggered when the `space` key is pressed following `CALL`, `PEEK`, or `POKE`.  A convenient way to do this is to select the snippet with the `special` annotation, and then immediately press `space`.
 
 ## Using with AppleWin
 

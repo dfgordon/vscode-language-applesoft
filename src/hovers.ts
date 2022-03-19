@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import * as Parser from 'web-tree-sitter';
+import Parser from 'web-tree-sitter';
 import { AddressHovers } from './hoversAddresses';
 import { StatementHovers } from './hoversStatements';
 import * as lxbase from './langExtBase';

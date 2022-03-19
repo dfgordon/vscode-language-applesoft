@@ -201,23 +201,30 @@
 		"yaml": "^2.0.0-10"
 	},
 	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
+		"reset": "run-script-os",
+		"reset:windows": "npx rimraf out && mkdir out && copy src\\*.wasm out && copy src\\*.scpt out",
+		"reset:default": "npx rimraf out && mkdir out && cp src/*.wasm out && cp src/*.scpt out",
+		"vscode:prepublish": "npm run esbuild-base -- --minify",
+		"esbuild-base": "npm run reset && esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+		"build": "npm run esbuild-base -- --sourcemap",
 		"lint": "eslint . --ext .ts,.tsx",
-		"watch": "tsc -watch -p ./",
+		"test-compile": "npm run reset && tsc -p ./",
 		"test": "node ./out/test/runTest.js"
 	},
 	"devDependencies": {
+		"@types/glob": "^7.2.0",
 		"@types/mocha": "^9.1.0",
 		"@types/node": "^14.16.0",
 		"@types/vscode": "^1.42.0",
-		"@types/glob": "^7.2.0",
+		"@typescript-eslint/eslint-plugin": "^5.14.0",
+		"@typescript-eslint/parser": "^5.14.0",
 		"@vscode/test-electron": "^2.1.2",
-		"@typescript-eslint/eslint-plugin": "^4.16.0",
-		"@typescript-eslint/parser": "^4.16.0",
+		"esbuild": "^0.14.25",
 		"eslint": "^7.21.0",
-		"mocha": "^9.2.0",
 		"glob": "^7.2.0",
+		"mocha": "^9.2.0",
+		"rimraf": "^3.0.2",
+		"run-script-os": "^1.1.6",
 		"typescript": "^4.5.5"
 	}
 }

@@ -55,7 +55,10 @@ export class AddressCompletionProvider implements vscode.CompletionItemProvider
 		for (const addr in specialAddresses)
 		{
 			const typ = Object(specialAddresses)[addr].type;
-			if (['byte value','word','vector'].indexOf(typ)>-1)
+			const ctx = Object(specialAddresses)[addr].ctx;
+			if (ctx && ctx=='Integer BASIC')
+				continue;
+			if (typ && typ.search('soft switch')==-1 && typ.search('routine')==-1)
 			{
 				this.pokeCompletions.push(this.get_completion_item(addr,'',','));
 				this.peekCompletions.push(this.get_completion_item(addr,'(',')'));
@@ -65,7 +68,7 @@ export class AddressCompletionProvider implements vscode.CompletionItemProvider
 				this.pokeCompletions.push(this.get_completion_item(addr,'',',0'));
 				this.peekCompletions.push(this.get_completion_item(addr,'(',')'));
 			}
-			if (typ=='ROM routine' || typ=='DOS routine' || typ=='ZP routine')
+			if (typ && typ.search('routine')>=0)
 				this.callCompletions.push(this.get_completion_item(addr,'',''));
 		}
 	}

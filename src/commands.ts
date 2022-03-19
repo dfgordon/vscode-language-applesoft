@@ -162,7 +162,7 @@ export class ViiEntryTool extends lxbase.LangExtBase
 			if (document && document.languageId=='applesoft')
 			{
 				const programText = document.getText() + "\n";
-				const scriptPath = path.join(__dirname,'../vscode-to-vii.scpt');
+				const scriptPath = path.join(__dirname,'vscode-to-vii.scpt');
 				const process = spawn('osascript',[scriptPath,action,machine,speed,colorMonitor,programText]);
 				process.stderr.on('data',data => {
 					vscode.window.showErrorMessage(`${data}`);
@@ -477,7 +477,7 @@ export class TokenizationTool extends lxbase.LangExtBase
 		const config = vscode.workspace.getConfiguration('applesoft');
 		const colorMonitor = config.get('vii.color') ? "1" : "0";
 		const speed = config.get('vii.speed') as string;
-		const scriptPath = path.join(__dirname,'../vscode-to-vii.scpt');
+		const scriptPath = path.join(__dirname,'vscode-to-vii.scpt');
 		const dumpPath = path.join(__dirname,'scratch.dump');
 		const process = spawn('osascript',[scriptPath,"get","front",speed,colorMonitor,dumpPath]);
 		process.stderr.on('data',data => {
@@ -503,13 +503,18 @@ export class TokenizationTool extends lxbase.LangExtBase
 		const proceed = await proceedDespiteErrors(verified.doc,'Tokenizing');
 		if (!proceed)
 			return;
-		const res = await vscode.window.showInputBox({title:'enter the base address (2049)'});
+		const res = await vscode.window.showInputBox({title:'enter the base address',placeHolder: '2049'});
+		if (res==undefined)
+			return;
 		const baseAddr = parseInt(res?res:"2049");
 		if (baseAddr<2049 || baseAddr>49143)
 		{
 			vscode.window.showErrorMessage('address is out of range (2049 - 49143)');
 			return;
 		}
+		const showUnicode = await vscode.window.showQuickPick(['unicode alongside hex','hex only'],{canPickMany:false,title:'select format'});
+		if (showUnicode==undefined)
+			return;
 		verified = this.verify_document();
 		if (!verified)
 			return;
@@ -519,17 +524,23 @@ export class TokenizationTool extends lxbase.LangExtBase
 		for (let i=0;i<code.length;i++)
 		{
 			if (i%8==0 && i>0)
-				content += '   ' + code.substring(i-8,i).replace(/\s/g,' ') + '\n';
+				if (showUnicode=='unicode alongside hex')
+					content += '   ' + code.substring(i-8,i).replace(/\s/g,' ') + '\n';
+				else
+					content += '\n';
 			if (i%8==0)
 				content += (baseAddr+i).toString(16).padStart(4,'0').toUpperCase() + ': ';
 			content += code.charCodeAt(i).toString(16).padStart(2,'0').toUpperCase() + ' ';
 			if (i==code.length-1)
-				content += ' '.repeat(3+3*(7-i%8)) + code.substring(i-i%8,i+1).replace(/\s/g,' ') + '\n';
+				if (showUnicode=='unicode alongside hex')
+					content += ' '.repeat(3+3*(7-i%8)) + code.substring(i-i%8,i+1).replace(/\s/g,' ') + '\n';
+				else
+					content += '\n';
 		}
 		vscode.workspace.openTextDocument({content:content}).then(doc => {
 			vscode.window.showTextDocument(doc);
 			if (baseAddr+code.length > 49152)
-				vscode.window.showInformationMessage('the program exceeds the limits of main address space')
+				vscode.window.showInformationMessage('the program exceeds the limits of main address space');
 		});
 	}
 }

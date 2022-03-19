@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import * as Parser from 'web-tree-sitter';
+import Parser from 'web-tree-sitter';
 import * as path from 'path';
 
 export const VariableTypes = [
@@ -27,7 +27,7 @@ function get_lang_path(caseSens: boolean|undefined) : string
 	let lang = 'tree-sitter-applesoft';
 	if (caseSens)
 		lang += 'casesens';
-	return path.join(__dirname,'..',lang+'.wasm');
+	return path.join(__dirname,lang+'.wasm');
 }
 
 export async function TreeSitterInit(): Promise<[Parser,Parser.Language,Parser.Language,boolean]>

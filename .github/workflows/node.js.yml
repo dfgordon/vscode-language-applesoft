@@ -27,7 +27,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install --include=dev
-    - run: tsc
+    - run: npm run test-compile
     - run: xvfb-run -a npm test
       if: runner.os == 'Linux'
     - run: npm test

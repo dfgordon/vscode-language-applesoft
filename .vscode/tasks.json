@@ -5,23 +5,20 @@
 	"tasks": [
 		{
 			"type": "npm",
-			"script": "watch",
-			"problemMatcher": "$tsc-watch",
-			"isBackground": true,
-			"presentation": {
-				"reveal": "never"
-			},
+			"script": "build",
+			"problemMatcher": "$esbuild",
 			"group": {
 				"kind": "build",
 				"isDefault": true
-			}
+			},
+			"label": "npm: build"
 		},
 		{
 			"type": "npm",
-			"script": "install",
-			"problemMatcher": [],
-			"label": "npm: install",
-			"detail": "install dependencies from package"
+			"script": "test-compile",
+			"group": "build",
+			"problemMatcher": "$tsc",
+			"label": "npm: test-compile"
 		}
 	]
 }
