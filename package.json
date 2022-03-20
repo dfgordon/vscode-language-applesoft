@@ -3,7 +3,7 @@
 	"displayName": "Applesoft BASIC",
 	"description": "Language support for Applesoft BASIC",
 	"icon": "language-applesoft-icon.png",
-	"version": "0.9.0",
+	"version": "0.9.1",
 	"license": "GPL-3.0-only",
 	"publisher": "dfgordon",
 	"repository": {
