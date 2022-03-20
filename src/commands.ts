@@ -100,7 +100,7 @@ export class RenumberTool extends lxbase.LineNumberTool
 				}
 				txt = verified.doc.getText(ext_sel);
 			}
-			let syntaxTree = this.parse(txt+"\n");
+			let syntaxTree = this.parse(txt,"\n");
 			const line_numbers = this.get_primary_nums(syntaxTree);
 			const lN = l0 + dl*(line_numbers.length-1);
 			if (!lower_guard)
@@ -122,7 +122,7 @@ export class RenumberTool extends lxbase.LineNumberTool
 				mapping.set(line_numbers[i],l0+i*dl);
 			// apply the mapping
 			txt = verified.doc.getText();
-			syntaxTree = this.parse(txt+"\n");
+			syntaxTree = this.parse(txt,"\n");
 			verified.ed.edit(editBuilder => { this.renumber(ext_sel,updateAll=='update all references',syntaxTree,mapping,editBuilder); });	
 		}
 	}
@@ -220,7 +220,15 @@ export class ViiEntryTool extends lxbase.LangExtBase
 
 export class TokenizationTool extends lxbase.LangExtBase
 {
-	persistentSpace = String.fromCharCode(255);
+	// Note on string encoding:
+	// Because JavaScript uses UTF16, 8 bit binary data can be put directly into a string
+	// with little trouble, since any value from 0-255 is mapped to exactly one code point.
+	// We use the name `raw_str` to indicate that the string may contain binary data encoded
+	// in this straightforward way.  When transferring to/from A2 memory images the
+	// low bytes from the code points are put into a Uint8Array.
+	// WARNING: text based manipulations are unsafe on `raw_str`.
+	// The `persistentSpace` code is used to allow spaces to be safely stripped from `raw_str`.
+	persistentSpace = String.fromCharCode(256);
 	tokenizedProgram = "";
 	tokenizedLine = "";
 	currAddr = 2049;
@@ -309,7 +317,7 @@ export class TokenizationTool extends lxbase.LangExtBase
 		if (curs.nodeType!="line")
 			return lxbase.WalkerOptions.gotoChild;
 		this.tokenizedLine = curs.nodeText;
-		const lineTree = this.parse(this.tokenizedLine);
+		const lineTree = this.parse(this.tokenizedLine,'');
 		this.walk(lineTree,this.tokenize_node.bind(this));
 		const linenum = parseInt(this.tokenizedLine,10);
 		const statements = this.tokenizedLine.
@@ -375,7 +383,7 @@ export class TokenizationTool extends lxbase.LangExtBase
 		const verified = this.verify_document();
 		if (!verified)
 			return;
-		const syntaxTree = this.parse(verified.doc.getText());
+		const syntaxTree = this.parse(verified.doc.getText(),"\n");
 		vscode.window.showOpenDialog({
 			"canSelectMany": false,
 			"canSelectFiles":true,
@@ -518,7 +526,7 @@ export class TokenizationTool extends lxbase.LangExtBase
 		verified = this.verify_document();
 		if (!verified)
 			return;
-		const syntaxTree = this.parse(verified.doc.getText());
+		const syntaxTree = this.parse(verified.doc.getText(),"\n");
 		const code = this.tokenize(syntaxTree,baseAddr);
 		let content = '';
 		for (let i=0;i<code.length;i++)

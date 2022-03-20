@@ -88,7 +88,7 @@ export class LangExtBase
 			return undefined;
 		return {ed:textEditor,doc:document};
 	}
-	parse(txt: string) : Parser.Tree
+	parse(txt: string,append: string) : Parser.Tree
 	{
 		this.config = vscode.workspace.getConfiguration('applesoft');
 		const caseSens = (c => c==undefined?false:c)(this.config.get('case.caseSensitive')); 
@@ -100,7 +100,7 @@ export class LangExtBase
 			else
 				this.parser.setLanguage(this.Applesoft);
 		}
-		return this.parser.parse(txt);
+		return this.parser.parse(txt+append);
 	}
 	walk(syntaxTree: Parser.Tree,visit: (node: Parser.TreeCursor) => WalkerChoice)
 	{

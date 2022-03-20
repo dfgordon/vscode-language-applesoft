@@ -206,7 +206,7 @@ export class TSDiagnosticProvider extends lxbase.LineNumberTool
 		{
 			const vars = new VariableNameSentry();
 			const diag = Array<vscode.Diagnostic>();
-			const syntaxTree = this.parse(document.getText()+"\n");
+			const syntaxTree = this.parse(document.getText(),"\n");
 			// First gather and check the primary line numbers
 			const line_numbers = this.get_primary_nums(syntaxTree);
 			this.add_linenum_diagnostics(diag);

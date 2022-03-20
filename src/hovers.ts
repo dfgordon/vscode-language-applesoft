@@ -78,7 +78,7 @@ export class TSHoverProvider extends lxbase.LangExtBase implements vscode.HoverP
 	{
 		this.hover = new Array<vscode.MarkdownString>();
 		this.position = position;
-		const tree = this.parse(document.getText()+"\n");
+		const tree = this.parse(document.getText(),"\n");
 		this.walk(tree,this.get_hover.bind(this));
 		if (this.hover.length>0)
 			return new vscode.Hover(this.hover,this.range);

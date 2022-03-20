@@ -96,7 +96,7 @@ export class TSSemanticTokensProvider extends lxbase.LangExtBase implements vsco
 	{
 		this.tokensBuilder = new vscode.SemanticTokensBuilder(legend);
 
-		const tree = this.parse(document.getText()+"\n");
+		const tree = this.parse(document.getText(),"\n");
 		this.walk(tree,this.process_node.bind(this));
 		return this.tokensBuilder.build();
 	}
