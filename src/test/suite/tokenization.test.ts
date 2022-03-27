@@ -221,7 +221,7 @@ describe('Control', async function() {
 		assert.deepStrictEqual(actual,expected);
 	});
 	it('if then', function() {
-		let testCode = '10 if x > y then 1000\n';
+		let testCode = ' 1 0  if x > y then 1000\n';
 		testCode += '20 if x < y then 1010\n';
 		testCode += '30 if x <> y then 1020\n';
 		testCode += '40 if x = y then 1030\n';

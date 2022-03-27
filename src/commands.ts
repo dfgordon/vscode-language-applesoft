@@ -319,9 +319,9 @@ export class TokenizationTool extends lxbase.LangExtBase
 		this.tokenizedLine = curs.nodeText;
 		const lineTree = this.parse(this.tokenizedLine,'');
 		this.walk(lineTree,this.tokenize_node.bind(this));
-		const linenum = parseInt(this.tokenizedLine,10);
+		const linenum = parseInt(this.tokenizedLine.replace(/ /g,''),10);
 		const statements = this.tokenizedLine.
-			replace(/[0-9]+/,'').
+			replace(/[0-9 ]+/,'').
 			trimEnd().
 			replace(/ /g,'').
 			replace(RegExp(this.persistentSpace,'g'),' ');
