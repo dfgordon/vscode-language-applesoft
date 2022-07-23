@@ -46,15 +46,15 @@ export class TSSemanticTokensProvider extends lxbase.LangExtBase implements vsco
 	tokensBuilder : vscode.SemanticTokensBuilder = new vscode.SemanticTokensBuilder(legend);
 	process_node(curs: Parser.TreeCursor): lxbase.WalkerChoice
 	{
-		const rng = this.curs_to_range(curs);
-		if (["comment_text","rem_tok"].indexOf(curs.nodeType)>-1) // must precede _tok handler
+		const rng = lxbase.curs_to_range(curs);
+		if (["comment_text","tok_rem"].indexOf(curs.nodeType)>-1) // must precede tok_ handler
 		{
 			this.tokensBuilder.push(rng,"comment",[]);
 			return lxbase.WalkerOptions.gotoSibling;
 		}
-		if (curs.nodeType.slice(-3)=="tok")
+		if (curs.nodeType.substring(0,4)=="tok_")
 		{
-			if (funcNames.indexOf(curs.nodeType.slice(0,-4))>-1)
+			if (funcNames.includes(curs.nodeType.substring(4)))
 				this.tokensBuilder.push(rng,"function",[]);
 			else
 				this.tokensBuilder.push(rng,"keyword",[]);
@@ -65,29 +65,24 @@ export class TSSemanticTokensProvider extends lxbase.LangExtBase implements vsco
 			this.tokensBuilder.push(rng,"macro",[]);
 			return lxbase.WalkerOptions.gotoSibling;
 		}
-		if (["string","terminal_string"].indexOf(curs.nodeType)>-1)
+		if (["str","terminal_str","data_str","data_literal"].includes(curs.nodeType))
 		{
 			this.tokensBuilder.push(rng,"string",[]);
 			return lxbase.WalkerOptions.gotoSibling;
 		}
-		if (curs.nodeType=="fn_name")
+		if (curs.nodeType=="name_fn")
 		{
 			this.tokensBuilder.push(rng,"function",[]);
 			return lxbase.WalkerOptions.gotoSibling;
 		}
-		if (["integer","real","data_integer","data_real"].indexOf(curs.nodeType)>-1)
+		if (["int","real","data_int","data_real"].includes(curs.nodeType))
 		{
 			this.tokensBuilder.push(rng,"number",[]);
 			return lxbase.WalkerOptions.gotoSibling;
 		}
-		if (lxbase.VariableTypes.indexOf(curs.nodeType)>-1)
+		if (curs.nodeType.substring(0,5)=="name_")
 		{
-			this.tokensBuilder.push(this.var_name_range(curs),"variable",[]);
-			return lxbase.WalkerOptions.gotoChild;
-		}
-		if (curs.nodeType=="literal")
-		{
-			this.tokensBuilder.push(rng,"string",[]);
+			this.tokensBuilder.push(rng,"variable",[]);
 			return lxbase.WalkerOptions.gotoSibling;
 		}
 		return lxbase.WalkerOptions.gotoChild;

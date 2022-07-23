@@ -1,12 +1,12 @@
 import { assert } from 'console';
-import * as vscode from 'vscode';
+import * as vsserv from 'vscode-languageserver/node';
 import * as specialAddresses from './specialAddresses.json';
 
 export class AddressHovers
 {
-	amap: Map<number,Array<vscode.MarkdownString>>;
+	amap: Map<number,Array<vsserv.MarkupContent>>;
 
-	get(addr:number) : Array<vscode.MarkdownString> | undefined
+	get(addr:number) : Array<vsserv.MarkupContent> | undefined
 	{
 		return this.amap.get(addr);
 	}
@@ -21,28 +21,28 @@ export class AddressHovers
 		const addr_unsigned = addr < 0 ? addr + 2**16 : addr;
 		const addr_signed = addr_unsigned - 2**16;
 		const addr_hex = addr_unsigned.toString(16).toUpperCase();
-		const ans = new Array<vscode.MarkdownString>();
+		const ans = new Array<vsserv.MarkupContent>();
 		const obj = Object(specialAddresses)[addr_str];
 		if (obj.label)
-			ans.push(new vscode.MarkdownString('`'+obj.label+'`'));
+			ans.push({ kind: 'markdown', value: '`' + obj.label + '`' });
 		let addr_type = obj.type;
 		if (offset_names[addr_type])
 			addr_type += ", " + offset_names[addr_type][offset];
 		if (addr_unsigned>=2**15)
-			ans.push(new vscode.MarkdownString('Special address: **'+addr_type+'** ('+addr_unsigned+' | '+addr_signed+' | $'+addr_hex+')'));
+			ans.push({ kind: 'markdown', value: 'Special address: **' + addr_type + '** (' + addr_unsigned + ' | ' + addr_signed + ' | $' + addr_hex + ')' });
 		else
-			ans.push(new vscode.MarkdownString('Special address: **'+addr_type+'** ('+addr_unsigned+' | $'+addr_hex+')'));
-		ans.push(new vscode.MarkdownString(obj.desc));
+			ans.push({ kind: 'markdown', value: 'Special address: **' + addr_type + '** (' + addr_unsigned + ' | $' + addr_hex + ')' });
+		ans.push({ kind: 'markdown', value: obj.desc });
 		if (obj.ctx)
-			ans.push(new vscode.MarkdownString('Context limitation: ' + obj.ctx));
+			ans.push({ kind: 'markdown', value: 'Context limitation: ' + obj.ctx });
 		if (obj.note)
-			ans.push(new vscode.MarkdownString('Note: ' + obj.note));
-		this.amap.set(addr,ans);
+			ans.push({ kind: 'markdown', value: 'Note: ' + obj.note });
+		this.amap.set(addr, ans);
 	}
 	
 	constructor()
 	{
-		this.amap = new Map<number,Array<vscode.MarkdownString>>();
+		this.amap = new Map<number,Array<vsserv.MarkupContent>>();
 		
 		for (const property in specialAddresses)
 		{

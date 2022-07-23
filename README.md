@@ -4,13 +4,12 @@
 
 Language support for Applesoft BASIC in Visual Studio Code.
 
-If you are viewing this on github, you can install the extension from VS Code by searching the Marketplace for `applesoft`.
+*latest features*: outline, symbol operations, minify command
 
 * Semantic highlights true to Apple //e ROM parsing
-* Completions and hovers for all statements
-* Completions and hovers for soft switches, ROM routines, etc.
+* Comprehensive completions and hovers
+* Management of variables, functions, and line numbers
 * Diagnostics to identify errors and gotchas
-* Renumber lines in a selection or full document
 * Transfer programs to and from Apple ][ emulators (see below)
 * View tokenized program as hex dump and unicode text
 * Options : see `Ctrl+Comma` -> `Extensions` -> `Applesoft BASIC`
@@ -18,6 +17,46 @@ If you are viewing this on github, you can install the extension from VS Code by
 * Activates for file extensions `.bas`, `.abas`, `.A`
 
 <img src="sample/demo.gif" alt="session capture"/>
+
+## Line Numbers
+
+The extension will treat line numbers as document symbols if they are branch destinations.  You can treat these line numbers just as if they were, say, function names in a modern language.  For example, if `GOSUB 100` is found in the document, right-clicking on any reference to line 100 allows you to apply symbol manipulations such as `goto references` and `goto definition`.  The line number and the text of any comment on the line will appear in the document outline.  On the other hand, `rename symbol` cannot be used with line numbers.  Instead, use the `renumber lines` command if you want to renumber.
+
+## Managing Variables
+
+Applesoft variables and function names have the property that only the first two characters are significant, e.g., `CUTE` and `CUBE` are the same variable.  By default, the extension will underline colliding variable names with a warning squiggle.  In every other respect, the extension will treat colliding variable names as distinct, e.g., using `goto references` on `CUTE` will not find references to `CUBE`.  The assumption here is that colliding variable names are bugs or potential bugs.
+
+You can use `rename symbol` to quickly change the names of variables or functions.
+
+Variables and functions only appear in the symbol outline where they are assigned, defined, or dimensioned.
+
+## Declarations and Definitions
+
+The `DIM` statement is the only item we recognize as a declaration.  Using `goto declaration` on an array reference will find all the places in the file where it is dimensioned.
+
+Using `goto definition` on a variable will find all the places in the file where it is assigned (as of this writing it does not find input sources like `INPUT` or `READ`).
+
+Using `goto definition` on a function will find the function definition.
+
+Using `goto definition` on a line number reference will find the line.
+
+## Multi-File Programs and Program Flow
+
+As of this writing, the extension analyzes each file in isolation.  This is why, e.g., undimensioned array references trigger a warning rather than an error (the array might be dimensioned in another file).  Also as of this writing, the extension does not try to follow the program's flow.  As a result, errors such as `NEXT WITHOUT FOR`, `REDIM'D ARRAY`, etc., are not detected.
+
+## Minify and Tokenize
+
+The extension provides a `minify` command to reduce the memory used by your Applesoft program.  This performs the following transformations on your code:
+
+* Strips all comments
+* Reduces all variable and function names to the first two characters
+* Strips unnecessary separators and unquotes
+
+This produces a new document, leaving the existing one unchanged.  Make sure you review and repair all variable name collisions before applying this transformation.
+
+As of this writing, `minify` does not include renumbering lines.  This has to be done separately using the `renumber lines` command.
+
+If you want to see how much space you have saved, you can use the `show tokenized program` command on the transformed and untransformed code. Note the ending addresses in the two cases.
 
 ## Apple ][ Special Addresses
 
