@@ -24,6 +24,26 @@ describe('Minify Variables', async function() {
 		const expected = "10HOME\n20PRINTHE";
 		testMinify(testCode, expected, this.tool);
 	});
+	it('lower case long string', function() {
+		const testCode = '10 HOME\n20 PRINT hello$';
+		const expected = "10HOME\n20PRINThe$";
+		testMinify(testCode, expected, this.tool);
+	});
+	it('upper case long string', function() {
+		const testCode = '10 HOME\n20 PRINT HELLO$';
+		const expected = "10HOME\n20PRINTHE$";
+		testMinify(testCode, expected, this.tool);
+	});
+	it('lower case long int', function() {
+		const testCode = '10 HOME\n20 PRINT hello%';
+		const expected = "10HOME\n20PRINThe%";
+		testMinify(testCode, expected, this.tool);
+	});
+	it('upper case long int', function() {
+		const testCode = '10 HOME\n20 PRINT HELLO%';
+		const expected = "10HOME\n20PRINTHE%";
+		testMinify(testCode, expected, this.tool);
+	});
 	it('lower case long array name', function() {
 		const testCode = '10 print aero(xa1b2,ya2b1)';
 		const expected = "10printae(xa,ya)";
@@ -32,6 +52,26 @@ describe('Minify Variables', async function() {
 	it('upper case long array name', function() {
 		const testCode = '10 PRINT AERO(XA1B2,YA2B1)';
 		const expected = "10PRINTAE(XA,YA)";
+		testMinify(testCode, expected, this.tool);
+	});
+	it('lower case long string array', function() {
+		const testCode = '10 print aero$(xa1b2,ya2b1)';
+		const expected = "10printae$(xa,ya)";
+		testMinify(testCode, expected, this.tool);
+	});
+	it('upper case long string array', function() {
+		const testCode = '10 PRINT AERO$(XA1B2,YA2B1)';
+		const expected = "10PRINTAE$(XA,YA)";
+		testMinify(testCode, expected, this.tool);
+	});
+	it('lower case long int array', function() {
+		const testCode = '10 print aero%(xa1b2,ya2b1)';
+		const expected = "10printae%(xa,ya)";
+		testMinify(testCode, expected, this.tool);
+	});
+	it('upper case long int array', function() {
+		const testCode = '10 PRINT AERO%(XA1B2,YA2B1)';
+		const expected = "10PRINTAE%(XA,YA)";
 		testMinify(testCode, expected, this.tool);
 	});
 });

@@ -21,9 +21,10 @@ export class Minifier extends lxbase.LangExtBase {
 		// Shorten variable names
 		if (curs.nodeType.substring(0, 5) == 'name_') {
 			const txt = curs.nodeText.replace(/ /g, '');
-			const keep = curs.nodeType == 'name_str' || curs.nodeType == 'name_int' ? 3 : 2;
-			if (txt.length > keep)
-				this.workingLine = this.replace_curs(txt.substring(0, keep), curs);
+			if (txt.length > 3 && curs.nodeType=='name_str' || curs.nodeType=='name_int')
+				this.workingLine = this.replace_curs(txt.substring(0, 2) + txt.slice(-1), curs);
+			if (txt.length > 2 && curs.nodeType!='name_str' && curs.nodeType!='name_int')
+				this.workingLine = this.replace_curs(txt.substring(0, 2), curs);
 		}
 	
 		// Strip comment text, leaving REM token
@@ -86,11 +87,12 @@ export class Minifier extends lxbase.LangExtBase {
 			lastIter = this.workingLine;
 			const lineTree = this.parse(this.workingLine, '');
 			this.walk(lineTree, this.minify_node.bind(this));
+			this.workingLine = this.workingLine.
+				trimEnd().
+				replace(/ /g, '').
+				replace(RegExp(this.persistentSpace, 'g'), ' ');
 		} while (this.workingLine != lastIter);
-		this.minifiedProgram += this.workingLine.
-			trimEnd().
-			replace(/ /g, '').
-			replace(RegExp(this.persistentSpace, 'g'), ' ') + '\n';
+		this.minifiedProgram += this.workingLine + '\n';
 		return lxbase.WalkerOptions.gotoSibling;
 	}
 	minify(program: string): string {

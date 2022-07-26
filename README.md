@@ -26,7 +26,7 @@ The extension will treat line numbers as document symbols if they are branch des
 
 Applesoft variables and function names have the property that only the first two characters are significant, e.g., `CUTE` and `CUBE` are the same variable.  By default, the extension will underline colliding variable names with a warning squiggle.  In every other respect, the extension will treat colliding variable names as distinct, e.g., using `goto references` on `CUTE` will not find references to `CUBE`.  The assumption here is that colliding variable names are bugs or potential bugs.
 
-You can use `rename symbol` to quickly change the names of variables or functions.
+You can use `rename symbol` to quickly change the names of variables or functions.  You must include any desired suffix (`$` or `%`) in the replacement text, even though VS Code may offer a default without this.
 
 Variables and functions only appear in the symbol outline where they are assigned, defined, or dimensioned.
 
