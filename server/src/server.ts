@@ -135,6 +135,7 @@ connection.onDidChangeConfiguration(change => {
 		renumberer.configure(globalSettings);
 	}).then(() => {
 		// Revalidate all open text documents
+		// TODO: for this to work we might need to store DocSymbols for all open documents
 		documents.all().forEach(validateTextDocument);
 	});
 });

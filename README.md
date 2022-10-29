@@ -4,7 +4,7 @@
 
 Language support for Applesoft BASIC in Visual Studio Code.
 
-*latest features*: outline, symbol operations, minify command
+*latest patch*: minify guards against hidden tokens, keep trailing spaces in terminal strings upon tokenization
 
 * Semantic highlights true to Apple //e ROM parsing
 * Comprehensive completions and hovers
@@ -49,7 +49,8 @@ As of this writing, the extension analyzes each file in isolation.  This is why,
 The extension provides a `minify` command to reduce the memory used by your Applesoft program.  This performs the following transformations on your code:
 
 * Strips all comments
-* Reduces all variable and function names to the first two characters
+* Reduces variable and function names to the first two characters
+	- reduction can be less if hidden tokens would be introduced
 * Strips unnecessary separators and unquotes
 
 This produces a new document, leaving the existing one unchanged.  Make sure you review and repair all variable name collisions before applying this transformation.

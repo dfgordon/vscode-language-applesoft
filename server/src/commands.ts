@@ -3,6 +3,7 @@ import * as vsserv from 'vscode-languageserver';
 import * as lxbase from './langExtBase';
 import * as detokenize_map from './detokenize_map.json';
 import * as tokenize_map from './tokenize_map.json';
+import * as guard_map from './short_var_guards.json';
 
 export class Minifier extends lxbase.LangExtBase {
 	workingLine = '';
@@ -16,6 +17,24 @@ export class Minifier extends lxbase.LangExtBase {
 		const postNode = this.workingLine.substring(curs.endPosition.column);
 		return preNode + newNodeText + ' '.repeat(curs.nodeText.length-newNodeText.length) + postNode;
 	}
+	/// figure out if the short name needs to be guarded against forming a hidden token
+	needs_guard(curs: Parser.TreeCursor): boolean {
+		const shortStr = curs.nodeText.substring(0, 2).toLowerCase();
+		const cannot_follow = Object(guard_map)[shortStr];
+		let parent = curs.currentNode().parent;
+		if (!parent)
+			return false;
+		while (!parent.nextNamedSibling) {
+			if (!parent.parent)
+				return false;
+			parent = parent.parent;
+		}
+		const next = parent.nextNamedSibling;
+		if (next && cannot_follow)
+			if (cannot_follow.includes(next.type))
+				return true;
+		return false;
+	}
 	minify_node(curs: Parser.TreeCursor): lxbase.WalkerChoice {
 
 		// Shorten variable names
@@ -23,8 +42,18 @@ export class Minifier extends lxbase.LangExtBase {
 			const txt = curs.nodeText.replace(/ /g, '');
 			if (txt.length > 3 && curs.nodeType=='name_str' || curs.nodeType=='name_int')
 				this.workingLine = this.replace_curs(txt.substring(0, 2) + txt.slice(-1), curs);
-			if (txt.length > 2 && curs.nodeType!='name_str' && curs.nodeType!='name_int')
-				this.workingLine = this.replace_curs(txt.substring(0, 2), curs);
+			if (txt.length > 2 && curs.nodeType != 'name_str' && curs.nodeType != 'name_int') {
+				if (!this.needs_guard(curs)) {
+					this.workingLine = this.replace_curs(txt.substring(0, 2), curs);
+				}
+				else {
+					// if it is longer than 4 characters we gain something by guarding with parenthesis
+					if (txt.length > 4) {
+						this.workingLine = this.replace_curs("(" + txt.substring(0, 2) + ")", curs);
+					}
+					// otherwise do not change it
+				}
+			}
 		}
 	
 		// Strip comment text, leaving REM token
@@ -180,8 +209,10 @@ export class Tokenizer extends lxbase.LangExtBase
 				}
 			}
 		}
-		if (curs.nodeType=='str' || curs.nodeType=='terminal_str')
+		if (curs.nodeType=='str')
 			this.tokenizedLine = this.replace_curs(curs.nodeText.trim().replace(/ /g,this.persistentSpace),curs);
+		if (curs.nodeType=='terminal_str')
+			this.tokenizedLine = this.replace_curs(curs.nodeText.trimStart().replace(/ /g,this.persistentSpace),curs);
 		if (curs.nodeType=='comment_text')
 			this.tokenizedLine = this.replace_curs(curs.nodeText.replace(/ /g,this.persistentSpace),curs);
 		

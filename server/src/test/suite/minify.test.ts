@@ -76,6 +76,39 @@ describe('Minify Variables', async function() {
 	});
 });
 
+describe('Minify Variables with Guards', async function() {
+	//vscode.window.showInformationMessage('Start output statements');
+	this.beforeEach(async function() {
+		const TSInitResult = await lxbase.TreeSitterInit();
+		this.tool = new com.Minifier(TSInitResult,config.defaultSettings);
+	});
+	it('TO and STEP guards', function() {
+		const testCode = '10 for x = ca12345 to abracadabra step 5';
+		const expected = "10forx=(ca)to(ab)step5";
+		testMinify(testCode, expected, this.tool);
+	});
+	it('logic guards', function() {
+		const testCode = '10 if hf123 or it123 and nobody then 100';
+		const expected = "10if(hf)or(it)and(no)then100";
+		testMinify(testCode, expected, this.tool);
+	});
+	it('logic non-guards', function() {
+		const testCode = '10 if hf123% or it123% and nobody% then 100';
+		const expected = "10ifhf%orit%andno%then100";
+		testMinify(testCode, expected, this.tool);
+	});
+	it('negated logic guards', function() {
+		const testCode = '10 if not hf123 or not it123 and not nobody then 100';
+		const expected = "10ifnot(hf)ornot(it)andnot(no)then100";
+		testMinify(testCode, expected, this.tool);
+	});
+	it('not worth shortening', function() {
+		const testCode = '10 if not hf12 or not it12 and not nobo then 100';
+		const expected = "10ifnothf12ornotit12andnotnobothen100";
+		testMinify(testCode, expected, this.tool);
+	});
+});
+
 describe('Minify Functions', async function() {
 	//vscode.window.showInformationMessage('Start output statements');
 	this.beforeEach(async function() {
