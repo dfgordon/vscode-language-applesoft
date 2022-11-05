@@ -74,6 +74,11 @@ describe('Minify Variables', async function() {
 		const expected = "10PRINTAE%(XA,YA)";
 		testMinify(testCode, expected, this.tool);
 	});
+	it('short variables only', function () {
+		const testCode = '10 PRINT A%(X,Y) A$(X%,Y%)';
+		const expected = "10PRINTA%(X,Y)A$(X%,Y%)";
+		testMinify(testCode, expected, this.tool);
+	});
 });
 
 describe('Minify Variables with Guards', async function() {
@@ -105,6 +110,11 @@ describe('Minify Variables with Guards', async function() {
 	it('not worth shortening', function() {
 		const testCode = '10 if not hf12 or not it12 and not nobo then 100';
 		const expected = "10ifnothf12ornotit12andnotnobothen100";
+		testMinify(testCode, expected, this.tool);
+	});
+	it('spaces thrown in', function() {
+		const testCode = '10 for x = ca1  23 45 to abrac adabra step 5';
+		const expected = "10forx=(ca)to(ab)step5";
 		testMinify(testCode, expected, this.tool);
 	});
 });

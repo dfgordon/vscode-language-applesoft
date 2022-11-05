@@ -18,8 +18,8 @@ export class Minifier extends lxbase.LangExtBase {
 		return preNode + newNodeText + ' '.repeat(curs.nodeText.length-newNodeText.length) + postNode;
 	}
 	/// figure out if the short name needs to be guarded against forming a hidden token
-	needs_guard(curs: Parser.TreeCursor): boolean {
-		const shortStr = curs.nodeText.substring(0, 2).toLowerCase();
+	needs_guard(clean_str: string, curs: Parser.TreeCursor): boolean {
+		const shortStr = clean_str.substring(0, 2).toLowerCase();
 		const cannot_follow = Object(guard_map)[shortStr];
 		let parent = curs.currentNode().parent;
 		if (!parent)
@@ -40,10 +40,10 @@ export class Minifier extends lxbase.LangExtBase {
 		// Shorten variable names
 		if (curs.nodeType.substring(0, 5) == 'name_') {
 			const txt = curs.nodeText.replace(/ /g, '');
-			if (txt.length > 3 && curs.nodeType=='name_str' || curs.nodeType=='name_int')
+			if (txt.length > 3 && (curs.nodeType=='name_str' || curs.nodeType=='name_int'))
 				this.workingLine = this.replace_curs(txt.substring(0, 2) + txt.slice(-1), curs);
 			if (txt.length > 2 && curs.nodeType != 'name_str' && curs.nodeType != 'name_int') {
-				if (!this.needs_guard(curs)) {
+				if (!this.needs_guard(txt,curs)) {
 					this.workingLine = this.replace_curs(txt.substring(0, 2), curs);
 				}
 				else {
@@ -82,20 +82,25 @@ export class Minifier extends lxbase.LangExtBase {
 				}
 			}
 		}
-		if (curs.nodeType == 'terminal_str')
+		if (curs.nodeType == 'terminal_str') {
 			this.workingLine = this.replace_curs(curs.nodeText.trim().replace(/ /g, this.persistentSpace), curs);
+			return lxbase.WalkerOptions.gotoSibling;
+		}
 		if (curs.nodeType == 'str') {
 			let persistentSpaceStr = curs.nodeText.trim().replace(/ /g, this.persistentSpace);
-			// check to see if there are trailing nodes at this level or at the statement level, if no, strip the last character
-			const next = curs.currentNode().nextSibling;
-			if (!next) {
-				let parentStatement = curs.currentNode().parent;
-				while (parentStatement && parentStatement.type != 'statement')
-					parentStatement = parentStatement.parent;
-				if (parentStatement && !parentStatement.nextSibling)
-					persistentSpaceStr = persistentSpaceStr.substring(0, persistentSpaceStr.length - 1);
+			// check to see if there are trailing nodes at any level up to line, if no, strip the last character
+			let curr: Parser.SyntaxNode | null = curs.currentNode();
+			while (curr && curr.type != "line") {
+				const next = curr.nextSibling;
+				if (next) {
+					this.workingLine = this.replace_curs(persistentSpaceStr, curs);
+					return lxbase.WalkerOptions.gotoSibling;
+				}
+				curr = curr.parent;
 			}
+			persistentSpaceStr = persistentSpaceStr.substring(0, persistentSpaceStr.length - 1);
 			this.workingLine = this.replace_curs(persistentSpaceStr, curs);
+			return lxbase.WalkerOptions.gotoSibling;
 		}
 
 		// Extraneous separators
