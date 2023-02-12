@@ -4,7 +4,7 @@
 
 Language support for Applesoft BASIC in Visual Studio Code.
 
-*latest patch*: minify guards against hidden tokens, keep trailing spaces in terminal strings upon tokenization
+*latest patch*: fix tokenization of unary expressions
 
 * Semantic highlights true to Apple //e ROM parsing
 * Comprehensive completions and hovers

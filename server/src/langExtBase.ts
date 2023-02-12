@@ -4,16 +4,16 @@ import Parser from 'web-tree-sitter';
 import * as path from 'path';
 import { applesoftSettings } from './settings';
 
-export function curs_to_range(curs: Parser.TreeCursor): vsserv.Range
+export function curs_to_range(curs: Parser.TreeCursor,row: number): vsserv.Range
 {
-	const start_pos = vsserv.Position.create(curs.startPosition.row, curs.startPosition.column);
-	const end_pos = vsserv.Position.create(curs.endPosition.row, curs.endPosition.column);
+	const start_pos = vsserv.Position.create(row+curs.startPosition.row, curs.startPosition.column);
+	const end_pos = vsserv.Position.create(row+curs.endPosition.row, curs.endPosition.column);
 	return vsserv.Range.create(start_pos, end_pos);
 }
-export function node_to_range(node: Parser.SyntaxNode): vsserv.Range
+export function node_to_range(node: Parser.SyntaxNode,row: number): vsserv.Range
 {
-	const start_pos = vsserv.Position.create(node.startPosition.row,node.startPosition.column);
-	const end_pos = vsserv.Position.create(node.endPosition.row,node.endPosition.column);
+	const start_pos = vsserv.Position.create(row+node.startPosition.row,node.startPosition.column);
+	const end_pos = vsserv.Position.create(row+node.endPosition.row,node.endPosition.column);
 	return vsserv.Range.create(start_pos,end_pos);
 }
 
@@ -30,13 +30,13 @@ export function var_to_key(node: Parser.SyntaxNode): string
 	return base + '()';
 }
 
-export function name_range(node: Parser.SyntaxNode): vsserv.Range
+export function name_range(node: Parser.SyntaxNode,row: number): vsserv.Range
 {
 	// node can be either var_* or name_*
 	const nameNode = node.firstNamedChild;
 	if (!nameNode)
-		return node_to_range(node);
-	return node_to_range(nameNode);
+		return node_to_range(node,row);
+	return node_to_range(nameNode,row);
 }
 
 export const WalkerOptions = {

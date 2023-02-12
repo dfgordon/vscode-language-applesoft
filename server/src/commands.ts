@@ -288,7 +288,7 @@ export class LineNumberTool extends lxbase.LangExtBase
 	}
 	push_linenum(curs: Parser.TreeCursor)
 	{
-		const rng = lxbase.curs_to_range(curs);
+		const rng = lxbase.curs_to_range(curs,0);
 		const leading = curs.nodeText.length - curs.nodeText.trimLeft().length;
 		const trailing = curs.nodeText.length - curs.nodeText.trimRight().length;
 		const parsed = parseInt(curs.nodeText.replace(/ /g,''));

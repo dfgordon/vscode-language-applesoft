@@ -44,7 +44,7 @@ describe('Diagnostics', function() {
 	it('Range Errors', async function () {
 		await diagnosticTester('test-ranges.abas', 13, [
 			/Out of range \(0,63999\)/,
-			/Out of range \(-1e\+38,1e\+38\)/,
+			/Out of range \(-1\.7e\+38,1\.7e\+38\)/,
 			/Out of range \(-32767,32767\)/,
 			/Out of range \(0,7\)/,
 			/Out of range \(-32767,65535\)/,

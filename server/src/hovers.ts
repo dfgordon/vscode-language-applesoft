@@ -56,7 +56,7 @@ export class TSHoverProvider extends lxbase.LangExtBase
 	}
 	get_hover(curs:Parser.TreeCursor) : lxbase.WalkerChoice
 	{
-		this.range = lxbase.curs_to_range(curs);
+		this.range = lxbase.curs_to_range(curs,0);
 		if (lxbase.rangeContainsPos(this.range,this.position))
 		{
 			if (this.config.hovers.specialAddresses)

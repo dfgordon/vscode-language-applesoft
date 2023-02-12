@@ -45,16 +45,17 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 	vsentry = new VariableNameSentry();
 	fsentry = new VariableNameSentry();
 	lastGoodLineNumber = -1;
+	row = 0;
 	num(node: Parser.SyntaxNode): number
 	{
 		return parseInt(node.text.replace(/ /g, ''));
 	}
 	value_range(diag: Array<vsserv.Diagnostic>,node: Parser.SyntaxNode,low:number,high:number)
 	{
-		if (node.type!="int" && node.type!="real")
+		if (node.type!="int" && node.type!="real" && node.type!="unary_aexpr")
 			return;
-		const rng = lxbase.node_to_range(node);
-		const parsed = parseFloat(node.text);
+		const rng = lxbase.node_to_range(node,this.row);
+		const parsed = parseFloat(node.text.replace(/ /g,""));
 		if (!isNaN(parsed))
 			if (parsed<low || parsed>high)
 				diag.push(vsserv.Diagnostic.create(rng,'Out of range ('+low+','+high+')'));
@@ -83,15 +84,15 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 		if (!varInfo)
 			varInfo = { dec: [], def: [], ref: [] };
 		if (dim)
-			varInfo.dec.push(lxbase.name_range(node));
+			varInfo.dec.push(lxbase.name_range(node,this.row));
 		else
-			varInfo.def.push(lxbase.name_range(node));
+			varInfo.def.push(lxbase.name_range(node,this.row));
 		map.set(keyname, varInfo);
 	}
 	visit_primaries(curs: Parser.TreeCursor): lxbase.WalkerChoice
 	{
 		const parent = curs.currentNode().parent;
-		const rng = lxbase.curs_to_range(curs);
+		const rng = lxbase.curs_to_range(curs,this.row);
 		if (curs.currentNode().hasError())
 			return lxbase.WalkerOptions.gotoSibling;
 		if (curs.nodeType == "linenum" && parent && parent.type == "line") {
@@ -127,7 +128,7 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 		else if (curs.nodeType == "tok_def") {
 			const nameNode = curs.currentNode().nextNamedSibling?.nextNamedSibling;
 			if (nameNode) {
-				const nameRange = lxbase.node_to_range(nameNode);
+				const nameRange = lxbase.node_to_range(nameNode,this.row);
 				const keyname = lxbase.var_to_key(nameNode);
 				if (this.workingSymbols.functions.has(keyname)) {
 					this.diag.push(vsserv.Diagnostic.create(nameRange, 'function is redefined'));
@@ -156,15 +157,20 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 		if (next.type != "linenum") // we might start on GOSUB node
 			next = next.nextNamedSibling;
 		while (next && next.type == "linenum") {
-			const rng = lxbase.node_to_range(next);
+			const rng = lxbase.node_to_range(next,this.row);
 			const num = this.num(next);
 			const line = this.workingSymbols.lines.get(num);
 			if (line) {
 				const ranges = is_sub ? line.gosubs : line.gotos;
 				ranges.push(rng);
 			}
+			else if (next.parent && next.parent.hasError())
+			{
+				this.diag.push(vsserv.Diagnostic.create(rng, 'Maybe unanalyzed (fix line)', vsserv.DiagnosticSeverity.Warning));
+				return lxbase.WalkerOptions.gotoSibling;
+			}
 			else
-				this.diag.push(vsserv.Diagnostic.create(rng,'Line does not exist'));
+				this.diag.push(vsserv.Diagnostic.create(rng, 'Line does not exist'));
 			next = next.nextNamedSibling;
 		}
 		return lxbase.WalkerOptions.gotoParentSibling;
@@ -172,7 +178,7 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 	process_variable_ref(curs: Parser.TreeCursor): lxbase.WalkerChoice
 	{
 		const keyname = lxbase.var_to_key(curs.currentNode());
-		const nameRange = lxbase.name_range(curs.currentNode());
+		const nameRange = lxbase.name_range(curs.currentNode(),this.row);
 		const isArray = keyname.slice(-1) == ')';
 		if (this.config.warn.collisions)
 			this.vsentry.add(keyname, nameRange, this.diag);
@@ -197,7 +203,7 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 	visit_node(curs: Parser.TreeCursor): lxbase.WalkerChoice
 	{
 		const parent = curs.currentNode().parent;
-		const rng = lxbase.curs_to_range(curs);
+		const rng = lxbase.curs_to_range(curs,this.row);
 		if (curs.currentNode().hasError())
 		{
 			if (!this.is_error_inside(curs.currentNode()))
@@ -238,9 +244,9 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 			const rhs = curs.currentNode().lastNamedChild;
 			if (lhs && rhs)
 			{
-				if (lhs.type=="var_real" && rhs.type=="real")
-					this.value_range(this.diag,rhs,-1e38,1e38);
-				if (lhs.type=="var_int" && (rhs.type=="real" || rhs.type=="int"))
+				if (lhs.type=="var_real")
+					this.value_range(this.diag,rhs,-1.7e38,1.7e38);
+				if (lhs.type=="var_int")
 					this.value_range(this.diag,rhs,-32767,32767);
 			}
 		}
@@ -323,9 +329,15 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 			this.fsentry = new VariableNameSentry();
 			this.workingSymbols = new server.DocSymbols();
 			this.lastGoodLineNumber = -1;
-			const syntaxTree = this.parse(document.getText(),"\n");
-			this.walk(syntaxTree, this.visit_primaries.bind(this));
-			this.walk(syntaxTree, this.visit_node.bind(this));
+			const lines = document.getText().split('\n');
+			for (this.row = 0; this.row < lines.length; this.row++) {
+				const syntaxTree = this.parse(lines[this.row],"\n");
+				this.walk(syntaxTree, this.visit_primaries.bind(this));
+			}
+			for (this.row = 0; this.row < lines.length; this.row++) {
+				const syntaxTree = this.parse(lines[this.row],"\n");
+				this.walk(syntaxTree, this.visit_node.bind(this));
+			}
 		}
 		return this.diag;
 	}

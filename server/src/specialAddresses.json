@@ -1375,25 +1375,25 @@
     },
     "-16241": {
         "brief": "write RAM, read RAM, 4K bank 1",
-        "desc": "Upper address space, write RAM, read RAM, 4K bank 1.",
+        "desc": "Upper address space, write RAM, read RAM, 4K bank 1, also base address for logic state sequencer Q7 on.",
         "label": "HI12K",
         "type": "soft switch"
     },
     "-16242": {
         "brief": "read ROM, 4K bank 1",
-        "desc": "Upper address space, read ROM, 4K bank 1.",
+        "desc": "Upper address space, read ROM, 4K bank 1, also base address for logic state sequencer Q7 off.",
         "label": "HI12K",
         "type": "soft switch"
     },
     "-16243": {
         "brief": "write RAM, read ROM, 4K bank 1",
-        "desc": "Upper address space, write RAM, read ROM, 4K bank 1.",
+        "desc": "Upper address space, write RAM, read ROM, 4K bank 1, also base address for logic state sequencer Q6 on.",
         "label": "HI12K",
         "type": "soft switch"
     },
     "-16244": {
         "brief": "read RAM, 4K bank 1",
-        "desc": "Upper address space, read RAM, 4K bank 1.",
+        "desc": "Upper address space, read RAM, 4K bank 1, also base address for logic state sequencer Q6 off.",
         "label": "HI12K",
         "type": "soft switch"
     },
