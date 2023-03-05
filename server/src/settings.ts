@@ -9,6 +9,8 @@ export interface applesoftSettings {
 	warn: {
 		terminalString: boolean,
 		collisions: boolean,
+		undeclaredArrays: boolean,
+		undefinedVariables: boolean,
 		run: boolean
 	},
 	hovers: {
@@ -23,6 +25,9 @@ export interface applesoftSettings {
 		speed: string,
 		color: boolean
 	},
+	detokenizer: {
+		escapes: number[]
+	}
 	trace: {
 		server: string
 	}
@@ -36,6 +41,8 @@ export const defaultSettings: applesoftSettings = {
 	warn: {
 		terminalString: true,
 		collisions: true,
+		undeclaredArrays: true,
+		undefinedVariables: true,
 		run: true
 	},
 	hovers: {
@@ -49,6 +56,9 @@ export const defaultSettings: applesoftSettings = {
 		newMachine: "appleiie",
 		speed: "maximum",
 		color: false
+	},
+	detokenizer: {
+		escapes: [10,13]
 	},
 	trace: {
 		server: "verbose"

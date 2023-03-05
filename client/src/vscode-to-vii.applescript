@@ -42,7 +42,7 @@ on run argv
 	if not {"run","enter","get"} contains action then
 		error "action argument has unknown value " & action number 9001
 	end if
-	if not {"appleii","appleiiplus","appleiie","front"} contains machineType then
+	if not {"appleii","appleiiplus","appleiie","appleiic","appleiicplus","front"} contains machineType then
 		error "unknown machine type " & machineType number 9002
 	end if
 	if not {"regular","high","maximum"} contains runSpeed then
@@ -66,6 +66,16 @@ on run argv
 		end if
 		if machineType is "appleiie" then
 			set theMachine to (make new AppleIIe)
+			delay pause
+			reset theMachine
+		end if
+		if machineType is "appleiic" then
+			set theMachine to (make new AppleIIc)
+			delay pause
+			reset theMachine
+		end if
+		if machineType is "appleiicplus" then
+			set theMachine to (make new AppleIIcPlus)
 			delay pause
 			reset theMachine
 		end if

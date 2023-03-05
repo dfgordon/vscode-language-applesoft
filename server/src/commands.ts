@@ -82,8 +82,8 @@ export class Minifier extends lxbase.LangExtBase {
 				}
 			}
 		}
-		if (curs.nodeType == 'terminal_str') {
-			this.workingLine = this.replace_curs(curs.nodeText.trim().replace(/ /g, this.persistentSpace), curs);
+		if (curs.nodeType == 'str' && curs.nodeText[curs.nodeText.length-1]!='"') {
+			this.workingLine = this.replace_curs(curs.nodeText.trimLeft().replace(/ /g, this.persistentSpace), curs);
 			return lxbase.WalkerOptions.gotoSibling;
 		}
 		if (curs.nodeType == 'str') {
@@ -181,6 +181,12 @@ export class Tokenizer extends lxbase.LangExtBase
 		const postNode = this.tokenizedLine.substring(node.endPosition.column);
 		return preNode + newNodeText + ' '.repeat(node.text.length-newNodeText.length) + postNode;
 	}
+	stringlike_node_to_raw_str(txt: string,trim: boolean): string {
+		let ans = trim ? txt.trimStart() : txt;
+		ans = lxbase.escaped_string_to_raw_str(ans);
+		ans = ans.replace(/ /g, this.persistentSpace);
+		return ans + ' '.repeat(txt.length-ans.length);
+	}
 	tokenize_node(curs: Parser.TreeCursor) : lxbase.WalkerChoice
 	{
 		// Primary line numbers "tokenized" as 16 bit integers separately
@@ -194,7 +200,7 @@ export class Tokenizer extends lxbase.LangExtBase
 		if (curs.nodeType.substring(0,5)=='name_' || curs.nodeType=='real')
 			this.tokenizedLine = this.replace_curs(curs.nodeText.toUpperCase(),curs);
 		
-		// Persistent spaces
+		// Persistent spaces and escapes
 		if (curs.nodeType=='statement')
 		{
 			const tok = curs.currentNode().firstNamedChild;
@@ -206,20 +212,22 @@ export class Tokenizer extends lxbase.LangExtBase
 				if (tok.type=='tok_data')
 				{
 					const preItems = this.tokenizedLine.substring(0,tok.endPosition.column);
-					const items = this.tokenizedLine.substring(tok.endPosition.column,curs.endPosition.column);
+					const items = this.stringlike_node_to_raw_str(this.tokenizedLine.substring(tok.endPosition.column, curs.endPosition.column),false);
 					const postData = this.tokenizedLine.substring(curs.endPosition.column);
-					this.tokenizedLine = preItems + items.replace(/ /g,this.persistentSpace) + postData;
+					this.tokenizedLine = preItems + items + postData;
 					this.tokenizedLine = this.replace_node(String.fromCharCode(Object(tokenize_map)['tok_data'] as number),tok);
 					return lxbase.WalkerOptions.gotoSibling;
 				}
 			}
 		}
-		if (curs.nodeType=='str')
-			this.tokenizedLine = this.replace_curs(curs.nodeText.trim().replace(/ /g,this.persistentSpace),curs);
-		if (curs.nodeType=='terminal_str')
-			this.tokenizedLine = this.replace_curs(curs.nodeText.trimStart().replace(/ /g,this.persistentSpace),curs);
-		if (curs.nodeType=='comment_text')
-			this.tokenizedLine = this.replace_curs(curs.nodeText.replace(/ /g,this.persistentSpace),curs);
+		if (curs.nodeType == 'str') {
+			this.tokenizedLine = this.replace_curs(this.stringlike_node_to_raw_str(curs.nodeText,true), curs);
+			return lxbase.WalkerOptions.gotoSibling;
+		}
+		if (curs.nodeType == 'comment_text') {
+			this.tokenizedLine = this.replace_curs(this.stringlike_node_to_raw_str(curs.nodeText,false), curs);
+			return lxbase.WalkerOptions.gotoSibling;
+		}
 		
 		return lxbase.WalkerOptions.gotoChild;
 	}
@@ -227,15 +235,16 @@ export class Tokenizer extends lxbase.LangExtBase
 	{
 		if (curs.nodeType!="line")
 			return lxbase.WalkerOptions.gotoChild;
-		this.tokenizedLine = curs.nodeText;
-		const lineTree = this.parse(this.tokenizedLine,'');
+		if (curs.nodeText.length < 2)
+			return lxbase.WalkerOptions.gotoSibling;
+		this.tokenizedLine = curs.nodeText.substring(0,curs.nodeText.length-1);
+		const lineTree = this.parse(this.tokenizedLine,'\n');
 		this.walk(lineTree,this.tokenize_node.bind(this));
 		const linenum = parseInt(this.tokenizedLine.replace(/ /g,''),10);
 		const statements = this.tokenizedLine.
-			replace(/[0-9 ]+/,'').
-			trimEnd().
-			replace(/ /g,'').
-			replace(RegExp(this.persistentSpace,'g'),' ');
+			replace(/[0-9 ]+/, '').
+			replace(/ /g, '').
+			replace(RegExp(this.persistentSpace, 'g'), ' ');
 		this.currAddr += statements.length + 5;
 		this.tokenizedLine = this.encode_int16(this.currAddr) + this.encode_int16(linenum) + statements + String.fromCharCode(0);
 		this.tokenizedProgram += this.tokenizedLine;
@@ -252,19 +261,48 @@ export class Tokenizer extends lxbase.LangExtBase
 	}
 	detokenize(img: number[]) : string
 	{
+		const DATA_TOK = 131;
+		const REM_TOK = 178;
+		const QUOTE = 34;
+		const COLON = 58;
 		let addr = img[103] + img[104]*256;
-		let code = '\n';
-		while ((img[addr]!=0 || img[addr+1]!=0) && addr<2**16) {
+		let code = '';
+		while (addr<2**16-3 && (img[addr]!=0 || img[addr+1]!=0)) {
 			addr += 2; // skip link address
 			const line_num = img[addr] + img[addr+1]*256;
 			code += line_num.toString() + ' ';
 			addr += 2;
-			while (img[addr]!=0) {
-				if (img[addr]>127)
+			let escaped = "";
+			while (addr<2**16 && img[addr] != 0) {
+				if (img[addr] == QUOTE) {
+					code += "\"";
+					[escaped, addr] = lxbase.bytes_to_escaped_string(
+						this.config.detokenizer.escapes, img, addr + 1, [QUOTE, 0], "str");
+					code += escaped;
+					if (img[addr] == QUOTE) {
+						code += "\"";
+						addr += 1;
+					}
+				}
+				else if (img[addr] == REM_TOK) {
+					code += ' REM ';
+					[escaped, addr] = lxbase.bytes_to_escaped_string(
+						this.config.detokenizer.escapes, img, addr + 1, [0], "tok_rem");
+					code += escaped;
+				}
+				else if (img[addr] == DATA_TOK) {
+					code += ' DATA ';
+					[escaped, addr] = lxbase.bytes_to_escaped_string(
+						this.config.detokenizer.escapes, img, addr + 1, [COLON, 0], "tok_data");
+					code += escaped;
+				}
+				else if (img[addr] > 127) {
 					code += ' ' + Object(detokenize_map)[img[addr].toString()].toUpperCase() + ' ';
-				else
+					addr += 1;
+				} else {
 					code += String.fromCharCode(img[addr]);
-				addr += 1;
+					addr += 1;
+				}
 			}
 			code += '\n';
 			addr += 1;

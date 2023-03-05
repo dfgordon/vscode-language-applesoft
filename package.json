@@ -27,6 +27,8 @@
 		"onCommand:applesoft.getFrontVii",
 		"onCommand:applesoft.getAppleWinSaveState",
 		"onCommand:applesoft.setAppleWinSaveState",
+		"onCommand:applesoft.getFromDiskImage",
+		"onCommand:applesoft.saveToDiskImage",
 		"onCommand:applesoft.showTokenizedProgram",
 		"onCommand:applesoft.minify"
 	],
@@ -44,6 +46,16 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Warn against missing unquotes. In Applesoft, strings without an unquote run to end-of-line."
+				},
+				"applesoft.warn.undeclaredArrays": {
+					"type": "boolean",
+					"default": true,
+					"description": "Warn against arrays that have never been dimensioned."
+				},
+				"applesoft.warn.undefinedVariables": {
+					"type": "boolean",
+					"default": true,
+					"description": "Warn against variables that have never been assigned."
 				},
 				"applesoft.warn.collisions": {
 					"type": "boolean",
@@ -73,7 +85,9 @@
 				"applesoft.vii.newMachine": {
 					"enum": [
 						"appleiiplus",
-						"appleiie"
+						"appleiie",
+						"appleiic",
+						"appleiicplus"
 					],
 					"default": "appleiie",
 					"markdownDescription": "Type of machine to use when spawning a new Virtual ][ machine"
@@ -91,6 +105,11 @@
 					"type": "boolean",
 					"default": false,
 					"markdownDescription": "Use color monitor when spawning a new Virtual ][ machine"
+				},
+				"applesoft.detokenizer.escapes": {
+					"type": "array",
+					"default": [10,13],
+					"markdownDescription": "ASCII control codes that should be escaped by the detokenizer"
 				},
 				"applesoft.warn.run": {
 					"type": "boolean",
@@ -157,6 +176,14 @@
 				"title": "applesoft: Store program in AppleWin save state"
 			},
 			{
+				"command": "applesoft.getFromDiskImage",
+				"title": "applesoft: Insert program from disk image"
+			},
+			{
+				"command": "applesoft.saveToDiskImage",
+				"title": "applesoft: Save program to disk image"
+			},
+			{
 				"command": "applesoft.showTokenizedProgram",
 				"title": "applesoft: Show tokenized program"
 			},
@@ -201,6 +228,14 @@
 				},
 				{
 					"command": "applesoft.setAppleWinSaveState",
+					"when": "editorLangId == applesoft"
+				},
+				{
+					"command": "applesoft.getFromDiskImage",
+					"when": "editorLangId == applesoft"
+				},
+				{
+					"command": "applesoft.saveToDiskImage",
 					"when": "editorLangId == applesoft"
 				},
 				{

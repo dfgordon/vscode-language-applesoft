@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as tok from './semanticTokens';
 import * as com from './commands';
+import * as dimg from './diskImage';
 import * as lxbase from './langExtBase';
 import * as vsclnt from 'vscode-languageclient/node';
 import * as path from 'path';
@@ -36,6 +37,7 @@ export function activate(context: vscode.ExtensionContext)
 		const renumberer = new com.RenumberTool(TSInitResult);
 		const viiEntry = new com.ViiEntryTool(TSInitResult);
 		const appleWin = new com.AppleWinTool(TSInitResult);
+		const a2kit = new dimg.A2KitTool(TSInitResult);
 		const tokenizer = new com.TokenizationTool(TSInitResult);
 		const highlighter = new tok.TSSemanticTokensProvider(TSInitResult);
 		vscode.languages.registerDocumentSemanticTokensProvider(selector, highlighter, tok.legend);
@@ -46,7 +48,9 @@ export function activate(context: vscode.ExtensionContext)
 		context.subscriptions.push(vscode.commands.registerCommand("applesoft.enterFrontVii",viiEntry.enterFrontVirtualII,viiEntry));
 		context.subscriptions.push(vscode.commands.registerCommand("applesoft.getFrontVii",viiEntry.getFrontVirtualII,viiEntry));
 		context.subscriptions.push(vscode.commands.registerCommand("applesoft.getAppleWinSaveState",appleWin.getAppleWinSaveState,appleWin));
-		context.subscriptions.push(vscode.commands.registerCommand("applesoft.setAppleWinSaveState",appleWin.setAppleWinSaveState,appleWin));
+		context.subscriptions.push(vscode.commands.registerCommand("applesoft.setAppleWinSaveState", appleWin.setAppleWinSaveState, appleWin));
+		context.subscriptions.push(vscode.commands.registerCommand("applesoft.getFromDiskImage", a2kit.getApplesoftFile, a2kit));
+		context.subscriptions.push(vscode.commands.registerCommand("applesoft.saveToDiskImage", a2kit.putApplesoftFile, a2kit));
 		context.subscriptions.push(vscode.commands.registerCommand("applesoft.showTokenizedProgram",tokenizer.showTokenizedProgram,tokenizer));
 		context.subscriptions.push(vscode.commands.registerCommand("applesoft.renumber", renumberer.command, renumberer));
 		context.subscriptions.push(vscode.commands.registerCommand("applesoft.minify", tokenizer.minify_program, tokenizer));

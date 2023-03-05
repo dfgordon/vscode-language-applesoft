@@ -83,7 +83,7 @@ export class StatementHovers
 			MarkdownString('`DEL linenum,linenum`')
 		]);
 		this.hmap.set("tok_dim",[
-			MarkdownString('allocate space for arrays'),
+			MarkdownString('allocate space for arrays, specifying the last element (length-1)'),
 			MarkdownString('`DIM name[%|$] subscript [{,name[%|$] subscript}]`')
 		]);
 		this.hmap.set("tok_draw",[
@@ -224,7 +224,7 @@ export class StatementHovers
 			MarkdownString('`LOMEM: aexpr`')
 		]);
 		this.hmap.set("tok_mid",[
-			MarkdownString('return substring, `aexpr` arguments are start and length'),
+			MarkdownString('return substring, `aexpr` arguments are start (indexed from 1) and length'),
 			MarkdownString('`MID$ (sexpr,aexpr[,aexpr])`')
 		]);
 		this.hmap.set("tok_new",[

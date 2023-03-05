@@ -43,13 +43,40 @@ export const legend = new vscode.SemanticTokensLegend(tokenTypes,tokenModifiers)
 
 export class TSSemanticTokensProvider extends lxbase.LangExtBase implements vscode.DocumentSemanticTokensProvider
 {
-	tokensBuilder : vscode.SemanticTokensBuilder = new vscode.SemanticTokensBuilder(legend);
+	tokensBuilder: vscode.SemanticTokensBuilder = new vscode.SemanticTokensBuilder(legend);
+	process_escapes(curs: Parser.TreeCursor,rng: vscode.Range,typ: string) {
+		const patt = /\\x[0-9a-fA-F][0-9a-fA-F]/g;
+		let match;
+		let lastPos = rng.start.character;
+		while ((match = patt.exec(curs.nodeText)) != null) {
+			const newPos = rng.start.character + match.index;
+			const emb = new vscode.Range(
+				new vscode.Position(rng.start.line, newPos),
+				new vscode.Position(rng.start.line, rng.start.character + patt.lastIndex)
+			);
+			if (newPos > lastPos) {
+				const outer = new vscode.Range(
+					new vscode.Position(rng.start.line, lastPos),
+					new vscode.Position(rng.start.line, newPos)
+				);
+				this.tokensBuilder.push(outer, typ, []);
+			}
+			this.tokensBuilder.push(emb, "regexp", []);
+			lastPos = rng.start.character + patt.lastIndex;
+		}
+		const outer = new vscode.Range(
+			new vscode.Position(rng.start.line, lastPos),
+			rng.end
+		);
+		this.tokensBuilder.push(outer, typ, []);
+	}
 	process_node(curs: Parser.TreeCursor): lxbase.WalkerChoice
 	{
 		const rng = lxbase.curs_to_range(curs);
 		if (["comment_text","tok_rem"].indexOf(curs.nodeType)>-1) // must precede tok_ handler
 		{
-			this.tokensBuilder.push(rng,"comment",[]);
+			this.process_escapes(curs, rng, "comment");
+			//this.tokensBuilder.push(rng,"comment",[]);
 			return lxbase.WalkerOptions.gotoSibling;
 		}
 		if (curs.nodeType.substring(0,4)=="tok_")
@@ -65,9 +92,10 @@ export class TSSemanticTokensProvider extends lxbase.LangExtBase implements vsco
 			this.tokensBuilder.push(rng,"macro",[]);
 			return lxbase.WalkerOptions.gotoSibling;
 		}
-		if (["str","terminal_str","data_str","data_literal"].includes(curs.nodeType))
+		if (["str","data_str","data_literal"].includes(curs.nodeType))
 		{
-			this.tokensBuilder.push(rng,"string",[]);
+			this.process_escapes(curs,rng, "string");
+			//this.tokensBuilder.push(rng,"string",[]);
 			return lxbase.WalkerOptions.gotoSibling;
 		}
 		if (curs.nodeType=="name_fn")

@@ -46,6 +46,8 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 	fsentry = new VariableNameSentry();
 	lastGoodLineNumber = -1;
 	row = 0;
+	depthOfDEF = 0; // used to know if we are in a function definition
+	dummyKeyInDEF = ""; // used to know what the dummy variable is while inside function definition
 	num(node: Parser.SyntaxNode): number
 	{
 		return parseInt(node.text.replace(/ /g, ''));
@@ -74,12 +76,12 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 		}
 		return false;
 	}
-	process_variable_def(node: Parser.SyntaxNode | null, dim: boolean)
+	process_variable_def(node: Parser.SyntaxNode | null, dim: boolean, recall: boolean)
 	{
 		if (!node)
 			return;
-		const keyname = lxbase.var_to_key(node);
-		const map = keyname.slice(-1) == ')' ? this.workingSymbols.arrays : this.workingSymbols.scalars;
+		const keyname = recall ? lxbase.var_to_key(node) + '()' : lxbase.var_to_key(node);
+		const map = keyname.slice(-1) == ')' || recall ? this.workingSymbols.arrays : this.workingSymbols.scalars;
 		let varInfo = map.get(keyname);
 		if (!varInfo)
 			varInfo = { dec: [], def: [], ref: [] };
@@ -91,6 +93,10 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 	}
 	visit_primaries(curs: Parser.TreeCursor): lxbase.WalkerChoice
 	{
+		if (this.depth < this.depthOfDEF) {
+			this.depthOfDEF = 0;
+			this.dummyKeyInDEF = "";
+		}
 		const parent = curs.currentNode().parent;
 		const rng = lxbase.curs_to_range(curs,this.row);
 		if (curs.currentNode().hasError())
@@ -122,13 +128,15 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 		else if (curs.nodeType == "tok_dim")
 			return lxbase.WalkerOptions.gotoSibling; // goto dim_item
 		else if (curs.nodeType == "dim_item") {
-			this.process_variable_def(curs.currentNode().firstNamedChild,true);
+			this.process_variable_def(curs.currentNode().firstNamedChild, true, false);
 			return lxbase.WalkerOptions.gotoSibling;
 		}
 		else if (curs.nodeType == "tok_def") {
+			// dummy variable is not needed during this pass
+			this.depthOfDEF = this.depth;
 			const nameNode = curs.currentNode().nextNamedSibling?.nextNamedSibling;
 			if (nameNode) {
-				const nameRange = lxbase.node_to_range(nameNode,this.row);
+				const nameRange = lxbase.node_to_range(nameNode, this.row);
 				const keyname = lxbase.var_to_key(nameNode);
 				if (this.workingSymbols.functions.has(keyname)) {
 					this.diag.push(vsserv.Diagnostic.create(nameRange, 'function is redefined'));
@@ -144,9 +152,29 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 			if (next && next.type == 'tok_let')
 				next = next.nextNamedSibling;
 			if (next && next.type.substring(0, 4) == 'var_')
-				this.process_variable_def(next,false);
+				this.process_variable_def(next, false, false);
 		}
-		else if (curs.nodeType == "line" || (parent && parent.type == "line"))
+		else if (curs.nodeType == "tok_recall") {
+			const varNode = curs.currentNode().nextNamedSibling;
+			if (varNode && varNode.type.substring(0, 4) == 'var_')
+				this.process_variable_def(varNode, false, true);
+		}
+		else if (["tok_read","tok_get","tok_input"].includes(curs.nodeType)) {
+			let varNode = curs.currentNode().nextNamedSibling;
+			if (curs.nodeType=="tok_input" && varNode?.nextSibling?.text == ';')
+				varNode = varNode.nextNamedSibling;
+			while (varNode && varNode.type.substring(0, 4) == 'var_') {
+				this.process_variable_def(varNode, false, false);
+				varNode = varNode.nextNamedSibling;
+			}
+		}
+		else if (curs.nodeType == "tok_for") {
+			const varNode = curs.currentNode().nextNamedSibling;
+			if (varNode && varNode.type.substring(0, 4) == 'var_')
+				this.process_variable_def(varNode, false, false);
+		}
+		// this determines how deep in the tree we need to go
+		else if (curs.nodeType == "line" || (parent && (parent.type == "line" || parent.type == "statement")))
 			return lxbase.WalkerOptions.gotoChild;
 		
 		return lxbase.WalkerOptions.gotoParentSibling;
@@ -177,15 +205,21 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 	}
 	process_variable_ref(curs: Parser.TreeCursor): lxbase.WalkerChoice
 	{
-		const keyname = lxbase.var_to_key(curs.currentNode());
+		const isRecall = curs.currentNode().previousNamedSibling?.type == "tok_recall";
+		const rawKeyName = lxbase.var_to_key(curs.currentNode());
+		const keyname = isRecall ? rawKeyName + '()' : rawKeyName;
 		const nameRange = lxbase.name_range(curs.currentNode(),this.row);
-		const isArray = keyname.slice(-1) == ')';
+		const isArray = keyname.slice(-1) == ')' || isRecall;
 		if (this.config.warn.collisions)
 			this.vsentry.add(keyname, nameRange, this.diag);
 		const map = isArray ? this.workingSymbols.arrays : this.workingSymbols.scalars;
 		const varInfo = map.get(keyname);
-		if (!varInfo && isArray || varInfo && varInfo.dec.length==0 && isArray)
-			this.diag.push(vsserv.Diagnostic.create(nameRange, "array is never DIM'd", vsserv.DiagnosticSeverity.Warning));
+		if (!varInfo || varInfo && varInfo.dec.length == 0)
+			if (isArray && this.config.warn.undeclaredArrays)
+				this.diag.push(vsserv.Diagnostic.create(nameRange, "array is never DIM'd", vsserv.DiagnosticSeverity.Warning));
+		if (!varInfo || varInfo && varInfo.def.length == 0)
+			if (!isArray && this.config.warn.undefinedVariables && (this.depthOfDEF==0 || keyname!=this.dummyKeyInDEF))
+				this.diag.push(vsserv.Diagnostic.create(nameRange, "variable is never assigned", vsserv.DiagnosticSeverity.Warning));
 		if (!varInfo)
 			map.set(keyname, { dec: [], def: [], ref: [nameRange] });
 		else
@@ -202,6 +236,10 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 	}
 	visit_node(curs: Parser.TreeCursor): lxbase.WalkerChoice
 	{
+		if (this.depth < this.depthOfDEF) {
+			this.depthOfDEF = 0;
+			this.dummyKeyInDEF = "";
+		}
 		const parent = curs.currentNode().parent;
 		const rng = lxbase.curs_to_range(curs,this.row);
 		if (curs.currentNode().hasError())
@@ -215,6 +253,12 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 			return this.process_linenum_ref(curs, true);
 		else if (curs.nodeType == "linenum" && parent && parent.type != "line") // any ref that is not GOSUB
 			return this.process_linenum_ref(curs, false);
+		else if (curs.nodeType == "tok_def") {
+			const dummyVarNode = curs.currentNode().nextNamedSibling?.nextNamedSibling?.nextNamedSibling;
+			if (dummyVarNode && dummyVarNode.type == "var_real")
+				this.dummyKeyInDEF = lxbase.var_to_key(dummyVarNode);
+			this.depthOfDEF = this.depth;
+		}
 		else if (curs.nodeType.substring(0,4) == 'var_')
 			return this.process_variable_ref(curs);
 		else if (curs.nodeType == "name_fn") {
@@ -314,7 +358,7 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 				}
 			}
 		}
-		else if (curs.nodeType=="terminal_str" && this.config.warn.terminalString)
+		else if (curs.nodeType=="str" && curs.nodeText[curs.nodeText.length-1]!='"' && this.config.warn.terminalString)
 		{
 			this.diag.push(vsserv.Diagnostic.create(rng,"Unquote missing. This is valid if it is intended.",vsserv.DiagnosticSeverity.Warning));
 		}
