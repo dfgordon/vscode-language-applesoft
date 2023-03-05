@@ -3,7 +3,7 @@
 	"displayName": "Applesoft BASIC",
 	"description": "Language support for Applesoft BASIC",
 	"icon": "language-applesoft-icon.png",
-	"version": "1.0.5",
+	"version": "1.1.0",
 	"license": "GPL-3.0-only",
 	"publisher": "dfgordon",
 	"repository": {
@@ -108,7 +108,10 @@
 				},
 				"applesoft.detokenizer.escapes": {
 					"type": "array",
-					"default": [10,13],
+					"default": [
+						10,
+						13
+					],
 					"markdownDescription": "ASCII control codes that should be escaped by the detokenizer"
 				},
 				"applesoft.warn.run": {
