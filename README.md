@@ -4,7 +4,7 @@
 
 Language support for Applesoft BASIC in Visual Studio Code.
 
-*latest update*: disk image support, analyze input sources, hex escapes
+*latest update*: line reference hovers, various patches
 
 * Semantic highlights true to Apple //e ROM parsing
 * Comprehensive completions and hovers
@@ -20,7 +20,7 @@ Language support for Applesoft BASIC in Visual Studio Code.
 
 ## Line Numbers
 
-The extension will treat line numbers as document symbols if they are branch destinations.  You can treat these line numbers just as if they were, say, function names in a modern language.  For example, if `GOSUB 100` is found in the document, right-clicking on any reference to line 100 allows you to apply symbol manipulations such as `goto references` and `goto definition`.  The line number and the text of any comment on the line will appear in the document outline.  On the other hand, `rename symbol` cannot be used with line numbers.  Instead, use the `renumber lines` command if you want to renumber.
+The extension will treat line numbers as document symbols if they are branch destinations.  You can treat these line numbers just as if they were, say, function names in a modern language.  For example, if `GOSUB 100` is found in the document, right-clicking on any reference to line 100 allows you to apply symbol manipulations such as `goto references` and `goto definition`.  The text of any comment on or before the line will be used in the document outline and in line reference hovers.  On the other hand, `rename symbol` cannot be used with line numbers.  Instead, use the `renumber lines` command if you want to renumber.
 
 ## Managing Variables
 
@@ -106,7 +106,7 @@ This capability only applies to MacOS. Note that [Virtual \]\[](https://virtuali
 
 ## Using with Disk Images
 
-You can transfer programs to and from disk images.  In order to do this you must install `a2kit`.  If you have `cargo`, use the terminal to run `cargo install a2kit`, otherwise see the [github page](https://github.com/dfgordon/a2kit).  The extension will work with whatever image types `a2kit` supports.  As of this writing, the supported types are `woz`, `dsk`, `do`, `po`, `d13`.
+You can transfer programs to and from disk images.  In order to do this you must install `a2kit`.  If you have `cargo`, use the terminal to run `cargo install a2kit`, otherwise see the [github page](https://github.com/dfgordon/a2kit).  The extension will work with whatever image types `a2kit` supports.  As of this writing, the supported types are `woz`, `dsk`, `do`, `po`, `d13`.  Use `Cmd+P` to initiate one of the following:
 
 * `applesoft: Insert program from disk image`: brings up a file selector allowing you to choose an image file.  Once done, use the mini-menu to traverse the image's directory tree (if applicable) and select an Applesoft file.  Only directories and Applesoft files are shown.
 

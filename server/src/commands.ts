@@ -82,7 +82,8 @@ export class Minifier extends lxbase.LangExtBase {
 				}
 			}
 		}
-		if (curs.nodeType == 'str' && curs.nodeText[curs.nodeText.length-1]!='"') {
+		if (curs.nodeType == 'str' && (curs.nodeText[curs.nodeText.length - 1] != '"' || curs.nodeText.length == 1)) {
+			// if the the string already has no unquote intercept here and go out
 			this.workingLine = this.replace_curs(curs.nodeText.trimLeft().replace(/ /g, this.persistentSpace), curs);
 			return lxbase.WalkerOptions.gotoSibling;
 		}

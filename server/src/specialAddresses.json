@@ -828,7 +828,7 @@
     },
     "-1727": {
         "brief": "print 4 digit hex",
-        "desc": "Print 4 digit hex with value (X,A).",
+        "desc": "Print 4 digit hex with value X + A*256.",
         "label": "PRNTAX",
         "type": "ROM routine"
     },
@@ -1043,7 +1043,7 @@
     "-5198": {
         "brief": "float comparison",
         "ctx": "Applesoft",
-        "desc": "compare float at (Y,A) with FAC, A=-1, 0, 1 if <FAC, =FAC, >FAC",
+        "desc": "compare float at LE (A,Y) with FAC, A=-1, 0, 1 if <FAC, =FAC, >FAC",
         "label": "FCOMP",
         "subctx": "FP",
         "type": "ROM routine"
@@ -1075,7 +1075,7 @@
     "-5277": {
         "brief": "ARG = FAC",
         "ctx": "Applesoft",
-        "desc": "move ARG to FAC",
+        "desc": "move FAC to ARG",
         "label": "MOVAF",
         "subctx": "FP",
         "type": "ROM routine"
@@ -1083,15 +1083,23 @@
     "-5293": {
         "brief": "FAC = ARG",
         "ctx": "Applesoft",
-        "desc": "move FAC to ARG",
+        "desc": "move ARG to FAC",
         "label": "MOVFA",
         "subctx": "FP",
         "type": "ROM routine"
     },
-    "-5333": {
+    "-5330": {
         "brief": "pack float",
         "ctx": "Applesoft",
-        "desc": "pack FAC and store at (Y,A)",
+        "desc": "pack FAC and store at LE (X,Y)",
+        "label": "MOVMF1",
+        "subctx": "FP",
+        "type": "ROM routine"
+    },
+    "-5333": {
+        "brief": "pack rounded",
+        "ctx": "Applesoft",
+        "desc": "pack rounded FAC and store at LE (X,Y)",
         "label": "MOVMF",
         "subctx": "FP",
         "type": "ROM routine"
@@ -1099,7 +1107,7 @@
     "-5383": {
         "brief": "unpack float",
         "ctx": "Applesoft",
-        "desc": "unpack float at (Y,A) and put in FAC",
+        "desc": "unpack float at LE (A,Y) and put in FAC",
         "label": "MOVFM",
         "subctx": "FP",
         "type": "ROM routine"
@@ -1114,7 +1122,7 @@
     "-5661": {
         "brief": "unpack float",
         "ctx": "Applesoft",
-        "desc": "unpack float at (Y,A) and put in ARG",
+        "desc": "unpack float at LE (A,Y) and put in ARG",
         "label": "CONUPK",
         "subctx": "FP",
         "type": "ROM routine"
@@ -1159,7 +1167,7 @@
     "-6318": {
         "brief": "FAC to LINNUM",
         "ctx": "Applesoft",
-        "desc": "Convert FAC to integer and store in (Y,A) and LINNUM",
+        "desc": "Convert FAC to integer and store in LINNUM and LE Y,A",
         "label": "GETADR",
         "subctx": "FP",
         "type": "ROM routine"
@@ -1175,7 +1183,7 @@
     "-6686": {
         "brief": "move string",
         "ctx": "Applesoft",
-        "desc": "Move string at (X,Y) with length A to FRESPC",
+        "desc": "Move string at LE (X,Y) with length A to FRESPC",
         "label": "MOVSTR",
         "type": "ROM routine"
     },
@@ -1197,7 +1205,7 @@
     "-7438": {
         "brief": "integer to float",
         "ctx": "Applesoft",
-        "desc": "convert integer (Y,A) into float in FAC",
+        "desc": "convert signed integer LE Y,A into float in FAC",
         "label": "GIVAYF",
         "subctx": "FP",
         "type": "ROM routine"
@@ -1281,7 +1289,7 @@
     },
     "-9414": {
         "ctx": "Applesoft",
-        "desc": "Print string at (Y,A)",
+        "desc": "Print string at LE (A,Y)",
         "label": "STROUT",
         "type": "ROM routine"
     },

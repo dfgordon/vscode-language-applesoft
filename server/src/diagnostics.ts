@@ -362,6 +362,14 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 		{
 			this.diag.push(vsserv.Diagnostic.create(rng,"Unquote missing. This is valid if it is intended.",vsserv.DiagnosticSeverity.Warning));
 		}
+		else if (curs.nodeType == "tok_onerr") {
+			let nextStatement = parent?.nextNamedSibling;
+			while (nextStatement) {
+				if (nextStatement.firstChild?.type != "tok_rem")
+					this.diag.push(vsserv.Diagnostic.create(lxbase.node_to_range(nextStatement,this.row), "Statements trailing ONERR GOTO on the same line are ignored", vsserv.DiagnosticSeverity.Warning));
+				nextStatement = nextStatement.nextNamedSibling;
+			}
+		}
 		return lxbase.WalkerOptions.gotoChild;
 	}
 	update(document : vsdoc.TextDocument): Array<vsserv.Diagnostic>

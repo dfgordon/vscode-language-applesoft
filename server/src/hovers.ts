@@ -3,6 +3,7 @@ import * as vsdoc from 'vscode-languageserver-textdocument';
 import Parser from 'web-tree-sitter';
 import { AddressHovers } from './hoversAddresses';
 import { StatementHovers } from './hoversStatements';
+import { docSymbols } from './server';
 import * as lxbase from './langExtBase';
 
 export class TSHoverProvider extends lxbase.LangExtBase
@@ -70,6 +71,11 @@ export class TSHoverProvider extends lxbase.LangExtBase
 					temp.forEach(s => this.hover.push(s));
 					return lxbase.WalkerOptions.exit;
 				}
+			}
+			if (curs.nodeType == "linenum") {
+				const lineInfo = docSymbols.lines.get(parseInt(curs.nodeText.replace(' ', '')));
+				if (lineInfo?.rem)
+					this.hover.push({kind: 'markdown', value: lineInfo.rem});
 			}
 			return lxbase.WalkerOptions.gotoChild;
 		}

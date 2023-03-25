@@ -1,7 +1,7 @@
 {
 	"name": "vscode-language-applesoft-client",
 	"description": "Language client for Applesoft BASIC",
-	"version": "1.0.1",
+	"version": "1.1.1",
 	"license": "GPL-3.0-only",
 	"publisher": "dfgordon",
 	"repository": {
