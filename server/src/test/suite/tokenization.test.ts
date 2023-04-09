@@ -99,7 +99,7 @@ describe('Data Statements', async function() {
 		await testTokenizer(testCode, expected);
 	});
 	it('trailing statement', async function() {
-		const testCode = '10 DATA aliteral, "a string", 1  : PRINT A$ \n';
+		const testCode = '10 DATA aliteral, "a string", 1  : PRINT A$ \r\n';
 		const expected = "25080A008320616C69746572616C2C20226120737472696E67222C203120203ABA4124000000";
 		await testTokenizer(testCode, expected);
 	});
@@ -122,7 +122,7 @@ describe('Expressions', async function() {
 		await testTokenizer(testCode, expected);
 	});
 	it('nested', async function() {
-		const testCode = '10 x = 1e6*(1 + (x1 + x2)*5)\n';
+		const testCode = '10 x = 1e6*(1 + (x1 + x2)*5)\r\n';
 		const expected = "19080A0058D0314536CA2831C8285831C8583229CA3529000000";
 		await testTokenizer(testCode, expected);
 	});
@@ -140,7 +140,7 @@ describe('Expressions', async function() {
 
 describe('Graphics', async function() {
 	it('low res', async function() {
-		const testCode = '10 gr: color=4\n20 x=5:y=5\n30 plot x,y\n40 hlin x+1,x+10 at y\n50 vlin y+1,y+10 at x';
+		const testCode = '10 gr: color=4\n20 x=5:y=5\n30 plot x,y\r\n40 hlin x+1,x+10 at y\n50 vlin y+1,y+10 at x';
 		const expected = "0A080A00883AA034001608140058D0353A59D035001F081E008D582C59002F0828008E58C8312C58C83130C559003F0832008F59C8312C59C83130C558000000";
 		await testTokenizer(testCode, expected);
 	});

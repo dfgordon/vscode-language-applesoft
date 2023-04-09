@@ -18,7 +18,7 @@ describe('Minify Variables', async function() {
 		await testMinify(testCode, expected);
 	});
 	it('upper case long variable', async function() {
-		const testCode = '10 HOME\n20 PRINT HELLO';
+		const testCode = '10 HOME\r\n20 PRINT HELLO';
 		const expected = "10HOME\n20PRINTHE";
 		await testMinify(testCode, expected);
 	});
@@ -38,7 +38,7 @@ describe('Minify Variables', async function() {
 		await testMinify(testCode, expected);
 	});
 	it('upper case long int', async function() {
-		const testCode = '10 HOME\n20 PRINT HELLO%';
+		const testCode = '10 HOME\r\n20 PRINT HELLO%';
 		const expected = "10HOME\n20PRINTHE%";
 		await testMinify(testCode, expected);
 	});
@@ -121,7 +121,7 @@ describe('Minify Functions', async function() {
 		await testMinify(testCode, expected);
 	});
 	it('upper case long function', async function() {
-		const testCode = '10 DEF FN ABCD(X12) = X12^2\n20 PRINT FN ABCD(X12)';
+		const testCode = '10 DEF FN ABCD(X12) = X12^2\r\n20 PRINT FN ABCD(X12)';
 		const expected = '10DEFFNAB(X1)=X1^2\n20PRINTFNAB(X1)';
 		await testMinify(testCode, expected);
 	});

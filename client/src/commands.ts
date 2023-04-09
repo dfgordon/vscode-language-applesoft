@@ -305,7 +305,8 @@ export class AppleWinTool extends lxbase.LangExtBase
 			img.copy(buffList[block],0,block*64,(block+1)*64);
 			block64Map.items[block].value.value = buffList[block].toString('hex');
 		}
-		fs.writeFileSync(yamlPath,yamlTree.toString());
+		fs.writeFileSync(yamlPath, yamlTree.toString());
+		vscode.window.showInformationMessage('program stored in ' + yamlPath.toString());
 	}
 	async setAppleWinSaveState()
 	{

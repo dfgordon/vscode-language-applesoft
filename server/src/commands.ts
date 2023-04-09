@@ -236,9 +236,12 @@ export class Tokenizer extends lxbase.LangExtBase
 	{
 		if (curs.nodeType!="line")
 			return lxbase.WalkerOptions.gotoChild;
-		if (curs.nodeText.length < 2)
+		if (curs.nodeText.length > 2 && curs.nodeText.endsWith('\r\n'))
+			this.tokenizedLine = curs.nodeText.substring(0, curs.nodeText.length - 2);
+		else if (curs.nodeText.length > 1)
+			this.tokenizedLine = curs.nodeText.substring(0, curs.nodeText.length - 1);
+		else
 			return lxbase.WalkerOptions.gotoSibling;
-		this.tokenizedLine = curs.nodeText.substring(0,curs.nodeText.length-1);
 		const lineTree = this.parse(this.tokenizedLine,'\n');
 		this.walk(lineTree,this.tokenize_node.bind(this));
 		const linenum = parseInt(this.tokenizedLine.replace(/ /g,''),10);
