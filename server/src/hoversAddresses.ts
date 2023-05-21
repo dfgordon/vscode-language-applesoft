@@ -1,6 +1,6 @@
 import { assert } from 'console';
 import * as vsserv from 'vscode-languageserver/node';
-import * as specialAddresses from './specialAddresses.json';
+import * as a2map from 'a2-memory-map';
 
 export class AddressHovers
 {
@@ -11,7 +11,7 @@ export class AddressHovers
 		return this.amap.get(addr);
 	}
 
-	add(addr_str: string, addr_base: number,offset: number)
+	add(addr_base: number,offset: number,obj: a2map.AddressInfo)
 	{
 		const offset_names = Object({
 			"word" : ["low byte","high byte"] , "vector" : ["opcode","low addr","high addr"],
@@ -22,7 +22,6 @@ export class AddressHovers
 		const addr_signed = addr_unsigned - 2**16;
 		const addr_hex = addr_unsigned.toString(16).toUpperCase();
 		const ans = new Array<vsserv.MarkupContent>();
-		const obj = Object(specialAddresses)[addr_str];
 		if (obj.label)
 			ans.push({ kind: 'markdown', value: '`' + obj.label + '`' });
 		let addr_type = obj.type;
@@ -44,23 +43,23 @@ export class AddressHovers
 	{
 		this.amap = new Map<number,Array<vsserv.MarkupContent>>();
 		
-		for (const property in specialAddresses)
+		for (const [key,obj] of a2map.get_all())
 		{
-			let addr = parseInt(property);
+			let addr = parseInt(key);
 			if (!isNaN(addr))
 			{
 				addr = addr >= 2**15 ? addr - 2**16 : addr;
-				assert(Math.abs(addr)<2**15,"bad address found in database");
-				const typ = Object(specialAddresses)[property].type;
-				this.add(property,addr,0);
+				assert(Math.abs(addr) < 2 ** 15, "bad address found in database");
+				const typ = a2map.get_one(addr)?.type;
+				this.add(addr,0,obj);
 				if (typ=="word")
-					this.add(property,addr,1);
+					this.add(addr,1,obj);
 				if (typ=="vector")
-					[1,2].forEach( n => this.add(property,addr,n) );
+					[1,2].forEach( n => this.add(addr,n,obj) );
 				if (typ=="float")
-					[1,2,3,4].forEach( n => this.add(property,addr,n) );
+					[1,2,3,4].forEach( n => this.add(addr,n,obj) );
 				if (typ=="unpacked float")
-					[1,2,3,4,5].forEach( n => this.add(property,addr,n) );
+					[1,2,3,4,5].forEach( n => this.add(addr,n,obj) );
 			}
 		}
 	}

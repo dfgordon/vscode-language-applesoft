@@ -98,6 +98,12 @@ export class TSSemanticTokensProvider extends lxbase.LangExtBase implements vsco
 			//this.tokensBuilder.push(rng,"string",[]);
 			return lxbase.WalkerOptions.gotoSibling;
 		}
+		if (curs.nodeType == "name_amp") {
+			if (curs.currentNode().firstChild?.type.substring(0, 4) == "tok_")
+				return lxbase.WalkerOptions.gotoChild;
+			this.tokensBuilder.push(rng,"string",[]);
+			return lxbase.WalkerOptions.gotoSibling;
+		}
 		if (curs.nodeType=="name_fn")
 		{
 			this.tokensBuilder.push(rng,"function",[]);

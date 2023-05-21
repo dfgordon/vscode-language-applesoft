@@ -15,10 +15,11 @@
 		"Programming Languages"
 	],
 	"dependencies": {
-		"vscode-languageserver": "^7.0.0",
+		"vscode-languageserver": "^8.1.0",
 		"vscode-languageserver-textdocument": "^1.0.4",
-		"web-tree-sitter": "^0.20.7",
-		"yaml": "^2.0.1"
+		"web-tree-sitter": "^0.20.8",
+		"a2-memory-map": "^1.0.3",
+		"yaml": "^2.2.2"
 	},
 	"scripts": {}
 }

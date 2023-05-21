@@ -12,9 +12,9 @@
 		"vscode": "^1.63.0"
 	},
 	"dependencies": {
-		"vscode-languageclient": "^8.0.1",
-		"web-tree-sitter": "^0.20.3",
-		"yaml": "^2.0.1"
+		"vscode-languageclient": "^8.1.0",
+		"web-tree-sitter": "^0.20.8",
+		"yaml": "^2.2.2"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.2.0",

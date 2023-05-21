@@ -26,7 +26,11 @@ export type WalkerChoice = typeof WalkerOptions[keyof typeof WalkerOptions];
 
 export async function TreeSitterInit(): Promise<[Parser,Parser.Language]>
 {
-	await Parser.init();
+	await Parser.init({
+		locateFile(scriptName: string, scriptDirectory: string) {
+			return path.join(__dirname,'tree-sitter.wasm');
+		}
+	});
 	const parser = new Parser();
 	const Applesoft = await Parser.Language.load(path.join(__dirname,'tree-sitter-applesoft.wasm'));
 	parser.setLanguage(Applesoft);

@@ -1,7 +1,7 @@
 import * as vsserv from 'vscode-languageserver/node';
 import * as vsdoc from 'vscode-languageserver-textdocument';
 import * as lxbase from './langExtBase';
-import * as specialAddresses from './specialAddresses.json';
+import * as a2map from 'a2-memory-map';
 import { applesoftSettings } from './settings';
 import Parser from 'web-tree-sitter';
 
@@ -64,28 +64,25 @@ export class AddressCompletionProvider extends lxbase.LangExtBase
 		this.pokeCompletions = new Array<vsserv.CompletionItem>();
 		this.peekCompletions = new Array<vsserv.CompletionItem>();
 		this.callCompletions = new Array<vsserv.CompletionItem>();
-		for (const addr in specialAddresses)
+		for (const [addr,obj] of a2map.get_all())
 		{
-			const typ = Object(specialAddresses)[addr].type;
-			const ctx = Object(specialAddresses)[addr].ctx;
-			if (ctx && ctx=='Integer BASIC')
+			if (obj.ctx=='Integer BASIC')
 				continue;
-			if (typ && typ.search('soft switch')==-1 && typ.search('routine')==-1)
+			if (obj.type && obj.type.search('soft switch')==-1 && obj.type.search('routine')==-1)
 			{
-				this.pokeCompletions.push(this.get_completion_item(addr,'',','));
-				this.peekCompletions.push(this.get_completion_item(addr,'(',')'));
+				this.pokeCompletions.push(this.get_completion_item(addr,obj,'',','));
+				this.peekCompletions.push(this.get_completion_item(addr,obj,'(',')'));
 			}
-			if (typ=='soft switch')
+			if (obj.type=='soft switch')
 			{
-				this.pokeCompletions.push(this.get_completion_item(addr,'',',0'));
-				this.peekCompletions.push(this.get_completion_item(addr,'(',')'));
+				this.pokeCompletions.push(this.get_completion_item(addr,obj,'',',0'));
+				this.peekCompletions.push(this.get_completion_item(addr,obj,'(',')'));
 			}
-			if (typ && typ.search('routine')>=0)
-				this.callCompletions.push(this.get_completion_item(addr,'',''));
+			if (obj.type && obj.type.search('routine')>=0)
+				this.callCompletions.push(this.get_completion_item(addr,obj,'',''));
 		}
 	}
-	get_completion_item(addr: string, prefix: string, postfix: string): vsserv.CompletionItem {
-		const addr_entry = Object(specialAddresses)[addr];
+	get_completion_item(addr: string, addr_entry: a2map.AddressInfo, prefix: string, postfix: string): vsserv.CompletionItem {
 		let num_addr = parseInt(addr);
 		num_addr = num_addr < 0 && !this.config.completions.negativeAddresses ? num_addr + 2 ** 16 : num_addr;
 		num_addr = num_addr >= 2 ** 15 && this.config.completions.negativeAddresses ? num_addr - 2 ** 16 : num_addr;
