@@ -99,22 +99,29 @@ export function node_to_range(node: Parser.SyntaxNode,row: number): vsserv.Range
 	return vsserv.Range.create(start_pos,end_pos);
 }
 
-export function var_to_key(node: Parser.SyntaxNode): string
+/**
+ * Extract variable name from syntax node
+ * @param node syntax node to be analyzed, can be var_* or name_*, except for name_amp
+ * @param recall is this an implicit array like the argument of RECALL
+ * @returns [normalized name,specific name]
+ */
+export function var_to_key(node: Parser.SyntaxNode,recall: boolean): [string,string]
 {
-	// node must be var_* in general, can be name_* or name_fn if we are sure this node is not an array
-	const nameNode = node.firstNamedChild;
-	if (!nameNode)
-		return node.text.toUpperCase().replace(/ /g, '');
-	const base = nameNode.text.toUpperCase().replace(/ /g, '');
-	const subscript = nameNode.nextNamedSibling;
-	if (!subscript)
-		return base;
-	return base + '()';
+	const nameNode = node.firstNamedChild ? node.firstNamedChild : node;
+	let n = nameNode.text.replace(/ /g, '');
+	if (nameNode.nextNamedSibling?.type=="subscript" || recall)
+		n += '()';
+	return [n.toUpperCase(),n];
 }
 
+/**
+ * Extract range of the variable name within the node
+ * @param node node can be either var_* or name_*
+ * @param row row value to add when processing line by line
+ * @returns range of 
+ */
 export function name_range(node: Parser.SyntaxNode,row: number): vsserv.Range
 {
-	// node can be either var_* or name_*
 	const nameNode = node.firstNamedChild;
 	if (!nameNode)
 		return node_to_range(node,row);
@@ -181,7 +188,7 @@ export class LangExtBase {
 	}
 	lines(document: vsdoc.TextDocument) : string[]
 	{
-		return document.getText().split('\n');
+		return document.getText().split(/\r?\n/);
 	}
 	parse(txt: string,append: string) : Parser.Tree
 	{

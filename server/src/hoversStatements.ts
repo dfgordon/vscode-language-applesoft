@@ -27,11 +27,12 @@ export class StatementHovers
 			MarkdownString('`ASC (sexpr)`')
 		]);
 		this.hmap.set("tok_amp",[
-			MarkdownString('Execute JMP at $03F5.  Syntax depends on the particular object code that is called.'),
+			MarkdownString('Execute JMP at $03F5.  The syntax is arbitrary, but in order to be useful, the language server has to impose some limits.'),
 			MarkdownString('`& [{character}]`'),
 			exampleString([
 				'& "hello from ampersand"',
-				'& (X/5,A$,"hello from ampersand")'])
+				'& (X/5,A$,"hello from ampersand")',
+				'& print "overloaded print" at x,y'])
 		]);
 		this.hmap.set("tok_atn",[
 			MarkdownString('arc tangent in radians'),

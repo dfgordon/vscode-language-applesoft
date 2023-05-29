@@ -122,7 +122,7 @@ export class A2KitTool extends lxbase.LangExtBase
 	parse_catalog(catalog: string): [string[], string[]] | undefined {
 		const dirs = Array<string>();
 		const files = Array<string>();
-		const lines = catalog.split('\n');
+		const lines = catalog.split(/\r?\n/);
 		if (lines.length>3 && lines[1].length>11 && lines[1].substring(0, 11) == "DISK VOLUME") {
 			for (const line of lines.slice(3)) {
 				if (line.length>7 && line[1] == "A") {

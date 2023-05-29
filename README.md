@@ -4,7 +4,7 @@
 
 Language support for Applesoft BASIC in Visual Studio Code.
 
-*latest update*: tokenizer handles either line separator
+*latest update*: smarter completions, better ampersand handling
 
 * Semantic highlights true to Apple //e ROM parsing
 * Comprehensive completions and hovers
@@ -79,6 +79,10 @@ Disk Image Transfer | a2kit | Yes
 Save State Interaction | AppleWin | Yes
 Enter/Run Program | Virtual II | No
 Copy & Paste | any | No
+
+## Ampersand Commands
+
+Although the syntax for ampersand commands is technically arbitrary, the extension imposes limits in order to provide an interpretation.  The minifier will pass over ampersand commands in order to avoid breaking any assumptions made by the user's ampersand parser.  See the upstream parser's [wiki](https://github.com/dfgordon/tree-sitter-applesoft.wiki) for more.
 
 ## Using with AppleWin
 

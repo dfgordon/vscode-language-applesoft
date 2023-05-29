@@ -196,3 +196,52 @@ describe('Escapes', async function () {
 		await testDetokenizer(tokens, expected);
 	});
 });
+
+describe('Ampersand', async function () {
+	it('null_string_only', async function () {
+		const expected = "10  & \"\n";
+		const tokens = "08080A00AF22000000";
+		await testDetokenizer(tokens, expected);
+	});
+	it('string_only', async function () {
+		const expected = "10  & \"print something\"\n";
+		const tokens = "18080A00AF227072696E7420736F6D657468696E6722000000";
+		await testDetokenizer(tokens, expected);
+	});
+	it('anon_func_form', async function () {
+		const expected = "10  & (\"sarg\",X + Y,A$)\n";
+		const tokens = "16080A00AF282273617267222C58C8592C412429000000";
+		await testDetokenizer(tokens, expected);
+	});
+	// syntax is not supported but test will pass
+	it('func_form1', async function () {
+		const expected = "10  & \"print\"(X + Y,A$)\n";
+		const tokens = "16080A00AF227072696E74222858C8592C412429000000";
+		await testDetokenizer(tokens, expected);
+	});
+	it('overloaded_tok_func', async function () {
+		const expected = "10  &  PRINT (X + Y,A$)\n";
+		const tokens = "10080A00AFBA2858C8592C412429000000";
+		await testDetokenizer(tokens, expected);
+	});
+	it('func_form3', async function () {
+		const expected = "10  & MYFUNC(X + Y,A$)\n";
+		const tokens = "15080A00AF4D5946554E432858C8592C412429000000";
+		await testDetokenizer(tokens, expected);
+	});
+	it('statement_form1', async function () {
+		const expected = "10  & PRUSNG > \"0.00\";A$\n";
+		const tokens = "17080A00AF505255534E47CF22302E3030223B4124000000";
+		await testDetokenizer(tokens, expected);
+	});
+	it('statement_form2', async function () {
+		const expected = "10  & CAL; COS (X) *  SIN (Y)\n";
+		const tokens = "14080A00AF43414C3BDE285829CADF285929000000";
+		await testDetokenizer(tokens, expected);
+	});
+	it('overloaded_tok_statement', async function () {
+		const expected = "10  &  DRAW  AT X0,Y0\n";
+		const tokens = "0E080A00AF94C558302C5930000000";
+		await testDetokenizer(tokens, expected);
+	});
+});

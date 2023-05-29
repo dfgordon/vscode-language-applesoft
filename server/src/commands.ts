@@ -60,7 +60,7 @@ export class Minifier extends lxbase.LangExtBase {
 		if (curs.nodeType == 'comment_text')
 			this.workingLine = this.replace_curs('', curs); // OK even if statement was dropped
 	
-		// Persistent spaces and REM and unquotes
+		// Persistent spaces, REM, ampersand, and unquotes
 		if (curs.nodeType == 'statement') {
 			const tok = curs.currentNode().firstNamedChild;
 			if (tok) {
@@ -73,7 +73,8 @@ export class Minifier extends lxbase.LangExtBase {
 				// Text in the DATA statement is preserved unconditionally, so handle all at once and go out.
 				// There is a problem with calculation of end of data in connection with quote parity that
 				// cannot be solved in any satisfactory way (ROM handles it inconsistently).
-				if (tok.type == 'tok_data') {
+				// For ampersand, we treat the same as DATA (do not perturb) for now.
+				if (tok.type == 'tok_data' || tok.type == 'tok_amp') {
 					const preItems = this.workingLine.substring(0, tok.endPosition.column);
 					const items = this.workingLine.substring(tok.endPosition.column, curs.endPosition.column);
 					const postData = this.workingLine.substring(curs.endPosition.column);
@@ -82,9 +83,19 @@ export class Minifier extends lxbase.LangExtBase {
 				}
 			}
 		}
+		if (curs.nodeType == 'tok_at') {
+			// deal with ATO and ATN, could be more aggressive
+			const tok = curs.currentNode();
+			if (this.workingLine.substring(tok.endPosition.column, tok.endPosition.column + 1) == " ") {
+				const preSpc = this.workingLine.substring(0, tok.endPosition.column);
+				const postSpc = this.workingLine.substring(curs.endPosition.column + 1);
+				this.workingLine = preSpc + this.persistentSpace + postSpc;
+				return lxbase.WalkerOptions.gotoSibling;
+			}
+		}
 		if (curs.nodeType == 'str' && (curs.nodeText[curs.nodeText.length - 1] != '"' || curs.nodeText.length == 1)) {
 			// if the the string already has no unquote intercept here and go out
-			this.workingLine = this.replace_curs(curs.nodeText.trimLeft().replace(/ /g, this.persistentSpace), curs);
+			this.workingLine = this.replace_curs(curs.nodeText.trimStart().replace(/ /g, this.persistentSpace), curs);
 			return lxbase.WalkerOptions.gotoSibling;
 		}
 		if (curs.nodeType == 'str') {
@@ -391,7 +402,7 @@ export class LineNumberTool extends lxbase.LangExtBase
 		let lower_guard = undefined;
 		let upper_guard = undefined;
 		let txt = doc.text;
-		const lines = txt.split('\n');
+		const lines = txt.split(/\r?\n/);
 		if (ext_sel)
 		{
 			let l = ext_sel.start.line - 1;

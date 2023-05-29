@@ -65,6 +65,18 @@ export class TSHoverProvider extends lxbase.LangExtBase
 					return lxbase.WalkerOptions.exit;
 			if (this.config.hovers.keywords)
 			{
+				if (curs.nodeType == "name_amp") {
+					if (curs.currentNode().namedChildCount == 0) {
+						this.hover.push({ kind: 'markdown', value: 'custom command' });
+					} else {
+						this.hover.push({ kind: 'markdown', value: 'overloaded token' });
+					}
+					return lxbase.WalkerOptions.exit;
+				}
+				if (curs.nodeType.substring(0,4)=="tok_" && curs.nodeType!="tok_amp" && curs.currentNode().parent?.firstChild?.type == "tok_amp") {
+					this.hover.push({ kind: 'markdown', value: 'overloaded token' });
+					return lxbase.WalkerOptions.exit;
+				}
 				const temp = this.statements.get(curs.nodeType);
 				if (temp)
 				{

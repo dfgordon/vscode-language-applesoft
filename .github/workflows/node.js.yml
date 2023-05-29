@@ -9,15 +9,20 @@ on:
   pull_request:
     branches: [ master ]
 
+defaults:
+  run:
+    # necessary for windows?
+    shell: bash
+
 jobs:
   build:
-
-    runs-on: ubuntu-latest
 
     strategy:
       matrix:
         node-version: [16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        OS: [ubuntu-latest,macos-latest,windows-latest]
+
+    runs-on: ${{ matrix.OS }}
 
     steps:
     - name: Checkout

@@ -3,7 +3,9 @@ import * as vsdoc from 'vscode-languageserver-textdocument';
 import * as lxbase from './langExtBase';
 import * as a2map from 'a2-memory-map';
 import { applesoftSettings } from './settings';
+import { docSymbols } from './server';
 import Parser from 'web-tree-sitter';
+import { WalkerOptions } from './langExtBase';
 
 export class LineCompletionProvider extends lxbase.LangExtBase
 {
@@ -130,6 +132,11 @@ export class AddressCompletionProvider extends lxbase.LangExtBase
 
 export class StatementCompletionProvider extends lxbase.LangExtBase
 {
+	pos: vsdoc.Position = vsserv.Position.create(0, 0);
+	inExpr: boolean = false;
+	inFn: boolean = false;
+	inStr: boolean = false;
+	inStatement: boolean = false;
 	modify(s:string)
 	{
 		if (this.config.case.lowerCaseCompletions && !this.config.case.caseSensitive)
@@ -153,7 +160,7 @@ export class StatementCompletionProvider extends lxbase.LangExtBase
 			s = this.modify(s);
 			ans.push(vsserv.CompletionItem.create(s+' ('+expr_typ+')'));
 			ans[ans.length - 1].kind = vsserv.CompletionItemKind.Function;
-			ans[ans.length - 1].insertText = s + '(${0})';
+			ans[ans.length - 1].insertText = s + '(${1})';
 			ans[ans.length - 1].insertTextFormat = vsserv.InsertTextFormat.Snippet;
 		});
 	}
@@ -174,83 +181,152 @@ export class StatementCompletionProvider extends lxbase.LangExtBase
 		ans[ans.length - 1].insertText = this.modify(snip);
 		ans[ans.length - 1].insertTextFormat = vsserv.InsertTextFormat.Snippet;
 	}
+	visit_statement(curs: Parser.TreeCursor): lxbase.WalkerChoice
+	{
+		const rng = lxbase.curs_to_range(curs, this.pos.line);
+		if (!lxbase.rangeContainsPos(rng, this.pos))
+			return WalkerOptions.gotoSibling;
+		if (curs.nodeType == 'statement') {
+			if (curs.currentNode().childCount == 0) {
+				this.inStatement = true;
+				return WalkerOptions.exit;
+			} else {
+				return WalkerOptions.gotoChild;
+			}
+		}
+		if (curs.nodeType == 'str') {
+			this.inStr = true;
+			return WalkerOptions.exit;
+		}
+		const prev4 = curs.currentNode().previousNamedSibling?.type.substring(0, 4);
+		const prev = curs.currentNode().previousNamedSibling?.type;
+		if (prev == 'statement' || prev == 'linenum') {
+			this.inStatement = true;
+			return WalkerOptions.exit;
+		}
+		if (prev == 'tok_fn') {
+			this.inFn = true;
+			return WalkerOptions.exit;
+		}
+		if (prev4 == 'tok_' || prev == 'str' || prev == 'name_amp') {
+			this.inExpr = true;
+			return WalkerOptions.exit;
+		}
+		return WalkerOptions.gotoChild;
+	}
 	provideCompletionItems(document: vsdoc.TextDocument | undefined, position: vsdoc.Position) : vsserv.CompletionItem[]
 	{
 		const ans = new Array<vsserv.CompletionItem>();
-
+		this.inExpr = false;
+		this.inFn = false;
+		this.inStr = false;
+		this.inStatement = false;
+		this.pos = position;
 		if (!document)
 			return ans;
 
-		this.add_simple(ans, ['CLEAR', 'CONT', 'DATA', 'END', 'FLASH', 'GR', 'HGR', 'HGR2', 'HOME', 'INPUT', 'INVERSE', 'LOAD',
-			'NEW','NEXT','NORMAL','NOTRACE','POP','PRINT','READ','RECALL','REM','RESTORE','RESUME','RETURN','RUN',
-			'SAVE','SHLOAD','STOP','STORE','TEXT','TRACE']);
-		this.add_funcs(ans,['ABS','ATN','CHR$','COS','EXP','INT','LOG','PDL','PEEK','RND','SGN','SIN','SPC','SQR',
+		const currLine = this.lines(document)[position.line];
+		const tree = this.parse(currLine, '\n');
+		this.walk(tree, this.visit_statement.bind(this));
+
+		if (this.inStr) {
+			return ans;
+		}
+
+		if (this.inFn) {
+			for (const [k, v] of docSymbols.functions) {
+				for (const c of v.case) {
+					ans.push(vsserv.CompletionItem.create(c));
+					ans[ans.length - 1].kind = vsserv.CompletionItemKind.Function;
+				}
+			}
+ 		}
+
+		if (this.inExpr || this.inStatement) {
+			for (const [k,v] of docSymbols.scalars) {
+				for (const c of v.case) {
+					ans.push(vsserv.CompletionItem.create(c));
+					ans[ans.length - 1].kind = vsserv.CompletionItemKind.Variable;
+				}
+			}
+			for (const [k, v] of docSymbols.arrays) {
+				for (const c of v.case) {
+					// don't use add_snippet (would modify case)
+					ans.push(vsserv.CompletionItem.create(c));
+					ans[ans.length - 1].insertText = c.substring(0,c.length-2) + '(${1:subscript})';
+					ans[ans.length - 1].insertTextFormat = vsserv.InsertTextFormat.Snippet;
+				}
+			}
+			this.add_funcs(ans,['ABS','ATN','CHR$','COS','EXP','INT','LOG','PDL','PEEK','RND','SGN','SIN','SPC','SQR',
 			'STR$','TAB','TAN','USR'],'aexpr');
-		this.add_funcs(ans,['ASC','LEN','VAL'],'sexpr');
-		this.add_funcs(ans,['FRE','POS'],'expr');
-		this.add_procs(ans,['CALL','COLOR =','HCOLOR =','HIMEM:','HTAB','IN#','LOMEM:','PR#',
-			'ROT =','SCALE =','SPEED =','VTAB'],'aexpr');
+			this.add_funcs(ans,['ASC','LEN','VAL'],'sexpr');
+			this.add_funcs(ans,['FRE','POS'],'expr');
+			this.add_snippet(ans, 'LEFT$ (sexpr,aexpr)', 'LEFT$ (${1:sexpr},${0:length})');
+			this.add_snippet(ans, 'MID$ (sexpr,aexpr,aexpr)', 'MID$ (${1:sexpr},${2:start},${0:length})');
+			this.add_snippet(ans, 'RIGHT$ (sexpr,aexpr)', 'RIGHT$ (${1:sexpr},${0:length})');
+			this.add_snippet(ans, 'PEEK (special) (enter, space)', 'PEEK');
+			this.add_snippet(ans, 'SCRN (aexpr,aexpr)', 'SCRN (${1:x},${0:y})');
+		}
 
-		this.add_snippet(ans, 'CALL special (enter, space)', 'CALL');
+		if (this.inStatement) {
 
-		this.add_snippet(ans, 'DEF FN name (name) = aexpr', 'DEF FN ${1:name} (${2:dummy variable}) = ${0:aexpr}');
+			this.add_simple(ans, ['CLEAR', 'CONT', 'DATA', 'END', 'FLASH', 'GR', 'HGR', 'HGR2', 'HOME', 'INPUT', 'INVERSE', 'LOAD',
+				'NEW', 'NEXT', 'NORMAL', 'NOTRACE', 'POP', 'PRINT', 'READ', 'RECALL', 'REM', 'RESTORE', 'RESUME', 'RETURN', 'RUN',
+				'SAVE', 'SHLOAD', 'STOP', 'STORE', 'TEXT', 'TRACE']);
+			this.add_procs(ans, ['CALL', 'COLOR =', 'HCOLOR =', 'HIMEM:', 'HTAB', 'IN#', 'LOMEM:', 'PR#',
+				'ROT =', 'SCALE =', 'SPEED =', 'VTAB'], 'aexpr');
+
+			this.add_snippet(ans, 'CALL special (enter, space)', 'CALL');
+
+			this.add_snippet(ans, 'DEF FN name (name) = aexpr', 'DEF FN ${1:name} (${2:dummy variable}) = ${0:aexpr}');
 	
-		this.add_snippet(ans, 'DEL linenum,linenum', 'DEL ${1:first},${0:last}');
+			this.add_snippet(ans, 'DEL linenum,linenum', 'DEL ${1:first},${0:last}');
 
-		this.add_snippet(ans, 'DIM name (subscript)', 'DIM ${1:name} (${0:subscript})');
+			this.add_snippet(ans, 'DIM name (subscript)', 'DIM ${1:name} (${0:subscript})');
 
-		this.add_snippet(ans, 'DRAW aexpr', 'DRAW ${0:shape}');
-		this.add_snippet(ans, 'DRAW aexpr AT aexpr,aexpr', 'DRAW ${1:shape} AT ${2:x},${0:y}');
+			this.add_snippet(ans, 'DRAW aexpr', 'DRAW ${0:shape}');
+			this.add_snippet(ans, 'DRAW aexpr AT aexpr,aexpr', 'DRAW ${1:shape} AT ${2:x},${0:y}');
 
-		this.add_snippet(ans, 'FOR index = first TO last: statement: NEXT', 'FOR ${1:I} = ${2:1} TO ${3:last}: ${0}: NEXT');
-		this.add_snippet(ans, 'FOR index = first TO last STEP s: statement: NEXT', 'FOR ${1:I} = ${2:1} TO ${3:last} STEP ${4:step}: ${0}: NEXT');
+			this.add_snippet(ans, 'FOR index = first TO last: statement: NEXT', 'FOR ${1:I} = ${2:1} TO ${3:last}: ${0}: NEXT');
+			this.add_snippet(ans, 'FOR index = first TO last STEP s: statement: NEXT', 'FOR ${1:I} = ${2:1} TO ${3:last} STEP ${4:step}: ${0}: NEXT');
 
-		this.add_snippet(ans, 'FN name (aexpr)', 'FN ${1:name} (${0:aexpr})');
+			this.add_snippet(ans, 'FN name (aexpr)', 'FN ${1:name} (${0:aexpr})');
 
-		this.add_snippet(ans, 'GET var', 'GET ${0:var}');
+			this.add_snippet(ans, 'GET var', 'GET ${0:var}');
 
-		this.add_snippet(ans, 'GOSUB linenum', 'GOSUB ${0:linenum}');
+			this.add_snippet(ans, 'GOSUB linenum', 'GOSUB ${0:linenum}');
 
-		this.add_snippet(ans, 'GOTO linenum', 'GOTO ${0:linenum}');
+			this.add_snippet(ans, 'GOTO linenum', 'GOTO ${0:linenum}');
 
-		this.add_snippet(ans, 'HLIN aexpr,aexpr AT aexpr', 'HLIN ${1:x1},${2:x2} AT ${0:y}');
+			this.add_snippet(ans, 'HLIN aexpr,aexpr AT aexpr', 'HLIN ${1:x1},${2:x2} AT ${0:y}');
 
-		this.add_snippet(ans, 'HPLOT aexpr,aexpr', 'HPLOT ${1:x},${0:y}');
-		this.add_snippet(ans, 'HPLOT TO aexpr,aexpr', 'HPLOT TO ${1:x},${0:y}');
-		this.add_snippet(ans, 'HPLOT aexpr,aexpr TO aexpr,aexpr', 'HPLOT ${1:x},${2:y} TO ${3:x},${0:y}');
+			this.add_snippet(ans, 'HPLOT aexpr,aexpr', 'HPLOT ${1:x},${0:y}');
+			this.add_snippet(ans, 'HPLOT TO aexpr,aexpr', 'HPLOT TO ${1:x},${0:y}');
+			this.add_snippet(ans, 'HPLOT aexpr,aexpr TO aexpr,aexpr', 'HPLOT ${1:x},${2:y} TO ${3:x},${0:y}');
 
-		this.add_snippet(ans, 'IF expr THEN statement', 'IF ${1} THEN ${0}');
+			this.add_snippet(ans, 'IF expr THEN statement', 'IF ${1} THEN ${0}');
 
-		this.add_snippet(ans, 'LEFT$ (sexpr,aexpr)', 'LEFT$ (${1:sexpr},${0:length})');
-
-		this.add_snippet(ans, 'LET var = expr', 'LET ${1:var} = ${0:expr}');
+			this.add_snippet(ans, 'LET var = expr', 'LET ${1:var} = ${0:expr}');
 		
-		this.add_snippet(ans, 'LIST linenum, linenum', 'LIST ${1:first}, ${0:last}');
+			this.add_snippet(ans, 'LIST linenum, linenum', 'LIST ${1:first}, ${0:last}');
 
-		this.add_snippet(ans, 'MID$ (sexpr,aexpr,aexpr)', 'MID$ (${1:sexpr},${2:start},${0:length})');
+			this.add_snippet(ans, 'ON aexpr GOTO|GOSUB linenum', 'ON ${1:aexpr} ${2|GOTO,GOSUB|} ${0:linenum}');
 
-		this.add_snippet(ans, 'ON aexpr GOTO|GOSUB linenum', 'ON ${1:aexpr} ${2|GOTO,GOSUB|} ${0:linenum}');
+			this.add_snippet(ans, 'ONERR GOTO linenum', 'ONERR GOTO ${0:linenum}');
 
-		this.add_snippet(ans, 'ONERR GOTO linenum', 'ONERR GOTO ${0:linenum}');
+			this.add_snippet(ans, 'PLOT aexpr,aexpr', 'PLOT ${1:x},${0:y}');
 
-		this.add_snippet(ans, 'PEEK (special) (enter, space)', 'PEEK');
+			this.add_snippet(ans, 'POKE aexpr,aexpr', 'POKE ${1:addr},${0:val}');
 
-		this.add_snippet(ans, 'PLOT aexpr,aexpr', 'PLOT ${1:x},${0:y}');
+			this.add_snippet(ans, 'POKE special (enter, space)', 'POKE');
 
-		this.add_snippet(ans, 'POKE aexpr,aexpr', 'POKE ${1:addr},${0:val}');
+			this.add_snippet(ans, 'VLIN aexpr,aexpr AT aexpr', 'VLIN ${1:y1},${2:y2} AT ${0:x}');
 
-		this.add_snippet(ans, 'POKE special (enter, space)', 'POKE');
-		
-		this.add_snippet(ans, 'RIGHT$ (sexpr,aexpr)', 'RIGHT$ (${1:sexpr},${0:length})');
+			this.add_snippet(ans, 'WAIT aexpr,aexpr,aexpr', 'WAIT ${1:addr},${2:mask},${0:expected}');
 
-		this.add_snippet(ans, 'SCRN (aexpr,aexpr)', 'SCRN (${1:x},${0:y})');
-
-		this.add_snippet(ans, 'VLIN aexpr,aexpr AT aexpr', 'VLIN ${1:y1},${2:y2} AT ${0:x}');
-
-		this.add_snippet(ans, 'WAIT aexpr,aexpr,aexpr', 'WAIT ${1:addr},${2:mask},${0:expected}');
-
-		this.add_snippet(ans, 'XDRAW aexpr', 'XDRAW ${0:shape}');
-		this.add_snippet(ans, 'XDRAW aexpr AT aexpr,aexpr', 'XDRAW ${1:shape} AT ${2:x},${0:y}');
+			this.add_snippet(ans, 'XDRAW aexpr', 'XDRAW ${0:shape}');
+			this.add_snippet(ans, 'XDRAW aexpr AT aexpr,aexpr', 'XDRAW ${1:shape} AT ${2:x},${0:y}');
+		}
 
 		return ans;
 	}

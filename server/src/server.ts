@@ -30,6 +30,7 @@ export interface Variable {
 	dec: vsserv.Range[];
 	def: vsserv.Range[];
 	ref: vsserv.Range[];
+	case: Set<string>;
 }
 
 export class DocSymbols {

@@ -6,7 +6,7 @@ import * as assert from 'assert';
 // Tokenization is tested against Virtual ][
 // This assembly program generates the hex dump, which is then copied
 // and pasted directly into the test.
-//          ORG   300
+//          ORG   $300
 // ZPTR     EQU   $06
 // SPTR     EQU   $08
 // PRGST    EQU   $67
@@ -221,6 +221,55 @@ describe('Escapes', async function () {
 	it('DOS escapes', async function () {
 		const testCode = "0 PR# 0\n1 PRINT:PRINT \"\\x04BLOAD DATA1,A$4000\":END\n";
 		const expected = "080800008A300027080100BA3ABA2204424C4F41442044415441312C412434303030223A80000000";
+		await testTokenizer(testCode, expected);
+	});
+});
+
+describe('Ampersand', async function () {
+	it('null_string_only', async function () {
+		const testCode = "10 & \"";
+		const expected = "08080A00AF22000000";
+		await testTokenizer(testCode, expected);
+	});
+	it('string_only', async function () {
+		const testCode = "10 & \"print something\"";
+		const expected = "18080A00AF227072696E7420736F6D657468696E6722000000";
+		await testTokenizer(testCode, expected);
+	});
+	it('anon_func_form', async function () {
+		const testCode = "10 & (\"sarg\",x+y,a$)";
+		const expected = "16080A00AF282273617267222C58C8592C412429000000";
+		await testTokenizer(testCode, expected);
+	});
+	// syntax is not supported but test will pass
+	it('func_form1', async function () {
+		const testCode = "10 & \"print\"(x+y,a$)";
+		const expected = "16080A00AF227072696E74222858C8592C412429000000";
+		await testTokenizer(testCode, expected);
+	});
+	it('overloaded_tok_func', async function () {
+		const testCode = "10 & print(x+y,a$)";
+		const expected = "10080A00AFBA2858C8592C412429000000";
+		await testTokenizer(testCode, expected);
+	});
+	it('func_form3', async function () {
+		const testCode = "10 & MyFunc(x+y,a$)";
+		const expected = "15080A00AF4D5946554E432858C8592C412429000000";
+		await testTokenizer(testCode, expected);
+	});
+	it('statement_form1', async function () {
+		const testCode = "10 & PR USNG > \"0.00\";A$";
+		const expected = "17080A00AF505255534E47CF22302E3030223B4124000000";
+		await testTokenizer(testCode, expected);
+	});
+	it('statement_form2', async function () {
+		const testCode = "10 & cal ; cos(x)*sin(y)";
+		const expected = "14080A00AF43414C3BDE285829CADF285929000000";
+		await testTokenizer(testCode, expected);
+	});
+	it('overloaded_tok_statement', async function () {
+		const testCode = "10 & DRAW AT X0,Y0";
+		const expected = "0E080A00AF94C558302C5930000000";
 		await testTokenizer(testCode, expected);
 	});
 });

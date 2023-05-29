@@ -80,15 +80,16 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 	{
 		if (!node)
 			return;
-		const keyname = recall ? lxbase.var_to_key(node) + '()' : lxbase.var_to_key(node);
+		const [keyname,cased] = lxbase.var_to_key(node,recall);
 		const map = keyname.slice(-1) == ')' || recall ? this.workingSymbols.arrays : this.workingSymbols.scalars;
 		let varInfo = map.get(keyname);
 		if (!varInfo)
-			varInfo = { dec: [], def: [], ref: [] };
+			varInfo = { dec: [], def: [], ref: [], case: new Set<string>() };
 		if (dim)
 			varInfo.dec.push(lxbase.name_range(node,this.row));
 		else
-			varInfo.def.push(lxbase.name_range(node,this.row));
+			varInfo.def.push(lxbase.name_range(node, this.row));
+		varInfo.case.add(cased);
 		map.set(keyname, varInfo);
 	}
 	visit_primaries(curs: Parser.TreeCursor): lxbase.WalkerChoice
@@ -137,12 +138,12 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 			const nameNode = curs.currentNode().nextNamedSibling?.nextNamedSibling;
 			if (nameNode) {
 				const nameRange = lxbase.node_to_range(nameNode, this.row);
-				const keyname = lxbase.var_to_key(nameNode);
+				const [keyname,cased] = lxbase.var_to_key(nameNode,false);
 				if (this.workingSymbols.functions.has(keyname)) {
 					this.diag.push(vsserv.Diagnostic.create(nameRange, 'function is redefined'));
 				}
 				else {
-					this.workingSymbols.functions.set(keyname, { dec: [], def: [nameRange], ref: [] });
+					this.workingSymbols.functions.set(keyname, { dec: [], def: [nameRange], ref: [], case: new Set<string>([cased]) });
 				}
 				return lxbase.WalkerOptions.gotoParentSibling;
 			}
@@ -206,8 +207,7 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 	process_variable_ref(curs: Parser.TreeCursor): lxbase.WalkerChoice
 	{
 		const isRecall = curs.currentNode().previousNamedSibling?.type == "tok_recall";
-		const rawKeyName = lxbase.var_to_key(curs.currentNode());
-		const keyname = isRecall ? rawKeyName + '()' : rawKeyName;
+		const [keyname,cased] = lxbase.var_to_key(curs.currentNode(),isRecall);
 		const nameRange = lxbase.name_range(curs.currentNode(),this.row);
 		const isArray = keyname.slice(-1) == ')' || isRecall;
 		if (this.config.warn.collisions)
@@ -221,9 +221,11 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 			if (!isArray && this.config.warn.undefinedVariables && (this.depthOfDEF==0 || keyname!=this.dummyKeyInDEF))
 				this.diag.push(vsserv.Diagnostic.create(nameRange, "variable is never assigned", vsserv.DiagnosticSeverity.Warning));
 		if (!varInfo)
-			map.set(keyname, { dec: [], def: [], ref: [nameRange] });
-		else
+			map.set(keyname, { dec: [], def: [], ref: [nameRange], case: new Set<string>([cased]) });
+		else {
 			varInfo.ref.push(nameRange);
+			varInfo.case.add(cased);
+		}
 		const nameNode = curs.currentNode().firstNamedChild;
 		if (nameNode)
 			this.check_case(nameNode.text,nameRange);
@@ -256,21 +258,22 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 		else if (curs.nodeType == "tok_def") {
 			const dummyVarNode = curs.currentNode().nextNamedSibling?.nextNamedSibling?.nextNamedSibling;
 			if (dummyVarNode && dummyVarNode.type == "var_real")
-				this.dummyKeyInDEF = lxbase.var_to_key(dummyVarNode);
+				this.dummyKeyInDEF = lxbase.var_to_key(dummyVarNode,false)[0];
 			this.depthOfDEF = this.depth;
 		}
 		else if (curs.nodeType.substring(0,4) == 'var_')
 			return this.process_variable_ref(curs);
 		else if (curs.nodeType == "name_fn") {
 			this.check_case(curs.nodeText, rng);
-			const keyname = lxbase.var_to_key(curs.currentNode());
+			const [keyname,cased] = lxbase.var_to_key(curs.currentNode(),false);
 			if (this.config.warn.collisions)
 				this.fsentry.add(keyname, rng, this.diag);
 			const varInfo = this.workingSymbols.functions.get(keyname);
 			if (varInfo) {
 				varInfo.ref.push(rng);
+				varInfo.case.add(cased);
 			} else {
-				this.workingSymbols.functions.set(keyname, { dec: [], def: [], ref: [rng] });
+				this.workingSymbols.functions.set(keyname, { dec: [], def: [], ref: [rng], case: new Set<string>([cased]) });
 				if (parent && parent.type == "fcall")
 					this.diag.push(vsserv.Diagnostic.create(rng, 'function never defined'));
 			}
@@ -381,7 +384,7 @@ export class TSDiagnosticProvider extends lxbase.LangExtBase
 			this.fsentry = new VariableNameSentry();
 			this.workingSymbols = new server.DocSymbols();
 			this.lastGoodLineNumber = -1;
-			const lines = document.getText().split('\n');
+			const lines = document.getText().split(/\r?\n/);
 			for (this.row = 0; this.row < lines.length; this.row++) {
 				const syntaxTree = this.parse(lines[this.row],"\n");
 				this.walk(syntaxTree, this.visit_primaries.bind(this));

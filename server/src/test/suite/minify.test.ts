@@ -72,9 +72,24 @@ describe('Minify Variables', async function() {
 		const expected = "10PRINTAE%(XA,YA)";
 		await testMinify(testCode, expected);
 	});
-	it('short variables only', async function () {
+	it('short variables only', async function() {
 		const testCode = '10 PRINT A%(X,Y) A$(X%,Y%)';
 		const expected = "10PRINTA%(X,Y)A$(X%,Y%)";
+		await testMinify(testCode, expected);
+	});
+	it('amp_func_vars', async function() {
+		const testCode = "10 & MYFUNC (HELLO+Y,AERO%(XA1B2,YA2B1),aero$(x1ab2,y1ab1))";
+		const expected = "10& MYFUNC (HELLO+Y,AERO%(XA1B2,YA2B1),aero$(x1ab2,y1ab1))";
+		await testMinify(testCode, expected);
+	});
+	it('amp_expr_list', async function() {
+		const testCode = "10 & (\"cmd\",HELLO+Y,AERO%(XA1B2,YA2B1),aero$(x1ab2,y1ab1))";
+		const expected = "10& (\"cmd\",HELLO+Y,AERO%(XA1B2,YA2B1),aero$(x1ab2,y1ab1))";
+		await testMinify(testCode, expected);
+	});
+	it('amp_overloaded_toks', async function() {
+		const testCode = "10 & draw \"subcmd\" at HELLO+Y,AERO%(XA1B2,YA2B1) and aero%(x1ab2,y1ab1)";
+		const expected = "10& draw \"subcmd\" at HELLO+Y,AERO%(XA1B2,YA2B1) and aero%(x1ab2,y1ab1)";
 		await testMinify(testCode, expected);
 	});
 });
@@ -84,6 +99,16 @@ describe('Minify Variables with Guards', async function() {
 	it('TO and STEP guards', async function() {
 		const testCode = '10 for x = ca12345 to abracadabra step 5';
 		const expected = "10forx=(ca)to(ab)step5";
+		await testMinify(testCode, expected);
+	});
+	it('atn_guard', async function() {
+		const testCode = "10 hlin x,xrght at n";
+		const expected = "10hlinx,xrat n";
+		await testMinify(testCode, expected);
+	});
+	it('ato_guard', async function() {
+		const testCode = "10 draw br at o1,o2";
+		const expected = "10drawbrat o1,o2";
 		await testMinify(testCode, expected);
 	});
 	it('logic guards', async function() {
