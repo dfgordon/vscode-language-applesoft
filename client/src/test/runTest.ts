@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import * as electronTest from '@vscode/test-electron';
+import { runTests } from '@vscode/test-electron';
 
 async function main() {
   try {
@@ -10,12 +10,11 @@ async function main() {
 
     // The path to the extension test runner script
     // Passed to --extensionTestsPath
-    const extensionTestsPath = path.resolve(__dirname, './suite/');
+    const extensionTestsPath = path.resolve(__dirname, './suite/index');
 
     // Download VS Code, unzip it and run the integration test
-    await electronTest.runTests({ extensionDevelopmentPath, extensionTestsPath } );
+    await runTests({ extensionDevelopmentPath, extensionTestsPath, version: 'insiders' } );
   } catch (err) {
-    console.error(err);
     console.error('Failed to run tests');
     process.exit(1);
   }
