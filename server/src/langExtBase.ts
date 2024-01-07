@@ -4,9 +4,16 @@ import Parser from 'web-tree-sitter';
 import * as path from 'path';
 import { applesoftSettings } from './settings';
 
+export type Logger = vsserv.RemoteConsole & vsserv._ | Console;
+
 function is_hex(x: number): boolean
 {
 	return x >= 48 && x <= 57 || x >= 65 && x <= 70 || x >= 97 && x <= 102;
+}
+
+export function hex_from_bytes(buf: number[]) : string
+{
+	return [...buf].map(b => b.toString(16).toUpperCase().padStart(2,"0")).join("");
 }
 
 /**
@@ -52,9 +59,14 @@ export function bytes_to_escaped_string(escapes: number[], bytes: number[], offs
 	return [ans,idx];
 }
 
-export function escaped_string_to_raw_str(txt: string): string  {
+/**
+ * Put string with possible escapes into ascii array
+ * @param txt string with possible hex escapes, sign of escapes will not be changed
+ * @returns array of bytes in integer basic format
+ */
+export function escaped_string_to_bytes(txt: string): number[] {
 	const seq1 = [/\\/, /x/, /[0-9a-fA-F]/, /[0-9a-fA-F]/];
-	let ans = "";
+	const ans = new Array<number>();
 	let matches1 = 0;
 	let stack = "";
 	for (let i = 0; i < txt.length; i++) {
@@ -69,20 +81,24 @@ export function escaped_string_to_raw_str(txt: string): string  {
 			stack += txt.charAt(i);
 		else {
 			if (stack.length > 0) {
-				ans += stack;
+				for (const char of stack) {
+					ans.push(char.charCodeAt(0));
+				}
 				stack = "";
 				i--;
 			} else {
-				ans += txt.charAt(i);
+				ans.push(txt.charCodeAt(i));
 			}
 		}
 		if (matches1 == 4) {
-			ans += String.fromCharCode(parseInt(txt.slice(i-1,i+1),16));
+			ans.push(parseInt(txt.slice(i-1,i+1),16));
 			matches1 = 0;
 			stack = "";
 		}
 	}
-	ans += stack;
+	for (const char of stack) {
+		ans.push(char.charCodeAt(0));
+	}
 	return ans;
 }
 
@@ -103,7 +119,7 @@ export function node_to_range(node: Parser.SyntaxNode,row: number): vsserv.Range
  * Extract variable name from syntax node
  * @param node syntax node to be analyzed, can be var_* or name_*, except for name_amp
  * @param recall is this an implicit array like the argument of RECALL
- * @returns [normalized name,specific name]
+ * @returns [normalized name,specific name], includes `$`, `%`, or `()`
  */
 export function var_to_key(node: Parser.SyntaxNode,recall: boolean): [string,string]
 {
@@ -118,7 +134,7 @@ export function var_to_key(node: Parser.SyntaxNode,recall: boolean): [string,str
  * Extract range of the variable name within the node
  * @param node node can be either var_* or name_*
  * @param row row value to add when processing line by line
- * @returns range of 
+ * @returns range of name part of variable, includes `$` or `%` but not subscript
  */
 export function name_range(node: Parser.SyntaxNode,row: number): vsserv.Range
 {
@@ -173,11 +189,13 @@ export function rangeContainsRange(outer: vsserv.Range, inner: vsserv.Range) : b
 }
 
 export class LangExtBase {
+	logger: Logger;
 	parser: Parser;
 	Applesoft: Parser.Language;
 	config: applesoftSettings;
 	depth: number;
-	constructor(TSInitResult: [Parser, Parser.Language], settings: applesoftSettings) {
+	constructor(TSInitResult: [Parser, Parser.Language], connection: Logger, settings: applesoftSettings) {
+		this.logger = connection;
 		this.parser = TSInitResult[0];
 		this.Applesoft = TSInitResult[1];
 		this.config = settings;

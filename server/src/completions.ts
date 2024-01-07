@@ -49,9 +49,9 @@ export class AddressCompletionProvider extends lxbase.LangExtBase
 	pokeCompletions : Array<vsserv.CompletionItem>;
 	peekCompletions : Array<vsserv.CompletionItem>;
 	callCompletions : Array<vsserv.CompletionItem>;
-	constructor(TSInitResult: [Parser,Parser.Language],config: applesoftSettings)
+	constructor(TSInitResult: [Parser,Parser.Language], logger: lxbase.Logger, config: applesoftSettings)
 	{
-		super(TSInitResult, config);
+		super(TSInitResult, logger, config);
 		this.pokeCompletions = new Array<vsserv.CompletionItem>();
 		this.peekCompletions = new Array<vsserv.CompletionItem>();
 		this.callCompletions = new Array<vsserv.CompletionItem>();
@@ -133,10 +133,10 @@ export class AddressCompletionProvider extends lxbase.LangExtBase
 export class StatementCompletionProvider extends lxbase.LangExtBase
 {
 	pos: vsdoc.Position = vsserv.Position.create(0, 0);
-	inExpr: boolean = false;
-	inFn: boolean = false;
-	inStr: boolean = false;
-	inStatement: boolean = false;
+	inExpr = false;
+	inFn = false;
+	inStr = false;
+	inStatement = false;
 	modify(s:string)
 	{
 		if (this.config.case.lowerCaseCompletions && !this.config.case.caseSensitive)
@@ -240,7 +240,7 @@ export class StatementCompletionProvider extends lxbase.LangExtBase
 					ans[ans.length - 1].kind = vsserv.CompletionItemKind.Function;
 				}
 			}
- 		}
+		}
 
 		if (this.inExpr || this.inStatement) {
 			for (const [k,v] of docSymbols.scalars) {

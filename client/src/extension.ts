@@ -52,7 +52,8 @@ export function activate(context: vscode.ExtensionContext)
 		context.subscriptions.push(vscode.commands.registerCommand("applesoft.getFromDiskImage", a2kit.getApplesoftFile, a2kit));
 		context.subscriptions.push(vscode.commands.registerCommand("applesoft.saveToDiskImage", a2kit.putApplesoftFile, a2kit));
 		context.subscriptions.push(vscode.commands.registerCommand("applesoft.showTokenizedProgram",tokenizer.showTokenizedProgram,tokenizer));
-		context.subscriptions.push(vscode.commands.registerCommand("applesoft.renumber", renumberer.command, renumberer));
+		context.subscriptions.push(vscode.commands.registerCommand("applesoft.renumber", renumberer.renumber, renumberer));
+		context.subscriptions.push(vscode.commands.registerCommand("applesoft.move", renumberer.move, renumberer));
 		context.subscriptions.push(vscode.commands.registerCommand("applesoft.minify", tokenizer.minify_program, tokenizer));
 		context.subscriptions.push(vscode.commands.registerTextEditorCommand("applesoft.commentLines",com.commentLinesCommand));
 	});

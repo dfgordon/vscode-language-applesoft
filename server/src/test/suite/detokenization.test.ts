@@ -5,7 +5,7 @@ import * as assert from 'assert';
 
 async function testDetokenizer(hex_tokens: string, expected: string) {
 	const TSInitResult = await lxbase.TreeSitterInit();
-	const tool = new com.Tokenizer(TSInitResult,config.defaultSettings);
+	const tool = new com.Tokenizer(TSInitResult,console,config.defaultSettings);
 	const matches = hex_tokens.match(/[0-9a-fA-F][0-9a-fA-F]/g);
 	if (!matches) {
 		assert.fail("invalid hex tokens");

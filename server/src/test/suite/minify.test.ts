@@ -5,7 +5,7 @@ import * as assert from 'assert';
 
 async function testMinify(code: string, expected: string) {
 	const TSInitResult = await lxbase.TreeSitterInit();
-	const tool = new com.Minifier(TSInitResult, config.defaultSettings);
+	const tool = new com.Minifier(TSInitResult, console, config.defaultSettings);
 	const actual = tool.minify(code);
 	assert.deepStrictEqual(actual, expected+'\n');
 }

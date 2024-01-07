@@ -151,128 +151,116 @@ export class Minifier extends lxbase.LangExtBase {
 
 export class Tokenizer extends lxbase.LangExtBase
 {
-	// Note on string encoding:
-	// Because JavaScript uses UTF16, 8 bit binary data can be put directly into a string
-	// with little trouble, since any value from 0-255 is mapped to exactly one code point.
-	// We use the name `raw_str` to indicate that the string may contain binary data encoded
-	// in this straightforward way.  When transferring to/from A2 memory images the
-	// low bytes from the code points are put into a Uint8Array.
-	// WARNING: text based manipulations are unsafe on `raw_str`.
-	// The `persistentSpace` code is used to allow spaces to be safely stripped from `raw_str`.
-	persistentSpace = String.fromCharCode(256);
-	tokenizedProgram = "";
-	tokenizedLine = "";
+	err = new Array<string>();
+	lineText = "";
+	tokenizedLine = new Array<number>();
 	currAddr = 2049;
-	encode_int16(int16: number) : string
+	encode_int16(int16: number) : [number,number]
 	{
-		const hiByte = Math.floor(int16/256);
-		const loByte = int16 - hiByte*256;
-		return String.fromCharCode(loByte) + String.fromCharCode(hiByte);
+		const loByte = int16 % 256;
+		const hiByte = Math.floor(int16 / 256);
+		return [loByte,hiByte];
 	}
-	buffer_from_raw_str(raw_str: string) : Buffer
-	{
-		const rawBinary = new Uint8Array(raw_str.length);
-		for (let i=0;i<raw_str.length;i++)
-			rawBinary[i] = raw_str.charCodeAt(i);
-		return Buffer.from(rawBinary);
-	}
-	hex_from_raw_str(raw_str: string) : string
-	{
-		const rawBinary = new Uint8Array(this.buffer_from_raw_str(raw_str));
-		return [...rawBinary].map(b => b.toString(16).toUpperCase().padStart(2,"0")).join("");
-	}
-	replace_curs(newNodeText: string, curs: Parser.TreeCursor) : string
-	{
-		const preNode = this.tokenizedLine.substring(0,curs.startPosition.column);
-		const postNode = this.tokenizedLine.substring(curs.endPosition.column);
-		return preNode + newNodeText + ' '.repeat(curs.nodeText.length-newNodeText.length) + postNode;
-	}
-	replace_node(newNodeText: string, node: Parser.SyntaxNode) : string
-	{
-		const preNode = this.tokenizedLine.substring(0,node.startPosition.column);
-		const postNode = this.tokenizedLine.substring(node.endPosition.column);
-		return preNode + newNodeText + ' '.repeat(node.text.length-newNodeText.length) + postNode;
-	}
-	stringlike_node_to_raw_str(txt: string,trim: boolean): string {
-		let ans = trim ? txt.trimStart() : txt;
-		ans = lxbase.escaped_string_to_raw_str(ans);
-		ans = ans.replace(/ /g, this.persistentSpace);
-		return ans + ' '.repeat(txt.length-ans.length);
+	stringlike_node_to_bytes(txt: string,trim: boolean): number[] {
+		const trimmed = trim ? txt.trimStart().toString() : txt;
+		return lxbase.escaped_string_to_bytes(trimmed);
 	}
 	tokenize_node(curs: Parser.TreeCursor) : lxbase.WalkerChoice
 	{
-		// Primary line numbers "tokenized" as 16 bit integers separately
-		// because here we require sizeof(new_node_data)<=sizeof(old_node_data)
-
+		// Primary line number
+		if (curs.nodeType == "linenum") {
+			const parent = curs.currentNode().parent;
+			if (parent?.type=="line") {
+				const val = parseInt(curs.nodeText.replace(/ /g,''));
+				const bytes = this.encode_int16(val);
+				this.tokenizedLine.push(bytes[0]);
+				this.tokenizedLine.push(bytes[1]);
+				return lxbase.WalkerOptions.gotoSibling;
+			}
+		}
+		// Anonymous nodes
+		if (!curs.nodeIsNamed) {
+			const cleaned = curs.nodeText.toUpperCase().replace(/ /g, "");
+			this.tokenizedLine.push(...Buffer.from(cleaned));
+			return lxbase.WalkerOptions.gotoSibling;
+		}
 		// Negative ASCII tokens
-		if (curs.nodeType in tokenize_map)
-			this.tokenizedLine = this.replace_curs(String.fromCharCode(Object(tokenize_map)[curs.nodeType] as number),curs);
-		
+		if (curs.nodeType in tokenize_map) {
+			this.tokenizedLine.push(Object(tokenize_map)[curs.nodeType] as number);
+			return lxbase.WalkerOptions.gotoSibling;
+		}
 		// Required upper case
-		if (curs.nodeType.substring(0,5)=='name_' || curs.nodeType=='real')
-			this.tokenizedLine = this.replace_curs(curs.nodeText.toUpperCase(),curs);
-		
+		if (curs.nodeType.substring(0,5)=='name_' || curs.nodeType=='real') {
+			if (curs.nodeType=="name_amp" && curs.currentNode().childCount>0) {
+				// handle overloaded tokens
+				return lxbase.WalkerOptions.gotoChild;
+			}
+			const cleaned = curs.nodeText.toUpperCase().replace(/ /g,"");
+			this.tokenizedLine.push(...Buffer.from(cleaned));
+			return lxbase.WalkerOptions.gotoSibling;
+		}
 		// Persistent spaces and escapes
-		if (curs.nodeType=='statement')
-		{
+		if (curs.nodeType == "statement") {
 			const tok = curs.currentNode().firstNamedChild;
-			if (tok)
-			{
+			if (tok && tok.type=="tok_data") {
 				// Text in the DATA statement is preserved unconditionally, so handle all at once and go out.
 				// There is a problem with calculation of end of data in connection with quote parity that
 				// cannot be solved in any satisfactory way (ROM handles it inconsistently).
-				if (tok.type=='tok_data')
-				{
-					const preItems = this.tokenizedLine.substring(0,tok.endPosition.column);
-					const items = this.stringlike_node_to_raw_str(this.tokenizedLine.substring(tok.endPosition.column, curs.endPosition.column),false);
-					const postData = this.tokenizedLine.substring(curs.endPosition.column);
-					this.tokenizedLine = preItems + items + postData;
-					this.tokenizedLine = this.replace_node(String.fromCharCode(Object(tokenize_map)['tok_data'] as number),tok);
-					return lxbase.WalkerOptions.gotoSibling;
-				}
+				const items = this.stringlike_node_to_bytes(this.lineText.substring(tok.endPosition.column, curs.endPosition.column),false);
+				this.tokenizedLine.push(Object(tokenize_map)['tok_data'] as number);
+				this.tokenizedLine.push(...items);
+				return lxbase.WalkerOptions.gotoSibling;
 			}
 		}
-		if (curs.nodeType == 'str') {
-			this.tokenizedLine = this.replace_curs(this.stringlike_node_to_raw_str(curs.nodeText,true), curs);
+		if (curs.nodeType=="str") {
+			this.tokenizedLine.push(...this.stringlike_node_to_bytes(curs.nodeText,true));
 			return lxbase.WalkerOptions.gotoSibling;
 		}
-		if (curs.nodeType == 'comment_text') {
-			this.tokenizedLine = this.replace_curs(this.stringlike_node_to_raw_str(curs.nodeText,false), curs);
+		if (curs.nodeType=="comment_text") {
+			this.tokenizedLine.push(...this.stringlike_node_to_bytes(curs.nodeText,false));
 			return lxbase.WalkerOptions.gotoSibling;
 		}
-		
+
+		// If none of the above, look for terminal nodes and strip spaces
+		if (curs.currentNode().namedChildCount==0) {
+			const cleaned = curs.nodeText.replace(/ /g,"");
+			this.tokenizedLine.push(...Buffer.from(cleaned));
+			return lxbase.WalkerOptions.gotoSibling;
+		}
+
 		return lxbase.WalkerOptions.gotoChild;
 	}
-	tokenize_line(curs: Parser.TreeCursor) : lxbase.WalkerChoice
+	tokenize_line(line: string)
 	{
-		if (curs.nodeType!="line")
-			return lxbase.WalkerOptions.gotoChild;
-		if (curs.nodeText.length > 2 && curs.nodeText.endsWith('\r\n'))
-			this.tokenizedLine = curs.nodeText.substring(0, curs.nodeText.length - 2);
-		else if (curs.nodeText.length > 1)
-			this.tokenizedLine = curs.nodeText.substring(0, curs.nodeText.length - 1);
-		else
-			return lxbase.WalkerOptions.gotoSibling;
-		const lineTree = this.parse(this.tokenizedLine,'\n');
-		this.walk(lineTree,this.tokenize_node.bind(this));
-		const linenum = parseInt(this.tokenizedLine.replace(/ /g,''),10);
-		const statements = this.tokenizedLine.
-			replace(/[0-9 ]+/, '').
-			replace(/ /g, '').
-			replace(RegExp(this.persistentSpace, 'g'), ' ');
-		this.currAddr += statements.length + 5;
-		this.tokenizedLine = this.encode_int16(this.currAddr) + this.encode_int16(linenum) + statements + String.fromCharCode(0);
-		this.tokenizedProgram += this.tokenizedLine;
-		return lxbase.WalkerOptions.gotoSibling;
+		this.tokenizedLine = [];
+		this.lineText = line;
+		const lineTree = this.parse(line,'\n');
+		this.walk(lineTree, this.tokenize_node.bind(this));
+		const nextAddr = this.currAddr + this.tokenizedLine.length + 3;
+		const completed = this.encode_int16(nextAddr);
+		completed.push(...this.tokenizedLine);
+		completed.push(0);
+		this.tokenizedLine = completed;
+		this.currAddr = nextAddr;
 	}
-	tokenize(program: string,baseAddr: number) : string
+	tokenize(program: string,baseAddr: number) : number[]
 	{
-		const syntaxTree = this.parse(program, '\n');
-		this.tokenizedProgram = "";
+		this.err = [];
+		const lines = program.split(/\r?\n/);
+		const tokenizedProgram = [];
 		this.currAddr = baseAddr;
-		this.walk(syntaxTree,this.tokenize_line.bind(this));
-		this.tokenizedProgram += String.fromCharCode(0) + String.fromCharCode(0);
-		return this.tokenizedProgram;
+		for (const line of lines) {
+			if (line.trim().length == 0) {
+				continue;
+			}
+			this.tokenize_line(line);
+			tokenizedProgram.push(...this.tokenizedLine);
+		}
+		if (this.err.length > 0)
+			return [];
+		tokenizedProgram.push(0);
+		tokenizedProgram.push(0);
+		return tokenizedProgram;
 	}
 	detokenize(img: number[]) : string
 	{
@@ -282,13 +270,15 @@ export class Tokenizer extends lxbase.LangExtBase
 		const COLON = 58;
 		let addr = img[103] + img[104]*256;
 		let code = '';
-		while (addr<2**16-3 && (img[addr]!=0 || img[addr+1]!=0)) {
+		let lineCount = 0;
+		while (addr<2**16-3 && (img[addr]!=0 || img[addr+1]!=0) && lineCount<this.config.detokenizer.maxLines) {
 			addr += 2; // skip link address
 			const line_num = img[addr] + img[addr+1]*256;
 			code += line_num.toString() + ' ';
 			addr += 2;
 			let escaped = "";
-			while (addr<2**16 && img[addr] != 0) {
+			const lineAddr = addr;
+			while (addr<2**16 && img[addr] != 0 && addr<lineAddr+this.config.detokenizer.maxLineLength) {
 				if (img[addr] == QUOTE) {
 					code += "\"";
 					[escaped, addr] = lxbase.bytes_to_escaped_string(
@@ -312,13 +302,18 @@ export class Tokenizer extends lxbase.LangExtBase
 					code += escaped;
 				}
 				else if (img[addr] > 127) {
-					code += ' ' + Object(detokenize_map)[img[addr].toString()].toUpperCase() + ' ';
+					const tok = Object(detokenize_map)[img[addr].toString()];
+					if (tok)
+						code += ' ' + tok.toUpperCase() + ' ';
+					else
+						code += '\ufffd';
 					addr += 1;
 				} else {
 					code += String.fromCharCode(img[addr]);
 					addr += 1;
 				}
 			}
+			lineCount += 1;
 			code += '\n';
 			addr += 1;
 		}
@@ -326,31 +321,36 @@ export class Tokenizer extends lxbase.LangExtBase
 	}
 }
 
-export class LineNumberTool extends lxbase.LangExtBase
-{
+/**
+ * information about line number labels packed into arrays ordered by the
+ * order of appearance in the document.  The array length should be considered
+ * unrelated to count of lines in document.
+ */
+export class LabelInformation {
 	nums = new Array<number>();
 	rngs = new Array<vsserv.Range>();
 	leading_space = new Array<number>();
 	trailing_space = new Array<number>();
-	clear()
-	{
-		this.nums = new Array<number>();
-		this.rngs = new Array<vsserv.Range>();
-		this.leading_space = new Array<number>();
-		this.trailing_space = new Array<number>();
+}
+
+export class LineNumberTool extends lxbase.LangExtBase
+{
+	lineInfo = new LabelInformation();
+	clear() {
+		this.lineInfo = new LabelInformation();
 	}
 	push_linenum(curs: Parser.TreeCursor)
 	{
 		const rng = lxbase.curs_to_range(curs,0);
-		const leading = curs.nodeText.length - curs.nodeText.trimLeft().length;
-		const trailing = curs.nodeText.length - curs.nodeText.trimRight().length;
+		const leading = curs.nodeText.length - curs.nodeText.trimStart().length;
+		const trailing = curs.nodeText.length - curs.nodeText.trimEnd().length;
 		const parsed = parseInt(curs.nodeText.replace(/ /g,''));
 		if (!isNaN(parsed))
 		{
-			this.nums.push(parsed);
-			this.rngs.push(rng);
-			this.leading_space.push(leading);
-			this.trailing_space.push(trailing);
+			this.lineInfo.nums.push(parsed);
+			this.lineInfo.rngs.push(rng);
+			this.lineInfo.leading_space.push(leading);
+			this.lineInfo.trailing_space.push(trailing);
 		}
 	}
 	visitPrimaryLineNumber(curs:Parser.TreeCursor) : lxbase.WalkerChoice
@@ -375,34 +375,90 @@ export class LineNumberTool extends lxbase.LangExtBase
 			}
 		return lxbase.WalkerOptions.gotoChild;
 	}
-	get_primary_nums(tree: Parser.Tree) : Array<number>
+	/**
+	 * Gathers information about primary line numbers
+	 * @param tree syntax tree to analyze
+	 * @returns line information structure
+	 */
+	get_primary_nums(tree: Parser.Tree) : LabelInformation
 	{
 		this.clear();
 		this.walk(tree,this.visitPrimaryLineNumber.bind(this));
-		return this.nums;
+		return this.lineInfo;
 	}
-	apply_mapping(i: number,mapping: Map<number,number>,edits: Array<vsserv.TextEdit>)
+	/**
+	 * Gathers information about secondary line numbers
+	 * @param tree syntax tree to analyze
+	 * @returns line information structure
+	 */
+	get_secondary_nums(tree: Parser.Tree) : LabelInformation
 	{
-		const new_num =  mapping.get(this.nums[i]);
+		this.clear();
+		this.walk(tree,this.visitSecondaryLineNumber.bind(this));
+		return this.lineInfo;
+	}
+	/**
+	 * Add the edits to change the line labels
+	 * @param i index into the label information
+	 * @param info line label information, any scope
+	 * @param mapping old line label to new line label
+	 * @param edits array of edits to be updated
+	 */
+	apply_mapping(i: number,info: LabelInformation, mapping: Map<number,number>,edits: Array<vsserv.TextEdit>) {
+		const new_num =  mapping.get(info.nums[i]);
 		if (new_num!=undefined)
 		{
-			let fmt_num = ' '.repeat(this.leading_space[i]);
+			let fmt_num = ' '.repeat(info.leading_space[i]);
 			fmt_num += new_num.toString();
-			fmt_num += ' '.repeat(this.trailing_space[i]);
-			edits.push(vsserv.TextEdit.replace(this.rngs[i], fmt_num));
+			fmt_num += ' '.repeat(info.trailing_space[i]);
+			edits.push(vsserv.TextEdit.replace(info.rngs[i], fmt_num));
 		}
 	}
+	/**
+	 * Get the next updated line starting from the given line label index.
+	 * This is needed when there are overlaps, which cannot be handled by returning
+	 * edits to the client.
+	 * @param lines the text of the lines involved
+	 * @param i0 index into the label information where the search is started
+	 * @param currLine line index (not the line label)
+	 * @param info line label information
+	 * @param mapping old line label to new line label
+	 * @returns [next i0, the updated line]
+	 */
+	next_updated_line(lines: string[], i0: number, currLine: number, info: LabelInformation, mapping: Map<number, number>): [number, string] | null {
+		let offset = 0;
+		if (i0 >= info.rngs.length)
+			return null;
+		let updated = lines[currLine];
+		let i = i0;
+		while (i < info.rngs.length && info.rngs[i].start.line == currLine) {
+			const new_num = mapping.get(info.nums[i]);
+			if (new_num!=undefined)
+			{
+				let fmt_num = ' '.repeat(info.leading_space[i]);
+				fmt_num += new_num.toString();
+				fmt_num += ' '.repeat(info.trailing_space[i]);
+				updated = updated.substring(0, info.rngs[i].start.character + offset) + fmt_num + updated.substring(info.rngs[i].end.character + offset);
+				offset += fmt_num.length - info.rngs[i].end.character + info.rngs[i].start.character;
+			}
+			i += 1;
+		}
+		return [i, updated];
+	}
+	/** Renumber lines without disturbing the order of the lines
+	 * @returns [edit object | undefined , error message]
+	 */
 	renumber(doc: vsserv.TextDocumentItem, ext_sel: vsserv.Range | null, start: string, step: string, updateRefs: boolean):
-		[vsserv.TextDocumentEdit | undefined,string]
-	{
+		[vsserv.TextDocumentEdit | undefined,string] {
 		const l0 = parseInt(start);
 		const dl = parseInt(step);
 		if (isNaN(l0) || isNaN(dl) || l0<0 || dl<1)
 			return [undefined,'start and step parameters invalid'];
 		let lower_guard = undefined;
 		let upper_guard = undefined;
-		let txt = doc.text;
-		const lines = txt.split(/\r?\n/);
+		const all_txt = doc.text;
+		let sel_txt = all_txt;
+		const lines = all_txt.split(/\r?\n/);
 		if (ext_sel)
 		{
 			let l = ext_sel.start.line - 1;
@@ -421,13 +477,16 @@ export class LineNumberTool extends lxbase.LangExtBase
 					upper_guard = parseInt(matches[0])-1;
 				l++;
 			}
-			txt = '';
+			sel_txt = '';
 			for (l = ext_sel.start.line; l <= ext_sel.end.line; l++)
-				txt += lines[l] + '\n';
+				sel_txt += lines[l] + '\n';
 		}
-		let syntaxTree = this.parse(txt,"\n");
-		const line_numbers = this.get_primary_nums(syntaxTree);
-		const lN = l0 + dl*(line_numbers.length-1);
+		let syntaxTree = this.parse(sel_txt,"\n");
+		const sel_info = this.get_primary_nums(syntaxTree);
+		syntaxTree = this.parse(all_txt, "\n");
+		const all_info = this.get_primary_nums(syntaxTree);
+		const ref_info = this.get_secondary_nums(syntaxTree);
+		const lN = l0 + dl*(sel_info.nums.length-1);
 		if (!lower_guard)
 			lower_guard = 0;
 		if (!upper_guard)
@@ -440,26 +499,102 @@ export class LineNumberTool extends lxbase.LangExtBase
 			return [undefined,'new range ('+l0+','+lN+') exceeds bounds ('+lower_guard+','+upper_guard+')'];
 		// setup the mapping from old to new line numbers
 		const mapping = new Map<number,number>();
-		for (let i=0;i<line_numbers.length;i++)
-			mapping.set(line_numbers[i],l0+i*dl);
+		for (let i=0;i<sel_info.nums.length;i++)
+			mapping.set(sel_info.nums[i],l0+i*dl);
 		// apply the mapping
 		const edits = new Array<vsserv.TextEdit>();
-		txt = doc.text;
-		syntaxTree = this.parse(txt, "\n");
 		// Modify primary line numbers only in selected range
-		this.clear();
-		this.walk(syntaxTree,this.visitPrimaryLineNumber.bind(this));
-		for (let i=0;i<this.nums.length;i++)
-			if (ext_sel==undefined || lxbase.rangeContainsRange(ext_sel,this.rngs[i]))
-				this.apply_mapping(i,mapping,edits);
+		for (let i=0;i<all_info.nums.length;i++)
+			if (!ext_sel || lxbase.rangeContainsRange(ext_sel,all_info.rngs[i]))
+				this.apply_mapping(i,all_info,mapping,edits);
 		// Modify line number references globally
-		if (updateRefs)
-		{
-			this.clear();
-			this.walk(syntaxTree,this.visitSecondaryLineNumber.bind(this));
-			for (let i=0;i<this.nums.length;i++)
-				this.apply_mapping(i,mapping,edits);
+		if (updateRefs) {
+			for (let i=0;i<ref_info.nums.length;i++)
+				this.apply_mapping(i,ref_info,mapping,edits);
+		}
+		return [vsserv.TextDocumentEdit.create(doc, edits),''];
+	}
+	/** Move block of lines past other lines, updating the line numbers
+	 * @returns [edit object | undefined , error message]
+	 */
+	move(doc: vsserv.TextDocumentItem, ext_sel: vsserv.Range, start: string, step: string, updateRefs: boolean):
+		[vsserv.TextDocumentEdit | undefined,string] {
+		const edits = new Array<vsserv.TextEdit>();
+		const all_txt = doc.text;
+		const lines = all_txt.split(/\r?\n/);
+		let sel_txt = '';
+		for (let l = ext_sel.start.line; l <= ext_sel.end.line; l++) {
+			sel_txt += lines[l] + '\n';
+		}
+		const movLines = sel_txt.split(/\r?\n/);
+		let syntaxTree = this.parse(sel_txt, "\n");
+		const mov_primaries = this.get_primary_nums(syntaxTree);
+		const mov_secondaries = this.get_secondary_nums(syntaxTree);
+		syntaxTree = this.parse(all_txt, "\n");
+		const all_primaries = this.get_primary_nums(syntaxTree);
+		const all_secondaries = this.get_secondary_nums(syntaxTree);
+		const l0 = parseInt(start);
+		const dl = parseInt(step);
+		const lN = l0 + dl * (mov_primaries.nums.length - 1);
+		// verify parameters while getting insertPos
+		if (isNaN(l0) || isNaN(dl) || l0 < 0 || dl < 1)
+			return [undefined,'start and step parameters invalid'];
+		if (all_primaries.nums.includes(l0)) {
+			return [undefined, 'start line already exists'];
+		}
+		if (lN > 63999) {
+			return [undefined, 'upper bound of 63999 exceeded'];
+		}
+		let insertPos = vsserv.Position.create(0,0);
+		for (let i = 0; i < all_primaries.nums.length; i++) {
+			if (all_primaries.nums[i] >= l0 && all_primaries.nums[i] <= lN) {
+				return [undefined, 'existing line ' + all_primaries.nums[i] + ' is within proposed range'];
+			}
+			if (all_primaries.nums[i] < l0) {
+				insertPos = vsserv.Position.create(all_primaries.rngs[i].start.line + 1, 0);
+				if (i == all_primaries.nums.length - 1 && !all_txt.endsWith("\n")) {
+					edits.push(vsserv.TextEdit.insert(insertPos, "\n"));
+				}
+			}
+		}
+		// set up mappings
+		const lineLabelMapping = new Map<number, number>();
+		for (let i = 0; i < mov_primaries.nums.length; i++) {
+			lineLabelMapping.set(mov_primaries.nums[i], l0 + i * dl);
+		}
+		// delete lines
+		for (let l = ext_sel.start.line; l <= ext_sel.end.line; l++) {
+			const oldRng = vsserv.Range.create(l, 0, l + 1, 0);
+			edits.push(vsserv.TextEdit.del(oldRng));
+		}
+		// insert updated lines
+		let i0 = 0;
+		let idx = 0;
+		for (let l = ext_sel.start.line; l <= ext_sel.end.line; l++) {
+			let updatedLine = lines[l];
+			if (updatedLine.trim().length > 0) {
+				this.logger.log(updatedLine);
+				const res = this.next_updated_line(movLines, i0, l-ext_sel.start.line, mov_secondaries, lineLabelMapping);
+				if (res) {
+					[i0, updatedLine] = res;
+				}
+				this.logger.log(updatedLine);
+				const newLabel = lineLabelMapping.get(mov_primaries.nums[idx]);
+				updatedLine = updatedLine.replace(/^[0-9 ]*[0-9]/, newLabel ? newLabel.toString() : '???');
+				this.logger.log(updatedLine);
+				idx += 1;
+			}
+			edits.push(vsserv.TextEdit.insert(insertPos, updatedLine + "\n"));
+		}
+		// update line number references outside the moved block
+		const last = lineLabelMapping.get(mov_primaries.nums[mov_primaries.nums.length - 1]);
+		if (updateRefs && last) {
+			for (let i = 0; i < all_secondaries.nums.length; i++) {
+				if (!lxbase.rangeContainsRange(ext_sel,all_secondaries.rngs[i]))
+					this.apply_mapping(i, all_secondaries, lineLabelMapping, edits);
+			}
 		}
 		return [vsserv.TextDocumentEdit.create(doc, edits),''];
 	}
 }
+ 

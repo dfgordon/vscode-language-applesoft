@@ -4,7 +4,7 @@
 
 Language support for Applesoft BASIC in Visual Studio Code.
 
-*latest update*: smarter completions, better ampersand handling
+*latest update*: Move and renumber lines simultaneously, support 2MG and NIB images.
 
 * Semantic highlights true to Apple //e ROM parsing
 * Comprehensive completions and hovers
@@ -20,7 +20,9 @@ Language support for Applesoft BASIC in Visual Studio Code.
 
 ## Line Numbers
 
-The extension will treat line numbers as document symbols if they are branch destinations.  You can treat these line numbers just as if they were, say, function names in a modern language.  For example, if `GOSUB 100` is found in the document, right-clicking on any reference to line 100 allows you to apply symbol manipulations such as `goto references` and `goto definition`.  The text of any comment on or before the line will be used in the document outline and in line reference hovers.  On the other hand, `rename symbol` cannot be used with line numbers.  Instead, use the `renumber lines` command if you want to renumber.
+The extension will treat line numbers as document symbols if they are branch destinations.  You can treat these line numbers just as if they were, say, function names in a modern language.  For example, if `GOSUB 100` is found in the document, right-clicking on any reference to line 100 allows you to apply symbol manipulations such as `goto references` and `goto definition`.  The text of any comment on or before the line will be used in the document outline and in line reference hovers.
+
+There are two commands for renumbering.  `Renumber Lines` is used to change the line numbers without changing the ordering.  `Move Lines` is used if a block of lines is being moved to a different location relative to other lines.
 
 ## Managing Variables
 
@@ -42,7 +44,7 @@ Using `goto definition` on a line number reference will find the line.
 
 ## Multi-File Programs and Program Flow
 
-As of this writing, the extension analyzes each file in isolation.  This is why, e.g., undimensioned array references trigger a warning rather than an error (the array might be dimensioned in another file).  Also as of this writing, the extension does not try to follow the program's flow.  As a result, errors such as `NEXT WITHOUT FOR`, `REDIM'D ARRAY`, etc., are not detected.
+As of this writing, the extension analyzes each file in isolation.  For a multi-file project it may be desirable to suppress warnings related to undeclared or unassigned variables (see extension settings).  Also as of this writing, the extension does not try to follow the program's flow.  As a result, errors such as `NEXT WITHOUT FOR`, `REDIM'D ARRAY`, etc., are not detected.
 
 ## Minify and Tokenize
 
@@ -102,7 +104,7 @@ You can transfer programs to and from the [Virtual \]\[](https://virtualii.com) 
 
 * `applesoft: Enter in Virtual ][ new machine`: creates a new virtual machine, resets it, and enters the program.  Since this resets the machine while it is waiting for a disk to be inserted, there are no operating system commands available.  This is suitable for self-contained programs with no escapes.
 * `applesoft: Run in Virtual ][ new machine`: same as above, except the program is also run in the same step.
-* `applesoft: Enter in Virtual ][ front machine`: attempts to enter program into the machine in the front window.  This allows you to configure the machine any way you like, but is more dangerous, since we cannot know what the machine is doing at the moment you give the command.  Existing program and variables are erased.  No escapes.
+* `applesoft: Enter in Virtual ][ front machine`: attempts to enter program into the machine in the front window.  This allows you to configure the machine any way you like, just make sure the machine is in a safe state when the command is given.  Existing program and variables are erased.  No escapes.
 * `applesoft: Run in Virtual ][ front machine`: same as above, except the program is also run in the same step.
 * `applesoft: Insert program from Virtual ][ front machine`: extracts the Applesoft program currently in the memory of the virtual machine, and inserts it at the position of the cursor or selection.
 
@@ -110,11 +112,13 @@ This capability only applies to MacOS. Note that [Virtual \]\[](https://virtuali
 
 ## Using with Disk Images
 
-You can transfer programs to and from disk images.  In order to do this you must install `a2kit`.  If you have `cargo`, use the terminal to run `cargo install a2kit`, otherwise see the [github page](https://github.com/dfgordon/a2kit).  The extension will work with whatever image types `a2kit` supports.  As of this writing, the supported types are `woz`, `dsk`, `do`, `po`, `d13`.  Use `Ctrl+P` or `Cmd+P` to initiate one of the following:
+You can transfer programs to and from disk images.  In order to do this you must install `a2kit`.  If you have `cargo`, use the terminal to run `cargo install a2kit`, otherwise download an [executable](https://github.com/dfgordon/a2kit/releases) and put it where your shell can find it.  As of this writing, the supported disk image types are `2mg`, `d13`, `do`, `dsk`, `nib`, `po`, `woz`.  Use `Ctrl+P` or `Cmd+P` to initiate one of the following:
 
 * `applesoft: Insert program from disk image`: brings up a file selector allowing you to choose an image file.  Once done, use the mini-menu to traverse the image's directory tree (if applicable) and select an Applesoft file.  Only directories and Applesoft files are shown.
 
 * `applesoft: Save program to disk image`: first you are prompted for the program's load address, after which the file selector is brought up.  After choosing the image file, use the mini-menu to traverse the image's directory tree (if applicable) and select a directory (`.` selects the current level).  Finally enter the name that the saved file will be given on the disk image.  If the file already exists you must respond to a warning.
+
+Another way to load a file from a disk image is with the `Disk Image Notebook` extension (also depends on `a2kit`).
 
 Recommendations
 

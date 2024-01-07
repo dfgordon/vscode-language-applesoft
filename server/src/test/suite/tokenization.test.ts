@@ -43,9 +43,9 @@ import * as assert from 'assert';
 
 async function testTokenizer(code: string, expected: string) {
 	const TSInitResult = await lxbase.TreeSitterInit();
-	const tool = new com.Tokenizer(TSInitResult, config.defaultSettings);
-	const tokStr = tool.tokenize(code, 2049);
-	const actual = tool.hex_from_raw_str(tokStr);
+	const tool = new com.Tokenizer(TSInitResult, console, config.defaultSettings);
+	const tokArray = tool.tokenize(code, 2049);
+	const actual = lxbase.hex_from_bytes(tokArray);
 	assert.deepStrictEqual(actual, expected);
 }
 

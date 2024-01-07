@@ -44,18 +44,6 @@ export class A2KitTool extends lxbase.LangExtBase
 	file_list: string[] = [];
 	addr: string | undefined = undefined;
 	/**
-	 * Make u8 buffer using UTF16 encoded string
-	 * @param raw_str the string with data in the low bytes of the UTF16 string
-	 * @returns Buffer of u8
-	 */
-	buffer_from_raw_str(raw_str: string) : Buffer
-	{
-		const rawBinary = new Uint8Array(raw_str.length);
-		for (let i=0;i<raw_str.length;i++)
-			rawBinary[i] = raw_str.charCodeAt(i);
-		return Buffer.from(rawBinary);
-	}
-	/**
 	 * Run a2kit expecting to receive binary output
 	 *
 	 * @param args the a2kit arguments 
@@ -147,12 +135,6 @@ export class A2KitTool extends lxbase.LangExtBase
 	async insert_code(txt: string) {
 		const verified = this.verify_document();
 		if (verified) {
-			const r = extended_selection(verified.ed);
-			let rng: vsclnt.Range | null;
-			if (r)
-				rng = vsclnt.Range.create(r.start, r.end);
-			else
-				rng = null;
 			verified.ed.edit(edit => { edit.replace(verified.ed.selection, txt); });
 		}
 	}
@@ -173,12 +155,12 @@ export class A2KitTool extends lxbase.LangExtBase
 	async tokenize(dummy: string) {
 		const verified = this.verify_document();
 		if (this.addr && verified) {
-			const code = await client.sendRequest(vsclnt.ExecuteCommandRequest.type,
+			const code: number[] = await client.sendRequest(vsclnt.ExecuteCommandRequest.type,
 				{
 					command: 'applesoft.tokenize',
 					arguments: [verified.doc.getText(), parseInt(this.addr)]
 				});
-			this.save_code(this.buffer_from_raw_str(code));
+			this.save_code(Buffer.from(Uint8Array.from(code)));
 		}
 		else
 			vscode.window.showErrorMessage("could not find document tokenize");
@@ -286,7 +268,7 @@ export class A2KitTool extends lxbase.LangExtBase
 		const uri = await vscode.window.showOpenDialog({
 			"canSelectMany": false,
 			"canSelectFiles": true,
-			"filters": { "Disk image": ["dsk", "do", "d13", "po", "woz"] },
+			"filters": { "Disk image": ["2mg", "2img", "dsk", "do", "d13", "nib", "po", "woz"] },
 			"title": "Insert from Disk Image"
 		});
 		if (!uri) {
@@ -309,7 +291,7 @@ export class A2KitTool extends lxbase.LangExtBase
 		const uri = await vscode.window.showOpenDialog({
 			"canSelectMany": false,
 			"canSelectFiles": true,
-			"filters": { "Disk image": ["dsk", "do", "d13", "po", "woz"] },
+			"filters": { "Disk image": ["2mg", "2img", "dsk", "do", "d13", "nib", "po", "woz"] },
 			"title": "Save to Disk Image"
 		});
 		if (!uri) {

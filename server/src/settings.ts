@@ -26,7 +26,9 @@ export interface applesoftSettings {
 		color: boolean
 	},
 	detokenizer: {
-		escapes: number[]
+		escapes: number[],
+		maxLines: number,
+		maxLineLength: number
 	}
 	trace: {
 		server: string
@@ -58,7 +60,9 @@ export const defaultSettings: applesoftSettings = {
 		color: false
 	},
 	detokenizer: {
-		escapes: [10,13]
+		escapes: [10, 13],
+		maxLineLength: 255,
+		maxLines: 2000
 	},
 	trace: {
 		server: "verbose"

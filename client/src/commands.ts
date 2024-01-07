@@ -46,7 +46,7 @@ async function proceedDespiteErrors(document: vscode.TextDocument,actionDesc: st
 
 export class RenumberTool extends lxbase.LangExtBase
 {
-	async command()
+	async renumber()
 	{
 		let start: string | undefined = undefined;
 		let step: string | undefined = undefined;
@@ -69,6 +69,44 @@ export class RenumberTool extends lxbase.LangExtBase
 				const response = await client.sendRequest(vsclnt.ExecuteCommandRequest.type,
 					{
 						command: 'applesoft.renumber',
+						arguments: [
+							vsclnt.TextDocumentItem.create(verified.doc.uri.toString(),'applesoft',verified.doc.version,verified.doc.getText()),
+							rng,
+							start,
+							step,
+							updateAll=='update all references'
+						]
+					});
+				if (response != '') {
+					vscode.window.showErrorMessage(response);
+				}
+			}
+		}
+
+	}
+	async move()
+	{
+		let start: string | undefined = undefined;
+		let step: string | undefined = undefined;
+		let updateAll: string | undefined = undefined;
+		const verified = this.verify_document();
+		if (verified)
+		{
+			const proceed = await proceedDespiteErrors(verified.doc,'Moving lines');
+			if (proceed)
+			{
+				start = await vscode.window.showInputBox({title:'starting line number'});
+				step = await vscode.window.showInputBox({title:'step between lines'});
+				updateAll = await vscode.window.showQuickPick(['update all references','change only primary line numbers'],{canPickMany:false,title:'select methodology'});
+				const r = extended_selection(verified.ed);
+				if (!r) {
+					vscode.window.showErrorMessage('cannot move all lines');
+					return;
+				}
+				const rng = vsclnt.Range.create(r.start, r.end);
+				const response = await client.sendRequest(vsclnt.ExecuteCommandRequest.type,
+					{
+						command: 'applesoft.move',
 						arguments: [
 							vsclnt.TextDocumentItem.create(verified.doc.uri.toString(),'applesoft',verified.doc.version,verified.doc.getText()),
 							rng,
@@ -214,45 +252,28 @@ export class ViiEntryTool extends lxbase.LangExtBase
 
 export class AppleWinTool extends lxbase.LangExtBase
 {
-	// Note on string encoding:
-	// Because JavaScript uses UTF16, 8 bit binary data can be put directly into a string
-	// with little trouble, since any value from 0-255 is mapped to exactly one code point.
-	// We use the name `raw_str` to indicate that the string may contain binary data encoded
-	// in this straightforward way.  When transferring to/from A2 memory images the
-	// low bytes from the code points are put into a Uint8Array.
-	// WARNING: text based manipulations are unsafe on `raw_str`.
-	// The `persistentSpace` code is used to allow spaces to be safely stripped from `raw_str`.
-	encode_int16(int16: number) : string
+	encode_int16(int16: number) : [number,number]
 	{
-		const hiByte = Math.floor(int16/256);
-		const loByte = int16 - hiByte*256;
-		return String.fromCharCode(loByte) + String.fromCharCode(hiByte);
+		const loByte = int16 % 256;
+		const hiByte = Math.floor(int16 / 256);
+		return [loByte,hiByte];
 	}
-	buffer_from_raw_str(raw_str: string) : Buffer
-	{
-		const rawBinary = new Uint8Array(raw_str.length);
-		for (let i=0;i<raw_str.length;i++)
-			rawBinary[i] = raw_str.charCodeAt(i);
-		return Buffer.from(rawBinary);
-	}
-	openAppleWinSaveState(uri : vscode.Uri[]|undefined) : [tree:any|undefined,blockMap:any|undefined,path:fs.PathLike|undefined]
+	openAppleWinSaveState(uri : vscode.Uri[]|undefined) : [tree:YAML.Document|undefined, blockMap:YAML.YAMLMap|undefined, path:fs.PathLike|undefined]
 	{
 		if (!uri)
 			return [undefined,undefined,undefined];
 		const yamlString = fs.readFileSync(uri[0].fsPath,'utf8');
-		const yamlTree : any = YAML.parseAllDocuments(yamlString,{uniqueKeys: false,schema: "failsafe"})[0];
-		if (yamlTree.errors.length>0)
-		{
+		const yamlTree = YAML.parseAllDocuments(yamlString,{uniqueKeys: false,schema: "failsafe"})[0];
+		if (yamlTree.errors.length>0) {
 			vscode.window.showErrorMessage('Failed to parse YAML');
 			return [undefined,undefined,undefined];
 		}
-		const block64Map = yamlTree.getIn(['Unit','State','Main Memory']);
-		if (!block64Map)
-		{
-			vscode.window.showErrorMessage('Could not find keys in YAML file');
-			return [undefined,undefined,undefined];
+		const block64Map = yamlTree.getIn(['Unit', 'State', 'Main Memory']);
+		if (YAML.isMap(block64Map)) {
+			return [yamlTree, block64Map, uri[0].fsPath];
 		}
-		return [yamlTree,block64Map,uri[0].fsPath];
+		vscode.window.showErrorMessage('Could not find keys in YAML file');
+		return [undefined,undefined,undefined];
 	}
 	async appleWinSaveStateGo()
 	{
@@ -270,13 +291,16 @@ export class AppleWinTool extends lxbase.LangExtBase
 			return;
 		// construct the image of the machine's main memory
 		const buffList = new Array<Buffer>();
-		for (const p of block64Map.items)
-			buffList.push(Buffer.from(p.value.value,"hex"));
+		for (const pair of block64Map.items) {
+			if (YAML.isScalar(pair.value) && (typeof pair.value.value === 'string')) {
+				buffList.push(Buffer.from(pair.value.value, "hex"));
+			}
+		}
 		const img = Buffer.concat(buffList);
 
 		// form the image of the tokenized program
 		const baseAddr = img[103] + 256*img[104];
-		const code = await client.sendRequest(vsclnt.ExecuteCommandRequest.type,
+		const code: number[] = await client.sendRequest(vsclnt.ExecuteCommandRequest.type,
 			{
 				command: 'applesoft.tokenize',
 				arguments: [verified.doc.getText(),baseAddr]
@@ -290,9 +314,9 @@ export class AppleWinTool extends lxbase.LangExtBase
 		}
 
 		// insert program image and update zero page pointers
-		const lomemBuff = this.buffer_from_raw_str(this.encode_int16(lomem));
-		const himemBuff = this.buffer_from_raw_str(this.encode_int16(himem));
-		img.set(this.buffer_from_raw_str(code),baseAddr);
+		const lomemBuff = this.encode_int16(lomem);
+		const himemBuff = this.encode_int16(himem);
+		img.set(code,baseAddr);
 		img.set(lomemBuff,105); // start of variable space
 		img.set(lomemBuff,107); // start of array space
 		img.set(lomemBuff,109); // end of array space
@@ -300,10 +324,13 @@ export class AppleWinTool extends lxbase.LangExtBase
 		img.set(lomemBuff,175); // end of program
 
 		// write the changes
-		for (let block=0;block<1024;block++)
+		for (let block=0;block<buffList.length;block++)
 		{
-			img.copy(buffList[block],0,block*64,(block+1)*64);
-			block64Map.items[block].value.value = buffList[block].toString('hex');
+			img.copy(buffList[block], 0, block * 64, (block + 1) * 64);
+			const pair = block64Map.items[block];
+			if (YAML.isScalar(pair.value) && (typeof pair.value.value === 'string')) {
+				pair.value.value = buffList[block].toString('hex');
+			}
 		}
 		fs.writeFileSync(yamlPath, yamlTree.toString());
 		vscode.window.showInformationMessage('program stored in ' + yamlPath.toString());
@@ -330,7 +357,6 @@ export class AppleWinTool extends lxbase.LangExtBase
 		const verified = this.verify_document();
 		if (!verified)
 			return;
-		const config = vscode.workspace.getConfiguration('applesoft');
 		const uri = await vscode.window.showOpenDialog({
 			"canSelectMany": false,
 			"canSelectFiles": true,
@@ -341,8 +367,11 @@ export class AppleWinTool extends lxbase.LangExtBase
 		if (!yamlTree || !block64Map || !yamlPath)
 			return;
 		const buffList = new Array<Buffer>();
-		for (const p of block64Map.items)
-			buffList.push(Buffer.from(p.value.value,"hex"));
+		for (const pair of block64Map.items) {
+			if (YAML.isScalar(pair.value) && (typeof pair.value.value === 'string')) {
+				buffList.push(Buffer.from(pair.value.value, "hex"));
+			}
+		}
 		const img = Buffer.concat(buffList);
 		const img_messg: number[] = Array.from(Uint8Array.from(img));
 		const code = await client.sendRequest(vsclnt.ExecuteCommandRequest.type,
@@ -360,6 +389,14 @@ export class AppleWinTool extends lxbase.LangExtBase
 export class TokenizationTool extends lxbase.LangExtBase
 {
 	currAddr = 2049;
+	displayPosString(toks: number[]): string {
+		let ans = '';
+		for (let i = 0; i < toks.length; i++) {
+			const c = toks[i];
+			ans += c > 32 && c < 127 ? String.fromCharCode(c) : "."; 
+		}
+		return ans;
+	}
 	async showTokenizedProgram()
 	{
 		let verified = this.verify_document();
@@ -377,31 +414,36 @@ export class TokenizationTool extends lxbase.LangExtBase
 			vscode.window.showErrorMessage('address is out of range (2049 - 49143)');
 			return;
 		}
-		const showUnicode = await vscode.window.showQuickPick(['unicode alongside hex','hex only'],{canPickMany:false,title:'select format'});
+		const showUnicode = await vscode.window.showQuickPick(['ascii alongside hex','hex only'],{canPickMany:false,title:'select format'});
 		if (showUnicode==undefined)
 			return;
 		verified = this.verify_document();
 		if (!verified)
 			return;
-		const code = await client.sendRequest(vsclnt.ExecuteCommandRequest.type,
+		const code: number[] = await client.sendRequest(vsclnt.ExecuteCommandRequest.type,
 			{
 				command: 'applesoft.tokenize',
-				arguments: [verified.doc.getText(),baseAddr]
+				arguments: [verified.doc.getText(), baseAddr]
 			});
+		if (code.length==0)
+		{
+			vscode.window.showErrorMessage("Could not tokenize");
+			return;
+		}
 		let content = '';
 		for (let i=0;i<code.length;i++)
 		{
 			if (i%8==0 && i>0)
-				if (showUnicode=='unicode alongside hex')
-					content += '   ' + code.substring(i-8,i).replace(/\s/g,' ') + '\n';
+				if (showUnicode=='ascii alongside hex')
+					content += '   ' + this.displayPosString(code.slice(i-8,i)) + '\n';
 				else
 					content += '\n';
 			if (i%8==0)
 				content += (baseAddr+i).toString(16).padStart(4,'0').toUpperCase() + ': ';
-			content += code.charCodeAt(i).toString(16).padStart(2,'0').toUpperCase() + ' ';
+			content += code[i].toString(16).padStart(2,'0').toUpperCase() + ' ';
 			if (i==code.length-1)
-				if (showUnicode=='unicode alongside hex')
-					content += ' '.repeat(3+3*(7-i%8)) + code.substring(i-i%8,i+1).replace(/\s/g,' ') + '\n';
+				if (showUnicode=='ascii alongside hex')
+					content += ' '.repeat(3+3*(7-i%8)) + this.displayPosString(code.slice(i-i%8,i+1)) + '\n';
 				else
 					content += '\n';
 		}

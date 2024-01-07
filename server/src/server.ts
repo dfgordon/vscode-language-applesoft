@@ -45,6 +45,7 @@ export let docSymbols = new DocSymbols();
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 const connection = vsserv.createConnection(vsserv.ProposedFeatures.all);
+const logger: lxbase.Logger = connection.console;
 
 // Create a simple text document manager.
 const documents: vsserv.TextDocuments<vsdoc.TextDocument> = new vsserv.TextDocuments(vsdoc.TextDocument);
@@ -55,19 +56,19 @@ async function startServer()
 	connection.listen();
 	TSInitResult = await lxbase.TreeSitterInit();
 	globalSettings = await connection.workspace.getConfiguration('applesoft');
-	diagnosticTool = new diag.TSDiagnosticProvider(TSInitResult, globalSettings);
-	hoverTool = new hov.TSHoverProvider(TSInitResult, globalSettings);
-	statementTool = new compl.StatementCompletionProvider(TSInitResult, globalSettings);
-	addressTool = new compl.AddressCompletionProvider(TSInitResult, globalSettings);
-	lineCompleter = new compl.LineCompletionProvider(TSInitResult, globalSettings);
-	minifier = new comm.Minifier(TSInitResult, globalSettings);
-	tokenizer = new comm.Tokenizer(TSInitResult, globalSettings);
-	renumberer = new comm.LineNumberTool(TSInitResult, globalSettings);
+	diagnosticTool = new diag.TSDiagnosticProvider(TSInitResult, logger, globalSettings);
+	hoverTool = new hov.TSHoverProvider(TSInitResult, logger, globalSettings);
+	statementTool = new compl.StatementCompletionProvider(TSInitResult, logger, globalSettings);
+	addressTool = new compl.AddressCompletionProvider(TSInitResult, logger, globalSettings);
+	lineCompleter = new compl.LineCompletionProvider(TSInitResult, logger, globalSettings);
+	minifier = new comm.Minifier(TSInitResult, logger, globalSettings);
+	tokenizer = new comm.Tokenizer(TSInitResult, logger, globalSettings);
+	renumberer = new comm.LineNumberTool(TSInitResult, logger, globalSettings);
 }
 
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
-let hasDiagnosticRelatedInformationCapability = false;
+// let hasDiagnosticRelatedInformationCapability = false;
 
 connection.onInitialize((params: vsserv.InitializeParams) => {
 	const capabilities = params.capabilities;
@@ -80,11 +81,11 @@ connection.onInitialize((params: vsserv.InitializeParams) => {
 	hasWorkspaceFolderCapability = !!(
 		capabilities.workspace && !!capabilities.workspace.workspaceFolders
 	);
-	hasDiagnosticRelatedInformationCapability = !!(
-		capabilities.textDocument &&
-		capabilities.textDocument.publishDiagnostics &&
-		capabilities.textDocument.publishDiagnostics.relatedInformation
-	);
+	// hasDiagnosticRelatedInformationCapability = !!(
+	// 	capabilities.textDocument &&
+	// 	capabilities.textDocument.publishDiagnostics &&
+	// 	capabilities.textDocument.publishDiagnostics.relatedInformation
+	// );
 
 	const result: vsserv.InitializeResult = {
 		capabilities: {
@@ -325,6 +326,19 @@ connection.onExecuteCommand((params: vsserv.ExecuteCommandParams): any => {
 			const step: string = params.arguments[3];
 			const updateRefs: boolean = params.arguments[4];
 			const result = renumberer.renumber(doc, sel, start, step, updateRefs);
+			if (result[0])
+				connection.workspace.applyEdit({ documentChanges: [result[0]] });
+			return result[1];
+		}
+	}
+	else if (params.command == 'applesoft.move') {
+		if (params.arguments) {
+			const doc: vsserv.TextDocumentItem = params.arguments[0];
+			const sel: vsserv.Range = params.arguments[1];
+			const start: string = params.arguments[2];
+			const step: string = params.arguments[3];
+			const updateRefs: boolean = params.arguments[4];
+			const result = renumberer.move(doc, sel, start, step, updateRefs);
 			if (result[0])
 				connection.workspace.applyEdit({ documentChanges: [result[0]] });
 			return result[1];
