@@ -3,7 +3,7 @@
 	"displayName": "Applesoft BASIC",
 	"description": "Language support for Applesoft BASIC",
 	"icon": "language-applesoft-icon.png",
-	"version": "1.3.0",
+	"version": "2.0.0",
 	"license": "GPL-3.0-only",
 	"publisher": "dfgordon",
 	"repository": {
@@ -11,7 +11,7 @@
 		"url": "https://github.com/dfgordon/vscode-language-applesoft"
 	},
 	"engines": {
-		"vscode": "^1.75.0"
+		"vscode": "^1.85.0"
 	},
 	"categories": [
 		"Programming Languages"
@@ -21,35 +21,40 @@
 		"configuration": {
 			"title": "Applesoft BASIC",
 			"properties": {
-				"applesoft.case.caseSensitive": {
-					"type": "boolean",
-					"default": false,
-					"description": "Lower case in reserved words or variables is considered an error."
+				"applesoft.flag.caseSensitive": {
+					"enum": ["ignore","info","warn","error"],
+					"default": "ignore",
+					"description": "Flag lower case in reserved words or variables."
 				},
-				"applesoft.warn.terminalString": {
-					"type": "boolean",
-					"default": true,
-					"description": "Warn against missing unquotes. In Applesoft, strings without an unquote run to end-of-line."
+				"applesoft.flag.terminalString": {
+					"enum": ["ignore","info","warn","error"],
+					"default": "warn",
+					"description": "Flag missing unquotes. In Applesoft, strings without an unquote run to end-of-line."
 				},
-				"applesoft.warn.undeclaredArrays": {
-					"type": "boolean",
-					"default": true,
-					"description": "Warn against arrays that have never been dimensioned."
+				"applesoft.flag.extendedCall": {
+					"enum": ["ignore","info","warn","error"],
+					"default": "error",
+					"markdownDescription": "Flag extended `CALL` syntax"
 				},
-				"applesoft.warn.undefinedVariables": {
-					"type": "boolean",
-					"default": true,
-					"description": "Warn against variables that have never been assigned."
+				"applesoft.flag.badReferences": {
+					"enum": ["ignore","info","warn","error"],
+					"default": "error",
+					"markdownDescription": "Flag bad line number references"
 				},
-				"applesoft.warn.collisions": {
-					"type": "boolean",
-					"default": true,
-					"description": "Warn against long variable name collisions. In Applesoft, variables of the same type with the same first two characters share the same storage, i.e., are the same."
+				"applesoft.flag.undeclaredArrays": {
+					"enum": ["ignore","info","warn","error"],
+					"default": "warn",
+					"description": "Flag arrays that have never been dimensioned."
 				},
-				"applesoft.case.lowerCaseCompletions": {
-					"type": "boolean",
-					"default": false,
-					"markdownDescription": "Use lower case in completions and snippets (ingored if `#applesoft.caseSensitive#`)."
+				"applesoft.flag.undefinedVariables": {
+					"enum": ["ignore","info","warn","error"],
+					"default": "warn",
+					"description": "Flag variables that have never been assigned."
+				},
+				"applesoft.flag.collisions": {
+					"enum": ["ignore","info","warn","error"],
+					"default": "warn",
+					"description": "Flag long variable name collisions. In Applesoft, variables of the same type with the same first two characters share the same storage, i.e., are the same."
 				},
 				"applesoft.hovers.specialAddresses": {
 					"type": "boolean",
@@ -60,6 +65,11 @@
 					"type": "boolean",
 					"default": true,
 					"markdownDescription": "Show hovers for keywords such as `PRINT`, `FOR`, etc.."
+				},
+				"applesoft.completions.lowerCase": {
+					"type": "boolean",
+					"default": false,
+					"markdownDescription": "Use lower case in completions and snippets (case sensitive must be `ignore`)."
 				},
 				"applesoft.completions.negativeAddresses": {
 					"type": "boolean",
@@ -256,33 +266,28 @@
 	},
 	"scripts": {
 		"reset-client": "run-script-os",
-		"reset-server": "run-script-os",
-		"reset-client:windows": "npx rimraf client\\out && mkdir client\\out && copy server\\src\\*.wasm client\\out && copy client\\src\\*.scpt client\\out",
-		"reset-client:default": "npx rimraf client/out && mkdir client/out && cp server/src/*.wasm client/out && cp client/src/*.scpt client/out",
-		"reset-server:windows": "npx rimraf server\\out && mkdir server\\out && copy server\\src\\*.wasm server\\out",
-		"reset-server:default": "npx rimraf server/out && mkdir server/out && cp server/src/*.wasm server/out",
-		"vscode:prepublish": "npm run esbuild-client -- --minify && npm run esbuild-server -- --minify",
+		"reset-client:windows": "npx rimraf client\\out && mkdir client\\out",
+		"reset-client:default": "npx rimraf client/out && mkdir client/out",
+		"vscode:prepublish": "npm run esbuild-client -- --minify",
 		"esbuild-client": "npm run reset-client && esbuild ./client/src/extension.ts --bundle --outfile=client/out/extension.js --external:vscode --format=cjs --platform=node",
-		"esbuild-server": "npm run reset-server && esbuild ./server/src/server.ts --bundle --outfile=server/out/server.js --external:vscode --format=cjs --platform=node",
-		"build": "npm run esbuild-client -- --sourcemap && npm run esbuild-server -- --sourcemap",
+		"build": "npm run esbuild-client -- --sourcemap",
 		"lint": "eslint . --ext .ts,.tsx",
-		"test-compile": "npm run reset-client && tsc -p ./client/ && npm run reset-server && tsc -p ./server/",
-		"test": "node ./server/out/test/runTest.js && node ./client/out/test/runTest.js"
+		"test-compile": "npm run reset-client && tsc -p ./client/",
+		"test": "node ./client/out/test/runTest.js"
 	},
 	"devDependencies": {
-		"@types/glob": "^8.1.0",
 		"@types/mocha": "^10.0.1",
-		"@types/node": "^16.11.7",
-		"@types/vscode": "^1.75.0",
-		"@typescript-eslint/eslint-plugin": "^5.14.0",
-		"@typescript-eslint/parser": "^5.14.0",
-		"esbuild": "^0.17.19",
-		"eslint": "^8.41.0",
-		"glob": "^10.2.6",
-		"mocha": "^10.2.0",
-		"rimraf": "^5.0.1",
+		"@types/node": "^20.16.0",
+		"@types/vscode": "^1.85.0",
+		"@typescript-eslint/eslint-plugin": "^8.2.0",
+		"@typescript-eslint/parser": "^8.2.0",
+		"@vscode/test-electron": "^2.4.1",
+		"esbuild": "^0.23.1",
+		"eslint": "^9.9.0",
+		"glob": "^11.0.0",
+		"mocha": "^10.7.3",
+		"rimraf": "^6.0.1",
 		"run-script-os": "^1.1.6",
-		"typescript": "^5.0.4",
-		"@vscode/test-electron": "^2.3.8"
+		"typescript": "^5.5.4"
 	}
 }

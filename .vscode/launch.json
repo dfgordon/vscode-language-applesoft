@@ -16,14 +16,6 @@
 			"preLaunchTask": "npm: build"
 		},
 		{
-			"name": "Attach to Server",
-			"type": "node",
-			"request": "attach",
-			"port": 6009,
-			"restart": true,
-			"outFiles": ["${workspaceRoot}/server/out/**/*.js"]
-		},
-		{
 			"name": "E2E Test",
 			"type": "extensionHost",
 			"request": "launch",
@@ -35,20 +27,6 @@
 			],
 			"outFiles": ["${workspaceRoot}/client/out/test/**/*.js"],
 			"preLaunchTask": "npm: test-compile"
-		},
-		{
-			"name": "Server Test",
-			"type": "node",
-			"request": "launch",
-			"args": ["./server/out/test/runTest.js"],
-			"outFiles": ["${workspaceRoot}/server/out/test/**/*.js"],
-			"preLaunchTask": "npm: test-compile"
-		}
-	],
-	"compounds": [
-		{
-			"name": "Client + Server",
-			"configurations": ["Launch Client", "Attach to Server"]
 		}
 	]
 }
