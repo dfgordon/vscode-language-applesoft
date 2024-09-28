@@ -6,7 +6,6 @@
 		{
 			"type": "npm",
 			"script": "build",
-			"problemMatcher": "$esbuild",
 			"group": {
 				"kind": "build",
 				"isDefault": true
