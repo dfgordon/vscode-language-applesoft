@@ -4,12 +4,9 @@
 
 Language support for Applesoft BASIC in Visual Studio Code.
 
-*latest update*: Move and renumber lines simultaneously, support 2MG and NIB images.
-
 * Semantic highlights true to Apple //e ROM parsing
-* Comprehensive completions and hovers
+* Comprehensive diagnostics, completions, and hovers
 * Management of variables, functions, and line numbers
-* Diagnostics to identify errors and gotchas
 * Transfer programs to and from emulators and disk images (see below)
 * View tokenized program as hex dump and unicode text
 * Options : see `Ctrl+Comma` -> `Extensions` -> `Applesoft BASIC`
@@ -112,7 +109,7 @@ This capability only applies to MacOS. Note that [Virtual \]\[](https://virtuali
 
 ## Using with Disk Images
 
-You can transfer programs to and from disk images.  In order to do this you must install `a2kit`.  If you have `cargo`, use the terminal to run `cargo install a2kit`, otherwise download an [executable](https://github.com/dfgordon/a2kit/releases) and put it where your shell can find it.  As of this writing, the supported disk image types are `2mg`, `d13`, `do`, `dsk`, `nib`, `po`, `woz`.  Use `Ctrl+P` or `Cmd+P` to initiate one of the following:
+You can transfer programs to and from disk images.  As of this writing, the supported disk image types are `2mg`, `d13`, `do`, `dsk`, `nib`, `po`, `woz`.  Use `Ctrl+P` or `Cmd+P` to initiate one of the following:
 
 * `applesoft: Insert program from disk image`: brings up a file selector allowing you to choose an image file.  Once done, use the mini-menu to traverse the image's directory tree (if applicable) and select an Applesoft file.  Only directories and Applesoft files are shown.
 
