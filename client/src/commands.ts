@@ -406,11 +406,17 @@ export class TokenizationTool extends lxbase.LangExtBase
 		const proceed = await lxbase.proceedDespiteErrors(verified.doc,'Minifying',undefined);
 		if (!proceed)
 			return;
+		const level_desc = await vscode.window.showQuickPick(['preserve ampersands','minify ampersands'],{canPickMany:false,title:'select minify level'});
+		if (level_desc==undefined)
+			return;
+		let level = 1
+		if (level_desc == 'minify ampersands')
+			level = 3
 		verified = lxbase.verify_document();
 		if (!verified)
 			return;
 		try {
-			const minified = await lxbase.request<string>('applesoft.minify', [verified.doc.getText()]);
+			const minified = await lxbase.request<string>('applesoft.minify', [verified.doc.getText(),level]);
 			vscode.workspace.openTextDocument({ language: 'applesoft', content: minified }).then(doc => {
 				vscode.window.showTextDocument(doc);
 			});

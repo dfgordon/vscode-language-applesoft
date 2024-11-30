@@ -7,13 +7,20 @@ Language support for Applesoft BASIC in Visual Studio Code.
 * Semantic highlights true to Apple //e ROM parsing
 * Comprehensive diagnostics, completions, and hovers
 * Management of variables, functions, and line numbers
-* Transfer programs to and from emulators and disk images (see below)
-* View tokenized program as hex dump and unicode text
-* Options : see `Ctrl+Comma` -> `Extensions` -> `Applesoft BASIC`
-* Commands: see `Ctrl+P` -> `applesoft`
-* Activates for file extensions `.bas`, `.abas`, `.A`
+* Interact with [emulators](#using-with-emulators) and [disk images](#using-with-disk-images)
+* Generate hex dump of tokenized program
+
+Activates for file extensions `.bas`, `.abas`, `.A`
 
 <img src="sample/demo.gif" alt="session capture"/>
+
+## Other BASIC extensions
+
+If you use the file extension `.bas`, you may want to disable all other BASIC language extensions, since they will likely use that extension also.  You can use `.abas` to encourage Applesoft to analyze the file while discouraging other BASIC.
+
+## Language Server
+
+The language server is usually bundled with the extension.  If your platform isn't supported directly, you may still be able to use the extension by running `cargo install a2kit` from the terminal.
 
 ## Line Numbers
 
@@ -41,20 +48,20 @@ Using `goto definition` on a line number reference will find the line.
 
 ## Multi-File Programs and Program Flow
 
-As of this writing, the extension analyzes each file in isolation.  For a multi-file project it may be desirable to suppress warnings related to undeclared or unassigned variables (see extension settings).  Also as of this writing, the extension does not try to follow the program's flow.  As a result, errors such as `NEXT WITHOUT FOR`, `REDIM'D ARRAY`, etc., are not detected.
+As of this writing, the extension analyzes each file in isolation.  For a multi-file project it may be desirable to suppress warnings related to undeclared or unassigned variables (see extension settings).  Also as of this writing, analysis of program flow is very limited.  As a result, errors such as `NEXT WITHOUT FOR`, `REDIM'D ARRAY`, etc., are not detected.
 
 ## Minify and Tokenize
 
-The extension provides a `minify` command to reduce the memory used by your Applesoft program.  This performs the following transformations on your code:
+The extension provides a `minify` command to reduce the memory used by your Applesoft program.  It creates a new document with the following transformations:
 
-* Strips all comments
-* Reduces variable and function names to the first two characters
+* Strip all comments
+* Reduce variable and function names to the first two characters
 	- reduction can be less if hidden tokens would be introduced
-* Strips unnecessary separators and unquotes
+* Strip unnecessary separators and unquotes
 
-This produces a new document, leaving the existing one unchanged.  Make sure you review and repair all variable name collisions before applying this transformation.
+You are prompted for whether to minify ampersand commands (safe answer is no).  The minifier will not renumber or rearrange lines.  Renumbering can be done using the `renumber lines` command.
 
-As of this writing, `minify` does not include renumbering lines.  This has to be done separately using the `renumber lines` command.
+Make sure you review and repair all variable name collisions before minifying.
 
 If you want to see how much space you have saved, you can use the `show tokenized program` command on the transformed and untransformed code. Note the ending addresses in the two cases.
 
@@ -83,7 +90,9 @@ Copy & Paste | any | No
 
 Although the syntax for ampersand commands is technically arbitrary, the extension imposes limits in order to provide an interpretation.  The minifier will pass over ampersand commands in order to avoid breaking any assumptions made by the user's ampersand parser.  See the upstream parser's [wiki](https://github.com/dfgordon/tree-sitter-applesoft/wiki) for more.
 
-## Using with AppleWin
+## Using with Emulators
+
+### AppleWin
 
 You can transfer programs to and from [AppleWin](https://github.com/AppleWin/AppleWin).  Provided there are no escapes, you can use the emulator's own clipboard functions.  The extension also provides the following save state interactions:
 
@@ -95,7 +104,7 @@ You can transfer programs to and from [AppleWin](https://github.com/AppleWin/App
 
 Operations with the state file are the same on any platform, but [AppleWin](https://github.com/AppleWin/AppleWin) itself is native to Windows.  Note that [AppleWin](https://github.com/AppleWin/AppleWin) is not part of the extension, and must be installed separately.
 
-## Using with Virtual ][
+### Virtual ][
 
 You can transfer programs to and from the [Virtual \]\[](https://virtualii.com) emulator.  Provided there are no escapes, you can use the emulator's own clipboard functions.  The extension also provides the following commands (`Cmd+P`):
 
@@ -115,10 +124,9 @@ You can transfer programs to and from disk images.  As of this writing, the supp
 
 * `applesoft: Save program to disk image`: first you are prompted for the program's load address, after which the file selector is brought up.  After choosing the image file, use the mini-menu to traverse the image's directory tree (if applicable) and select a directory (`.` selects the current level).  Finally enter the name that the saved file will be given on the disk image.  If the file already exists you must respond to a warning.
 
-Another way to load a file from a disk image is with the `Disk Image Notebook` extension (also depends on `a2kit`).
+Another way to access disk images directly from VS Code is with the `Disk Image Notebook` extension.
 
 Recommendations
 
 * do not write to a disk image that is mounted in an emulator
 * backup disk image before writing to it
-* update `a2kit` from time to time (updating the extension itself will not do so)

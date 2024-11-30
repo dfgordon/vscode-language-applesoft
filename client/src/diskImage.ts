@@ -149,8 +149,8 @@ export class A2KitTool extends lxbase.LangExtBase {
 				selecting = await this.select(response);
 				response = await lxbase.request<string[]>("applesoft.disk.pick", [this.currPath(),[]]);
 			} while (selecting);
-
 			response = await lxbase.request<string[]>("applesoft.disk.pick", [this.currPath(), null]);
+
 			const existingFileList = this.getExisting(response);
 			let existingFilesPrompt = "existing files: ";
 			if (existingFileList.length == 0)
