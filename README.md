@@ -54,12 +54,17 @@ As of this writing, the extension analyzes each file in isolation.  For a multi-
 
 The extension provides a `minify` command to reduce the memory used by your Applesoft program.  It creates a new document with the following transformations:
 
-* Strip all comments
-* Reduce variable and function names to the first two characters
-	- reduction can be less if hidden tokens would be introduced
-* Strip unnecessary separators and unquotes
+* Level 1
+	- Strip all comments
+	- Reduce variable and function names to the first two characters
+	- Strip unnecessary separators and unquotes
+* Level 2
+	- Delete unnecessary lines (those starting with `REM`)
+* Level 3
+	- Combine lines where possible
+	- Apply level 1 transformations to ampersand commands
 
-You are prompted for whether to minify ampersand commands (safe answer is no).  The minifier will not renumber or rearrange lines.  Renumbering can be done using the `renumber lines` command.
+The minifier should never break valid, self-contained code.  Levels 2 and 3 could break external code that references line numbers.  The minifier does not renumber.  Renumbering can be done using the `renumber lines` command.
 
 Make sure you review and repair all variable name collisions before minifying.
 

@@ -22,7 +22,7 @@ if (! ($package1.version -match $package2.version)) {
 }
 Write-Output ("package version is " + $package1.version)
 
-$expected_re_patt = "## \[" + $package1.version + "\] - " + (Get-Date -Format yyyy-M-d)
+$expected_re_patt = "## \[" + $package1.version + "\] - " + (Get-Date -Format yyyy-MM-dd)
 if (! ($changelog -match $expected_re_patt)) {
 	Write-Error ("expected pattern " + "not found in the CHANGELOG (" + $expected_re_patt + ")")
 	exit 1

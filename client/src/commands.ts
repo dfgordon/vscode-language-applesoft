@@ -406,12 +406,14 @@ export class TokenizationTool extends lxbase.LangExtBase
 		const proceed = await lxbase.proceedDespiteErrors(verified.doc,'Minifying',undefined);
 		if (!proceed)
 			return;
-		const level_desc = await vscode.window.showQuickPick(['preserve ampersands','minify ampersands'],{canPickMany:false,title:'select minify level'});
+		const level_desc = await vscode.window.showQuickPick(['1 = intraline transforms','2 = delete REM lines','3 = combine lines, transform ampersands'],{canPickMany:false,title:'select minify level'});
 		if (level_desc==undefined)
 			return;
-		let level = 1
-		if (level_desc == 'minify ampersands')
-			level = 3
+		let level = 1;
+		if (level_desc.startsWith('2'))
+			level = 2;
+		if (level_desc.startsWith('3'))
+			level = 3;
 		verified = lxbase.verify_document();
 		if (!verified)
 			return;
