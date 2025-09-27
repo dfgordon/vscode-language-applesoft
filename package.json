@@ -3,7 +3,7 @@
 	"displayName": "Applesoft BASIC",
 	"description": "Language support for Applesoft BASIC",
 	"icon": "language-applesoft-icon.png",
-	"version": "2.2.0",
+	"version": "2.3.0",
 	"license": "GPL-3.0-only",
 	"publisher": "dfgordon",
 	"repository": {
@@ -147,118 +147,118 @@
 		],
 		"commands": [
 			{
-				"command": "applesoft.commentLines",
+				"command": "applesoft.client.commentLines",
 				"title": "applesoft: (Un)Comment Selection"
 			},
 			{
-				"command": "applesoft.renumber",
+				"command": "applesoft.client.renumber",
 				"title": "applesoft: Renumber Lines"
 			},
 			{
-				"command": "applesoft.move",
+				"command": "applesoft.client.move",
 				"title": "applesoft: Move Lines"
 			},
 			{
-				"command": "applesoft.runFrontVii",
+				"command": "applesoft.client.runFrontVii",
 				"title": "applesoft: Run in Virtual ][ front machine"
 			},
 			{
-				"command": "applesoft.enterFrontVii",
+				"command": "applesoft.client.enterFrontVii",
 				"title": "applesoft: Enter in Virtual ][ front machine"
 			},
 			{
-				"command": "applesoft.runNewVii",
+				"command": "applesoft.client.runNewVii",
 				"title": "applesoft: Run in Virtual ][ new machine"
 			},
 			{
-				"command": "applesoft.enterNewVii",
+				"command": "applesoft.client.enterNewVii",
 				"title": "applesoft: Enter in Virtual ][ new machine"
 			},
 			{
-				"command": "applesoft.getFrontVii",
+				"command": "applesoft.client.getFrontVii",
 				"title": "applesoft: Insert program from Virtual ][ front machine"
 			},
 			{
-				"command": "applesoft.getAppleWinSaveState",
+				"command": "applesoft.client.getAppleWinSaveState",
 				"title": "applesoft: Insert program from AppleWin save state"
 			},
 			{
-				"command": "applesoft.setAppleWinSaveState",
+				"command": "applesoft.client.setAppleWinSaveState",
 				"title": "applesoft: Store program in AppleWin save state"
 			},
 			{
-				"command": "applesoft.getFromDiskImage",
+				"command": "applesoft.client.getFromDiskImage",
 				"title": "applesoft: Insert program from disk image"
 			},
 			{
-				"command": "applesoft.saveToDiskImage",
+				"command": "applesoft.client.saveToDiskImage",
 				"title": "applesoft: Save program to disk image"
 			},
 			{
-				"command": "applesoft.showTokenizedProgram",
+				"command": "applesoft.client.showTokenizedProgram",
 				"title": "applesoft: Show tokenized program"
 			},
 			{
-				"command": "applesoft.minify",
+				"command": "applesoft.client.minify",
 				"title": "applesoft: Minify"
 			}
 		],
 		"menus": {
 			"commandPalette": [
 				{
-					"command": "applesoft.commentLines",
+					"command": "applesoft.client.commentLines",
 					"when": "editorLangId == applesoft"
 				},
 				{
-					"command": "applesoft.renumber",
+					"command": "applesoft.client.renumber",
 					"when": "editorLangId == applesoft"
 				},
 				{
-					"command": "applesoft.move",
+					"command": "applesoft.client.move",
 					"when": "editorLangId == applesoft"
 				},
 				{
-					"command": "applesoft.runFrontVii",
+					"command": "applesoft.client.runFrontVii",
 					"when": "editorLangId == applesoft"
 				},
 				{
-					"command": "applesoft.enterFrontVii",
+					"command": "applesoft.client.enterFrontVii",
 					"when": "editorLangId == applesoft"
 				},
 				{
-					"command": "applesoft.runNewVii",
+					"command": "applesoft.client.runNewVii",
 					"when": "editorLangId == applesoft"
 				},
 				{
-					"command": "applesoft.enterNewVii",
+					"command": "applesoft.client.enterNewVii",
 					"when": "editorLangId == applesoft"
 				},
 				{
-					"command": "applesoft.getFrontVii",
+					"command": "applesoft.client.getFrontVii",
 					"when": "editorLangId == applesoft"
 				},
 				{
-					"command": "applesoft.getAppleWinSaveState",
+					"command": "applesoft.client.getAppleWinSaveState",
 					"when": "editorLangId == applesoft"
 				},
 				{
-					"command": "applesoft.setAppleWinSaveState",
+					"command": "applesoft.client.setAppleWinSaveState",
 					"when": "editorLangId == applesoft"
 				},
 				{
-					"command": "applesoft.getFromDiskImage",
+					"command": "applesoft.client.getFromDiskImage",
 					"when": "editorLangId == applesoft"
 				},
 				{
-					"command": "applesoft.saveToDiskImage",
+					"command": "applesoft.client.saveToDiskImage",
 					"when": "editorLangId == applesoft"
 				},
 				{
-					"command": "applesoft.showTokenizedProgram",
+					"command": "applesoft.client.showTokenizedProgram",
 					"when": "editorLangId == applesoft"
 				},
 				{
-					"command": "applesoft.minify",
+					"command": "applesoft.client.minify",
 					"when": "editorLangId == applesoft"
 				}
 			]

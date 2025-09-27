@@ -96,8 +96,8 @@ export function activate(context: vscode.ExtensionContext)
 			const vstr = client.initializeResult.serverInfo.version;
 			client.outputChannel.appendLine("Server version is " + vstr);
 			const v= vstr.split('.')
-			if (parseInt(v[0]) != 3) {
-				vscode.window.showErrorMessage('Server version is ' + vstr + ', expected 3.x, stopping.');
+			if (parseInt(v[0]) != 4) {
+				vscode.window.showErrorMessage('Server version is ' + vstr + ', expected 4.x, stopping.');
 				client.stop();
 			}
 		} else {
@@ -115,20 +115,20 @@ export function activate(context: vscode.ExtensionContext)
 	const highlighter = new tok.SemanticTokensProvider();
 	highlighter.register();
 
-	context.subscriptions.push(vscode.commands.registerCommand("applesoft.runNewVii",viiEntry.runNewVirtualII,viiEntry));
-	context.subscriptions.push(vscode.commands.registerCommand("applesoft.runFrontVii",viiEntry.runFrontVirtualII,viiEntry));
-	context.subscriptions.push(vscode.commands.registerCommand("applesoft.enterNewVii",viiEntry.enterNewVirtualII,viiEntry));
-	context.subscriptions.push(vscode.commands.registerCommand("applesoft.enterFrontVii",viiEntry.enterFrontVirtualII,viiEntry));
-	context.subscriptions.push(vscode.commands.registerCommand("applesoft.getFrontVii",viiEntry.getFrontVirtualII,viiEntry));
-	context.subscriptions.push(vscode.commands.registerCommand("applesoft.getAppleWinSaveState",appleWin.getAppleWinSaveState,appleWin));
-	context.subscriptions.push(vscode.commands.registerCommand("applesoft.setAppleWinSaveState", appleWin.setAppleWinSaveState, appleWin));
-	context.subscriptions.push(vscode.commands.registerCommand("applesoft.getFromDiskImage", a2kit.getApplesoftFile, a2kit));
-	context.subscriptions.push(vscode.commands.registerCommand("applesoft.saveToDiskImage", a2kit.putApplesoftFile, a2kit));
-	context.subscriptions.push(vscode.commands.registerCommand("applesoft.showTokenizedProgram",tokenizer.showTokenizedProgram,tokenizer));
-	context.subscriptions.push(vscode.commands.registerCommand("applesoft.renumber", renumberer.renumber, renumberer));
-	context.subscriptions.push(vscode.commands.registerCommand("applesoft.move", renumberer.move, renumberer));
-	context.subscriptions.push(vscode.commands.registerCommand("applesoft.minify", tokenizer.minify_program, tokenizer));
-	context.subscriptions.push(vscode.commands.registerTextEditorCommand("applesoft.commentLines",com.commentLinesCommand));
+	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.runNewVii",viiEntry.runNewVirtualII,viiEntry));
+	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.runFrontVii",viiEntry.runFrontVirtualII,viiEntry));
+	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.enterNewVii",viiEntry.enterNewVirtualII,viiEntry));
+	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.enterFrontVii",viiEntry.enterFrontVirtualII,viiEntry));
+	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.getFrontVii",viiEntry.getFrontVirtualII,viiEntry));
+	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.getAppleWinSaveState",appleWin.getAppleWinSaveState,appleWin));
+	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.setAppleWinSaveState", appleWin.setAppleWinSaveState, appleWin));
+	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.getFromDiskImage", a2kit.getApplesoftFile, a2kit));
+	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.saveToDiskImage", a2kit.putApplesoftFile, a2kit));
+	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.showTokenizedProgram",tokenizer.showTokenizedProgram,tokenizer));
+	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.renumber", renumberer.renumber, renumberer));
+	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.move", renumberer.move, renumberer));
+	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.minify", tokenizer.minify_program, tokenizer));
+	context.subscriptions.push(vscode.commands.registerTextEditorCommand("applesoft.client.commentLines",com.commentLinesCommand));
 }
 
 export function deactivate(): Thenable<void> | undefined {
