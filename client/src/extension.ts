@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as lxbase from './langExtBase';
 import * as tok from './semanticTokens';
 import * as com from './commands';
 import * as dimg from './diskImage';
@@ -129,6 +130,22 @@ export function activate(context: vscode.ExtensionContext)
 	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.move", renumberer.move, renumberer));
 	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.minify", tokenizer.minify_program, tokenizer));
 	context.subscriptions.push(vscode.commands.registerTextEditorCommand("applesoft.client.commentLines",com.commentLinesCommand));
+
+	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
+		if (editor?.document.languageId == 'applesoft') {
+			if (vscode.workspace.workspaceFolders) {
+				try {
+					lxbase.request<null>("applesoft.activeEditorChanged", [
+						editor.document.uri.toString()
+					]);
+				} catch (error) {
+					if (error instanceof Error)
+						vscode.window.showErrorMessage(error.message);
+				}
+			}
+		}
+	}));
+
 }
 
 export function deactivate(): Thenable<void> | undefined {
