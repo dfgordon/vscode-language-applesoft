@@ -4,13 +4,13 @@
 
 Language support for Applesoft BASIC in Visual Studio Code.
 
-* Semantic highlights true to Apple //e ROM parsing
+* Syntax highlights true to Apple //e ROM parsing
 * Comprehensive diagnostics, completions, and hovers
 * Management of variables, functions, and line numbers
 * Interact with [emulators](#using-with-emulators) and [disk images](#using-with-disk-images)
 * Generate hex dump of tokenized program
 
-Activates for file extensions `.bas`, `.abas`, `.A`
+Activates for file extensions `.bas`, `.abas`
 
 <img src="sample/demo.gif" alt="session capture"/>
 
@@ -38,17 +38,28 @@ Variables and functions only appear in the symbol outline where they are assigne
 
 ## Declarations and Definitions
 
-The `DIM` statement is the only item we recognize as a declaration.  Using `goto declaration` on an array reference will find all the places in the file where it is dimensioned.
+The `DIM` statement is the only item we recognize as a declaration.  Using `goto declaration` on an array reference will find all the places in the program where it is dimensioned.  Also works with multi-file programs.
 
-Using `goto definition` on a non-array variable will find all the places in the file where it is assigned or read from an input source.
+Using `goto definition` on a non-array variable will find all the places in the program where it is assigned or read from an input source.  Also works with multi-file programs.
 
 Using `goto definition` on a function will find the function definition.
 
 Using `goto definition` on a line number reference will find the line.
 
-## Multi-File Programs and Program Flow
+## Multi-File Programs
 
-As of this writing, the extension analyzes each file in isolation.  For a multi-file project it may be desirable to suppress warnings related to undeclared or unassigned variables (see extension settings).  Also as of this writing, analysis of program flow is very limited.  As a result, errors such as `NEXT WITHOUT FOR`, `REDIM'D ARRAY`, etc., are not detected.
+Applesoft variables are passed from program to program using the ProDOS CHAIN command, or a special CALL in the case of DOS.  The extension will fully analyze the CHAIN relationships between files and use this information to improve detection of undeclared, undefined, and colliding variables.
+
+It is possible to miss the ProDOS chain pattern due to the many ways a programmer could create it, e.g. `PRINT A$` could be a CHAIN.  To avoid this problem:
+
+* Isolate the hook as either `CHR$(4)`, a separate string variable, or a literal ASCII 4
+* Always keep the CHAIN command literal
+* Always keep the program name literal (but a leading path variable is OK)
+
+In analyzing the CHAIN relationships it is necessary to match program names and source names.  The extension will rank the files it finds in the workspace based on matching names and path fragments.  For the matching to succeed:
+
+* Use `.bas` or `.abas` for the source files
+* The program name in the CHAIN command should not include the filename extension
 
 ## Minify and Tokenize
 
@@ -76,7 +87,7 @@ The extension knows hundreds of special address locations relevant to Applesoft,
 
 ## Hex Escapes
 
-Some Applesoft programs, especially those written in the early days, have `CR`, `LF`, or other control characters embedded in strings, comments, or data.  Hex escapes are used to allow such files to be parsed as normal line entry.  For example, `REM first line\x0anext line` uses `\x0a` to represent a line feed in the comment.
+Some Applesoft programs have `CR`, `LF`, or other control characters embedded in strings, comments, or data.  Hex escapes are used to allow such files to be parsed as normal line entry.  For example, `REM first line\x0anext line` uses `\x0a` to represent a line feed in the comment.
 
 The extension evaluates *only* hex escapes.  Sequences like `\n`, `\\`, etc. are always treated literally.  If you need to escape the escape, hex-escape it, e.g. `\xff` can be escaped as `\x5cxff`.
 

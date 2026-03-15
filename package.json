@@ -3,7 +3,7 @@
 	"displayName": "Applesoft BASIC",
 	"description": "Language support for Applesoft BASIC",
 	"icon": "language-applesoft-icon.png",
-	"version": "2.3.1",
+	"version": "2.4.0",
 	"license": "GPL-3.0-only",
 	"publisher": "dfgordon",
 	"repository": {
@@ -138,8 +138,7 @@
 				"id": "applesoft",
 				"extensions": [
 					".bas",
-					".abas",
-					".A"
+					".abas"
 				],
 				"firstLine": "^ *[0-9][0-9 ]*.*(HOME|home|HGR|hgr|HTAB|htab|ONERR|onerr|DEF FN|def fn).*",
 				"configuration": "./language-configuration.json"
