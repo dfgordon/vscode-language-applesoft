@@ -17,21 +17,21 @@ jobs:
     # Actual deployment will use a bundled a2kit language server.
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [24.x]
         OS: [ubuntu-latest,macos-latest,windows-latest]
 
     runs-on: ${{ matrix.OS }}
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install --include=dev
     - name: Cargo cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           ~/.cargo/registry
