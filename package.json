@@ -3,7 +3,7 @@
 	"displayName": "Applesoft BASIC",
 	"description": "Language support for Applesoft BASIC",
 	"icon": "language-applesoft-icon.png",
-	"version": "2.4.1",
+	"version": "2.5.0",
 	"license": "GPL-3.0-only",
 	"publisher": "dfgordon",
 	"repository": {
@@ -200,6 +200,10 @@
 			{
 				"command": "applesoft.client.minify",
 				"title": "applesoft: Minify"
+			},
+			{
+				"command": "applesoft.client.selectBacklink",
+				"title": "applesoft: Select chain backlink"
 			}
 		],
 		"menus": {
@@ -258,6 +262,10 @@
 				},
 				{
 					"command": "applesoft.client.minify",
+					"when": "editorLangId == applesoft"
+				},
+				{
+					"command": "applesoft.client.selectBacklink",
 					"when": "editorLangId == applesoft"
 				}
 			]

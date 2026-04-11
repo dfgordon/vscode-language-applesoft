@@ -50,6 +50,8 @@ Using `goto definition` on a line number reference will find the line.
 
 Applesoft variables are passed from program to program using the ProDOS CHAIN command, or a special CALL in the case of DOS.  The extension will fully analyze the CHAIN relationships between files and use this information to improve detection of undeclared, undefined, and colliding variables.
 
+You can use the `backlink` button on the lower toolbar to view or open files that chain to the active file.  You can use `Ctrl-t` to see the variables that are declared or defined (see above) in the scope of the chained files.
+
 It is possible to miss the ProDOS chain pattern due to the many ways a programmer could create it, e.g. `PRINT A$` could be a CHAIN.  To avoid this problem:
 
 * Isolate the hook as either `CHR$(4)`, a separate string variable, or a literal ASCII 4

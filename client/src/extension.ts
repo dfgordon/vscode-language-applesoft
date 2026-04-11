@@ -107,14 +107,25 @@ export function activate(context: vscode.ExtensionContext)
 	});
 	client.outputChannel.appendLine("using server " + serverCommand);
 
+	const chainButton = vscode.window.createStatusBarItem();
+	chainButton.text = "backlinks";
+	chainButton.tooltip = "switch to a CHAIN backlink";
+	chainButton.command = "applesoft.client.selectBacklink";
+
 	const renumberer = new com.RenumberTool(context);
 	const viiEntry = new com.ViiEntryTool(context);
 	const appleWin = new com.AppleWinTool(context);
 	const a2kit = new dimg.A2KitTool(context);
 	const tokenizer = new com.TokenizationTool(context);
+	const backlinkSelect = new com.BacklinkSelect(chainButton);
 
 	const highlighter = new tok.SemanticTokensProvider();
 	highlighter.register();
+
+	const startEditor = vscode.window.activeTextEditor;
+	if (startEditor?.document.languageId == "applesoft") {
+		chainButton.show();
+	}
 
 	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.runNewVii",viiEntry.runNewVirtualII,viiEntry));
 	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.runFrontVii",viiEntry.runFrontVirtualII,viiEntry));
@@ -129,10 +140,12 @@ export function activate(context: vscode.ExtensionContext)
 	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.renumber", renumberer.renumber, renumberer));
 	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.move", renumberer.move, renumberer));
 	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.minify", tokenizer.minify_program, tokenizer));
+	context.subscriptions.push(vscode.commands.registerCommand("applesoft.client.selectBacklink", backlinkSelect.selectBacklink, backlinkSelect));
 	context.subscriptions.push(vscode.commands.registerTextEditorCommand("applesoft.client.commentLines",com.commentLinesCommand));
 
 	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
 		if (editor?.document.languageId == 'applesoft') {
+			chainButton.show();
 			if (vscode.workspace.workspaceFolders) {
 				try {
 					lxbase.request<null>("applesoft.activeEditorChanged", [
@@ -143,6 +156,8 @@ export function activate(context: vscode.ExtensionContext)
 						vscode.window.showErrorMessage(error.message);
 				}
 			}
+		} else {
+			chainButton.hide();
 		}
 	}));
 

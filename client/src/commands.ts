@@ -28,6 +28,70 @@ function extended_selection(textEditor: vscode.TextEditor) : vscode.Range | unde
 	return undefined;
 }
 
+export class BacklinkSelect
+{
+	contextIndicator: vscode.StatusBarItem;
+	constructor(ind: vscode.StatusBarItem) {
+		this.contextIndicator = ind;
+	}
+	async selectBacklink()
+	{
+		let verified = lxbase.verify_document();
+		if (!verified)
+			return;
+		const display_uri = verified.doc.uri;
+		const ws_uri = vscode.workspace.getWorkspaceFolder(display_uri)?.uri;
+		if (!ws_uri)
+			return;
+		try {
+			let max_depth = 0;
+			let sel: string | undefined | null = null;
+			while (sel === null) {
+				const backlink_list = await lxbase.request<string[]>('applesoft.getBacklinks', [
+					max_depth,
+					display_uri.toString(),
+					ws_uri.toString()
+				]);
+				if (!backlink_list || backlink_list.length == 0) {
+					vscode.window.showInformationMessage("no backlinks were found");
+					return;
+				}
+				backlink_list.push("change recursion depth...");
+				sel = await vscode.window.showQuickPick(backlink_list);
+				if (sel == "change recursion depth...") {
+					const ans = await vscode.window.showInputBox({
+						title: "recursion depth",
+						value: max_depth.toString(),
+						validateInput: (s) => {
+							const v = parseInt(s);
+							if (v >= 0 && v < 33) {
+								return null;
+							}
+							return "value out of range"
+						}
+					});
+					if (!ans)
+						return;
+					max_depth = parseInt(ans);
+					sel = null;
+				}
+			}
+			if (!sel)
+				return;
+			verified = lxbase.verify_document();
+			if (!verified)
+				return;
+			if (verified.doc.uri != display_uri)
+				return;
+			const sel_path = path.join(ws_uri.fsPath, sel);
+			vscode.window.showTextDocument(vscode.Uri.file(sel_path));
+		} catch (error) {
+			if (error instanceof Error)
+				vscode.window.showErrorMessage(error.message);
+		}
+	}
+}
+
 export class RenumberTool extends lxbase.LangExtBase
 {
 	async renumber_or_move(cmd: string)
